@@ -87,6 +87,14 @@ async function runTests() {
     assert(stats.size > 10000, `Taille de jaquette valide (${stats.size} octets)`);
     fs.unlinkSync(testCoverDest);
   }
+
+  const failedCoverDest = path.join(tempDir, 'failed_cover.png');
+  const failedDownload = await scraper.downloadImage(
+    'https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Super_Nintendo_Entertainment_System/master/Named_Boxarts/This%20Cover%20Does%20Not%20Exist.png',
+    failedCoverDest
+  );
+  assert(!failedDownload && !fs.existsSync(failedCoverDest), 'Échec de téléchargement sans fichier cache incomplet');
+
   fs.rmdirSync(tempDir);
 
   // Test 5: Mode Kiosk & Sécurité

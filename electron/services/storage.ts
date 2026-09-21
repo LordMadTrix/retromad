@@ -16,14 +16,25 @@ export class StorageService {
     }
 
     this.mediaDir = path.join(this.dataDir, 'media');
-    if (!fs.existsSync(this.mediaDir)) {
-      fs.mkdirSync(this.mediaDir, { recursive: true });
-      fs.mkdirSync(path.join(this.mediaDir, 'boxarts'), { recursive: true });
-      fs.mkdirSync(path.join(this.mediaDir, 'snaps'), { recursive: true });
-    }
+    fs.mkdirSync(this.mediaDir, { recursive: true });
+    fs.mkdirSync(path.join(this.mediaDir, 'boxarts'), { recursive: true });
+    fs.mkdirSync(path.join(this.mediaDir, 'snaps'), { recursive: true });
 
     this.settingsFile = path.join(this.dataDir, 'settings.json');
     this.gamesFile = path.join(this.dataDir, 'games.json');
+  }
+
+  private writeJsonAtomically(filePath: string, value: unknown): void {
+    const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    try {
+      fs.writeFileSync(temporaryPath, JSON.stringify(value, null, 2), 'utf-8');
+      fs.renameSync(temporaryPath, filePath);
+    } catch (error) {
+      if (fs.existsSync(temporaryPath)) {
+        fs.unlinkSync(temporaryPath);
+      }
+      throw error;
+    }
   }
 
   getDefaultSettings(): AppSettings {
@@ -69,7 +80,7 @@ export class StorageService {
   saveSettings(settings: Partial<AppSettings>): AppSettings {
     const current = this.getSettings();
     const updated = { ...current, ...settings };
-    fs.writeFileSync(this.settingsFile, JSON.stringify(updated, null, 2), 'utf-8');
+    this.writeJsonAtomically(this.settingsFile, updated);
     return updated;
   }
 
@@ -86,7 +97,7 @@ export class StorageService {
   }
 
   saveGames(games: Game[]): void {
-    fs.writeFileSync(this.gamesFile, JSON.stringify(games, null, 2), 'utf-8');
+    this.writeJsonAtomically(this.gamesFile, games);
   }
 
   getDataDir(): string {

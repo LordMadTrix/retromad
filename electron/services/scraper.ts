@@ -10,34 +10,79 @@ export class ScraperService {
   /**
    * Télécharge une image depuis une URL et la sauvegarde localement
    */
-  async downloadImage(url: string, destPath: string): Promise<boolean> {
+  async downloadImage(url: string, destPath: string, redirectCount = 0): Promise<boolean> {
+    if (redirectCount > 5) {
+      console.warn(`[Scraper] Trop de redirections pour ${url}`);
+      return false;
+    }
+
     return new Promise((resolve) => {
-      const parsedUrl = new URL(url);
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        console.warn(`[Scraper] URL d'image invalide : ${url}`);
+        resolve(false);
+        return;
+      }
+
       const client = parsedUrl.protocol === 'https:' ? https : http;
 
       const request = client.get(url, { headers: { 'User-Agent': 'RetroMad-Scraper/1.0' } }, (res) => {
-        // Suivre les redirections (301, 302)
         if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          return this.downloadImage(res.headers.location, destPath).then(resolve);
+          res.resume();
+          const redirectUrl = new URL(res.headers.location, parsedUrl).toString();
+          this.downloadImage(redirectUrl, destPath, redirectCount + 1).then(resolve);
+          return;
         }
 
         if (res.statusCode !== 200) {
           res.resume();
-          return resolve(false);
+          resolve(false);
+          return;
         }
 
-        const fileStream = fs.createWriteStream(destPath);
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+        const temporaryPath = `${destPath}.${process.pid}.${Date.now()}.download`;
+        const fileStream = fs.createWriteStream(temporaryPath);
+        let completed = false;
+        const cleanup = () => {
+          if (fs.existsSync(temporaryPath)) {
+            fs.unlinkSync(temporaryPath);
+          }
+        };
+        const finish = (success: boolean) => {
+          if (completed) return;
+          completed = true;
+          cleanup();
+          resolve(success);
+        };
+
         res.pipe(fileStream);
 
         fileStream.on('finish', () => {
-          fileStream.close();
-          resolve(true);
+          fileStream.close((error) => {
+            if (error) {
+              finish(false);
+              return;
+            }
+
+            try {
+              fs.renameSync(temporaryPath, destPath);
+              completed = true;
+              resolve(true);
+            } catch (renameError) {
+              console.warn(`[Scraper] Impossible de mettre l'image en cache : ${destPath}`, renameError);
+              finish(false);
+            }
+          });
         });
 
         fileStream.on('error', () => {
-          fs.unlink(destPath, () => {});
-          resolve(false);
+          finish(false);
         });
+
+        res.on('error', () => finish(false));
       });
 
       request.on('error', () => {
