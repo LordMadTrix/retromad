@@ -1,0 +1,72 @@
+{
+  "name": "retromad",
+  "version": "1.0.0",
+  "description": "Frontend Retrogaming Moderne compatible Windows et Linux",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev:vite": "vite",
+    "build:vite": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "dev": "concurrently -k -r \"npm run dev:vite\" \"wait-on tcp:5173 && npm run build:electron && electron .\"",
+    "build": "npm run build:vite && npm run build:electron",
+    "start": "ELECTRON_FORCE_PROD=1 electron .",
+    "test": "npx tsx test/verify.ts",
+    "dist": "npm run build && electron-builder",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "retrogaming",
+    "frontend",
+    "emulator",
+    "roms",
+    "screenscraper",
+    "libretro"
+  ],
+  "author": "RetroMad Team",
+  "license": "MIT",
+  "dependencies": {
+    "lucide-react": "^1.16.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.retromad.frontend",
+    "productName": "RetroMad",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Game"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  }
+}

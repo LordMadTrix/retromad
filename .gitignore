@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-electron/
+release/
+.retromad_data/
+.directory
+*.log
+.DS_Store

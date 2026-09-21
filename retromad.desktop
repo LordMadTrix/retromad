@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=RetroMad
+Comment=Frontend Retrogaming Moderne (Windows & Linux)
+GenericName=Frontend Retrogaming
+Exec=/home/madtrix/Dev/retromad/launch.sh
+Icon=/home/madtrix/Dev/retromad/public/retromad.svg
+Terminal=false
+Type=Application
+Categories=Game;Emulator;ArcadeGame;
+StartupNotify=true
+StartupWMClass=retromad
+Keywords=retro;gaming;arcade;emulator;roms;nes;snes;sega;playstation;
