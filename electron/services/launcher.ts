@@ -113,17 +113,6 @@ export class LauncherService {
     const targetEmulatorId = preferredEmulatorId || (settings.systemLaunchers && settings.systemLaunchers[game.systemId]) || 'retroarch';
     const emuProfile = BUILTIN_EMULATORS.find(e => e.id === targetEmulatorId) || BUILTIN_EMULATORS[0];
 
-    // Mise à jour des statistiques de jeu
-    game.playCount = (game.playCount || 0) + 1;
-    game.lastPlayed = new Date().toISOString();
-
-    const games = storage.getGames();
-    const idx = games.findIndex(g => g.id === game.id);
-    if (idx >= 0) {
-      games[idx] = game;
-      storage.saveGames(games);
-    }
-
     let executable = isWindows ? emuProfile.executableWindows : emuProfile.executableLinux;
     let template = isWindows ? emuProfile.argsTemplateWindows : emuProfile.argsTemplateLinux;
 
@@ -159,6 +148,29 @@ export class LauncherService {
         detached: true,
         stdio: 'ignore'
       });
+
+      const spawnError = await new Promise<Error | null>((resolve) => {
+        child.once('spawn', () => resolve(null));
+        child.once('error', resolve);
+      });
+
+      if (spawnError) {
+        console.error(`[Launcher] Échec du démarrage de ${emuProfile.name}:`, spawnError);
+        return {
+          success: false,
+          message: `Impossible de démarrer ${emuProfile.name} : ${spawnError.message}`
+        };
+      }
+
+      // Ne comptabiliser la session qu'après la création effective du processus.
+      game.playCount = (game.playCount || 0) + 1;
+      game.lastPlayed = new Date().toISOString();
+      const games = storage.getGames();
+      const idx = games.findIndex((savedGame) => savedGame.id === game.id);
+      if (idx >= 0) {
+        games[idx] = game;
+        storage.saveGames(games);
+      }
 
       // Suivi précis du temps de jeu effectif lors de la fermeture de l'émulateur
       child.on('exit', () => {

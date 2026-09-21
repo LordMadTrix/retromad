@@ -51,6 +51,26 @@ async function runTests() {
   const sysPce = scanner.identifySystem('/path/to/roms/random/game.pce', 'random');
   assert(sysPce === 'pcengine', `Identification PC Engine par extension unique: "${sysPce}"`);
 
+  const scanFixtureDir = fs.mkdtempSync(path.join(process.cwd(), '.retromad-scan-test-'));
+  try {
+    const nestedSnesDir = path.join(scanFixtureDir, 'snes', 'homebrew');
+    const standardSnesDir = path.join(scanFixtureDir, 'snes', 'retail');
+    fs.mkdirSync(nestedSnesDir, { recursive: true });
+    fs.mkdirSync(standardSnesDir, { recursive: true });
+    fs.writeFileSync(path.join(nestedSnesDir, 'Test Game (USA).sfc'), 'nested rom');
+    fs.writeFileSync(path.join(standardSnesDir, 'Test Game (USA).sfc'), 'standard rom');
+
+    const scannedFixtureGames = await scanner.scanDirectory(scanFixtureDir);
+    assert(scannedFixtureGames.length === 2, 'Scan récursif des ROMs dans les sous-dossiers d’une console');
+    assert(
+      scannedFixtureGames.every((game) => game.systemId === 'snes') &&
+      new Set(scannedFixtureGames.map((game) => game.id)).size === 2,
+      'Identification SNES héritée et identifiants uniques pour des ROMs homonymes'
+    );
+  } finally {
+    fs.rmSync(scanFixtureDir, { recursive: true, force: true });
+  }
+
   // Test 4: Téléchargement en direct d'une jaquette via Libretro CDN
   console.log('\n--- Test Scraping Live Libretro CDN ---');
   const tempDir = path.join(__dirname, 'temp_media');

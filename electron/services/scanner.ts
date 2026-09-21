@@ -23,6 +23,18 @@ for (let i = 0; i < 256; i++) {
 }
 
 export class ScannerService {
+  private identifySystemFolder(folderName: string): string | null {
+    const normalizedFolder = folderName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const system = SYSTEMS.find((candidate) => {
+      const subfolder = candidate.subfolder.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const id = candidate.id.toLowerCase();
+      const shortName = candidate.shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return normalizedFolder === subfolder || normalizedFolder === id || normalizedFolder === shortName;
+    });
+
+    return system?.id ?? null;
+  }
+
   /**
    * Nettoie le nom de fichier pour obtenir le titre propre du jeu
    * Exemple : "Super Mario World (USA) [!].sfc" -> "Super Mario World"
@@ -87,13 +99,7 @@ export class ScannerService {
     const ext = path.extname(filePath).toLowerCase();
 
     // 1. Chercher par nom de sous-dossier (ex: /roms/snes/ -> snes)
-    const normalizedDir = parentDirName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const matchedByDir = SYSTEMS.find(s => {
-      const sub = s.subfolder.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const id = s.id.toLowerCase();
-      const short = s.shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      return normalizedDir === sub || normalizedDir === id || normalizedDir === short;
-    });
+    const matchedByDir = SYSTEMS.find((system) => system.id === this.identifySystemFolder(parentDirName));
 
     if (matchedByDir && matchedByDir.extensions.includes(ext)) {
       return matchedByDir.id;
@@ -126,7 +132,7 @@ export class ScannerService {
     const allExtensions = Array.from(new Set(SYSTEMS.flatMap(s => s.extensions)));
     let scannedCount = 0;
 
-    const walk = async (currentDir: string, parentDirName: string) => {
+    const walk = async (currentDir: string, inheritedSystemId: string | null) => {
       let entries: fs.Dirent[] = [];
       try {
         entries = await fs.promises.readdir(currentDir, { withFileTypes: true });
@@ -134,11 +140,15 @@ export class ScannerService {
         return;
       }
 
+      const systemIdForDirectory = this.identifySystemFolder(path.basename(currentDir)) || inheritedSystemId;
+
       for (const entry of entries) {
         const fullPath = path.join(currentDir, entry.name);
 
         if (entry.isDirectory()) {
-          await walk(fullPath, entry.name);
+          if (!entry.name.startsWith('.')) {
+            await walk(fullPath, systemIdForDirectory);
+          }
         } else if (entry.isFile()) {
           const ext = path.extname(entry.name).toLowerCase();
           if (allExtensions.includes(ext)) {
@@ -147,14 +157,25 @@ export class ScannerService {
               onProgress(scannedCount, entry.name);
             }
 
-            const systemId = this.identifySystem(fullPath, parentDirName);
+            const inferredSystem = systemIdForDirectory
+              ? SYSTEMS.find((system) => system.id === systemIdForDirectory)
+              : undefined;
+            const systemId = inferredSystem?.extensions.includes(ext)
+              ? inferredSystem.id
+              : this.identifySystem(fullPath, path.basename(currentDir));
             if (systemId) {
               const { cleanTitle, region } = this.cleanTitle(entry.name);
-              const stats = await fs.promises.stat(fullPath);
+              let stats: fs.Stats;
+              try {
+                stats = await fs.promises.stat(fullPath);
+              } catch (error) {
+                console.warn(`[Scanner] ROM ignorée, lecture impossible : ${fullPath}`, error);
+                continue;
+              }
               const { md5, crc32 } = await this.getFileHashes(fullPath);
 
               const game: Game = {
-                id: `${systemId}_${Buffer.from(entry.name).toString('base64').replace(/[^a-zA-Z0-9]/g, '')}`,
+                id: `${systemId}_${crypto.createHash('sha256').update(path.resolve(fullPath)).digest('hex').slice(0, 24)}`,
                 systemId,
                 title: path.basename(entry.name, ext),
                 cleanTitle,
@@ -178,7 +199,7 @@ export class ScannerService {
       }
     };
 
-    await walk(dirPath, path.basename(dirPath));
+    await walk(dirPath, null);
     return games;
   }
 }
