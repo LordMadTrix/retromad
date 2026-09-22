@@ -121,11 +121,19 @@ ipcMain.handle('select-directory', async () => {
 });
 
 ipcMain.handle('get-systems', async () => {
-  return SYSTEMS;
+  return storage.getSystems();
+});
+
+ipcMain.handle('save-systems', async (_, systems) => {
+  return storage.saveSystems(systems);
 });
 
 ipcMain.handle('get-companies', async () => {
-  return COMPANIES;
+  return storage.getCompanies();
+});
+
+ipcMain.handle('save-companies', async (_, companies) => {
+  return storage.saveCompanies(companies);
 });
 
 ipcMain.handle('get-games', async () => {
@@ -229,7 +237,11 @@ ipcMain.handle('launch-game', async (_, game: Game, emulatorId?: string) => {
 });
 
 ipcMain.handle('get-emulators', async () => {
-  return BUILTIN_EMULATORS;
+  return storage.getEmulators();
+});
+
+ipcMain.handle('save-emulators', async (_, emulators) => {
+  return storage.saveEmulators(emulators);
 });
 
 ipcMain.handle('detect-emulators', async () => {

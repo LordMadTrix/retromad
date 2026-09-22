@@ -206,12 +206,19 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         )}
                       </div>
                       <div className="flex items-center space-x-2 mt-0.5">
-                        <span
-                          className="text-[10px] font-bold px-1.5 py-0.5 rounded font-mono"
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectSystem(game.systemId);
+                            onClose();
+                          }}
+                          title={`Filtrer par console : ${sys?.name || game.systemId}`}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded font-mono hover:opacity-80 transition cursor-pointer"
                           style={{ backgroundColor: `${sys?.themeColor || '#00f2fe'}22`, color: sys?.themeColor || '#00f2fe' }}
                         >
                           {sys?.shortName || game.systemId}
-                        </span>
+                        </button>
                         {game.metadata?.developer && (
                           <span className="text-[11px] text-slate-400 truncate">{game.metadata.developer}</span>
                         )}

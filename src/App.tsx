@@ -9,21 +9,52 @@ import { GameGrid } from './components/GameGrid';
 import { GameDetailModal } from './components/GameDetailModal';
 import { CompanyView } from './components/CompanyView';
 import { BiosManager } from './components/BiosManager';
-import { SettingsModal } from './components/SettingsModal';
+import { AdminHubModal } from './components/AdminHubModal';
+import { GameEditModal } from './components/GameEditModal';
+import { SystemEditModal } from './components/SystemEditModal';
+import { CompanyEditModal } from './components/CompanyEditModal';
 import { ScraperModal } from './components/ScraperModal';
 import { ExtensionsDownloaderModal } from './components/ExtensionsDownloaderModal';
 import { KioskPinModal } from './components/KioskPinModal';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { ConsoleExhibitionModal } from './components/ConsoleExhibitionModal';
+import { CompanyExhibitionModal } from './components/CompanyExhibitionModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { KioskAttractMode } from './components/KioskAttractMode';
 import { GamepadHint } from './components/GamepadHint';
 import { useGamepad } from './hooks/useGamepad';
 import { useAudio } from './hooks/useAudio';
+import {
+  RetroAchievement,
+  GameCheat,
+  SaveStateItem,
+  DailyChallenge,
+  PlayerProfile,
+  BezelConfig,
+} from './types/retroFeatures';
+import {
+  INITIAL_ACHIEVEMENTS,
+  INITIAL_PLAYER_PROFILE,
+  INITIAL_CHEATS,
+  INITIAL_SAVESTATES,
+  INITIAL_MANUALS,
+  INITIAL_BEZELS,
+  INITIAL_DAILY_CHALLENGES,
+} from './data/retroFeaturesData';
+import { useRetroJukebox } from './hooks/useRetroJukebox';
+import { RetroAchievementsModal } from './components/retro/RetroAchievementsModal';
+import { RetroCheatsModal } from './components/retro/RetroCheatsModal';
+import { RetroSaveStatesModal } from './components/retro/RetroSaveStatesModal';
+import { RetroJukeboxModal } from './components/retro/RetroJukeboxModal';
+import { RetroJukeboxFloatingPlayer } from './components/retro/RetroJukeboxFloatingPlayer';
+import { ArcadeTournamentModal } from './components/retro/ArcadeTournamentModal';
+import { RetroManualsViewerModal } from './components/retro/RetroManualsViewerModal';
+import { BezelStudioModal } from './components/retro/BezelStudioModal';
+import { RetroRouletteDailyChallengeModal } from './components/retro/RetroRouletteDailyChallengeModal';
 
 export const App: React.FC = () => {
-  // Navigation & Vues
-  const [currentTab, setCurrentTab] = useState<NavTab>('games');
+  // Navigation & Vues (Par défaut sur 'companies' pour afficher immédiatement les firmes et vidéos)
+  const [currentTab, setCurrentTab] = useState<NavTab>('companies');
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
 
   // Profil Kiosk vs Admin
@@ -56,6 +87,10 @@ export const App: React.FC = () => {
   // États actifs / Modales
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [exhibitionSystem, setExhibitionSystem] = useState<System | null>(null);
+  const [exhibitionCompany, setExhibitionCompany] = useState<Company | null>(null);
+  const [directEditingGame, setDirectEditingGame] = useState<Game | null>(null);
+  const [directEditingSystem, setDirectEditingSystem] = useState<System | null>(null);
+  const [directEditingCompany, setDirectEditingCompany] = useState<Company | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isExtensionsModalOpen, setIsExtensionsModalOpen] = useState(false);
   const [isScrapingBatch, setIsScrapingBatch] = useState(false);
@@ -95,6 +130,112 @@ export const App: React.FC = () => {
     settings.bgmEnabled ?? false,
     settings.bgmVolume ?? 0.35
   );
+
+  // Jukebox Chiptune Web Audio Engine
+  const jukebox = useRetroJukebox();
+
+  // 8 Features Rétro Data States (avec persistance localStorage)
+  const [achievements, setAchievements] = useState<RetroAchievement[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_achievements');
+      return stored ? JSON.parse(stored) : INITIAL_ACHIEVEMENTS;
+    } catch {
+      return INITIAL_ACHIEVEMENTS;
+    }
+  });
+
+  const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_player_profile');
+      return stored ? JSON.parse(stored) : INITIAL_PLAYER_PROFILE;
+    } catch {
+      return INITIAL_PLAYER_PROFILE;
+    }
+  });
+
+  const [cheats, setCheats] = useState<GameCheat[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_cheats');
+      return stored ? JSON.parse(stored) : INITIAL_CHEATS;
+    } catch {
+      return INITIAL_CHEATS;
+    }
+  });
+
+  const [saveStates, setSaveStates] = useState<SaveStateItem[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_save_states');
+      return stored ? JSON.parse(stored) : INITIAL_SAVESTATES;
+    } catch {
+      return INITIAL_SAVESTATES;
+    }
+  });
+
+  const [currentBezel, setCurrentBezel] = useState<BezelConfig>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_current_bezel');
+      return stored ? JSON.parse(stored) : INITIAL_BEZELS[0];
+    } catch {
+      return INITIAL_BEZELS[0];
+    }
+  });
+
+  const [dailyChallenges, setDailyChallenges] = useState<DailyChallenge[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_daily_challenges');
+      return stored ? JSON.parse(stored) : INITIAL_DAILY_CHALLENGES;
+    } catch {
+      return INITIAL_DAILY_CHALLENGES;
+    }
+  });
+
+  // Modales pour les 8 fonctionnalités
+  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+  const [isCheatsModalOpen, setIsCheatsModalOpen] = useState(false);
+  const [isSaveStatesModalOpen, setIsSaveStatesModalOpen] = useState(false);
+  const [isJukeboxModalOpen, setIsJukeboxModalOpen] = useState(false);
+  const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
+  const [isManualsModalOpen, setIsManualsModalOpen] = useState(false);
+  const [isBezelStudioModalOpen, setIsBezelStudioModalOpen] = useState(false);
+  const [isRouletteModalOpen, setIsRouletteModalOpen] = useState(false);
+  const [activeManualGameId, setActiveManualGameId] = useState<string | undefined>(undefined);
+
+  // Synchronisation avec localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_achievements', JSON.stringify(achievements));
+    } catch {}
+  }, [achievements]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_player_profile', JSON.stringify(playerProfile));
+    } catch {}
+  }, [playerProfile]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_cheats', JSON.stringify(cheats));
+    } catch {}
+  }, [cheats]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_save_states', JSON.stringify(saveStates));
+    } catch {}
+  }, [saveStates]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_current_bezel', JSON.stringify(currentBezel));
+    } catch {}
+  }, [currentBezel]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_daily_challenges', JSON.stringify(dailyChallenges));
+    } catch {}
+  }, [dailyChallenges]);
 
   // Notifications éphémères
   const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -373,6 +514,118 @@ export const App: React.FC = () => {
     );
   };
 
+  // Handlers pour les 8 fonctionnalités Rétro
+  const handleToggleUnlockAchievement = (achievementId: string) => {
+    setAchievements((prev) =>
+      prev.map((a) => {
+        if (a.id === achievementId) {
+          const willUnlock = !a.unlocked;
+          if (willUnlock) {
+            playUnlock();
+            showNotification(`🏆 Succès débloqué : ${a.title} (+${a.points} pts)`, 'success');
+            setPlayerProfile((prof) => {
+              const newXp = prof.totalXp + a.points;
+              const newLevel = Math.floor(newXp / 100) + 1;
+              return {
+                ...prof,
+                totalXp: newXp,
+                level: newLevel,
+              };
+            });
+          }
+          return {
+            ...a,
+            unlocked: willUnlock,
+            unlockedAt: willUnlock ? new Date().toISOString() : undefined,
+          };
+        }
+        return a;
+      })
+    );
+  };
+
+  const handleToggleCheat = (cheatId: string) => {
+    playSelect();
+    setCheats((prev) =>
+      prev.map((c) => (c.id === cheatId ? { ...c, enabled: !c.enabled } : c))
+    );
+  };
+
+  const handleAddCheat = (newCheat: GameCheat) => {
+    playSelect();
+    setCheats((prev) => [newCheat, ...prev]);
+    showNotification(`Code de triche ajouté : "${newCheat.title}"`, 'success');
+  };
+
+  const handleDeleteCheat = (cheatId: string) => {
+    playBack();
+    setCheats((prev) => prev.filter((c) => c.id !== cheatId));
+    showNotification('Code de triche supprimé.', 'info');
+  };
+
+  const handleLoadSaveState = (stateItem: SaveStateItem) => {
+    playLaunch();
+    showNotification(`Chargement du slot ${stateItem.slot} pour ${stateItem.gameTitle}...`, 'success');
+  };
+
+  const handleCreateSaveState = (game: Game, slot: number | 'auto', note?: string) => {
+    playSelect();
+    const newState: SaveStateItem = {
+      id: `state-${Date.now()}`,
+      gameId: game.id,
+      gameTitle: game.cleanTitle,
+      systemId: game.systemId,
+      systemName: systems.find((s) => s.id === game.systemId)?.shortName || game.systemId.toUpperCase(),
+      slot: slot,
+      timestamp: new Date().toLocaleTimeString(),
+      thumbnail: game.media?.snap || game.media?.boxart2d || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80',
+      note: note || `Sauvegarde manuelle slot #${slot}`,
+      fileSize: '240 KB',
+      stateType: 'savestate',
+    };
+    setSaveStates((prev) => [newState, ...prev]);
+    showNotification(`Nouvel état d'émulation créé (Slot ${slot})`, 'success');
+  };
+
+  const handleDeleteSaveState = (stateId: string) => {
+    playBack();
+    setSaveStates((prev) => prev.filter((s) => s.id !== stateId));
+    showNotification('État de sauvegarde supprimé.', 'info');
+  };
+
+  const handleImportSaveState = (file: File, game: Game) => {
+    playSelect();
+    const newState: SaveStateItem = {
+      id: `imported-${Date.now()}`,
+      gameId: game.id,
+      gameTitle: game.cleanTitle,
+      systemId: game.systemId,
+      systemName: systems.find((s) => s.id === game.systemId)?.shortName || game.systemId.toUpperCase(),
+      slot: (saveStates.filter((s) => s.gameId === game.id).length || 0) + 1,
+      timestamp: new Date().toLocaleTimeString(),
+      thumbnail: game.media?.snap || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80',
+      note: `Importé depuis ${file.name}`,
+      fileSize: `${Math.round(file.size / 1024)} KB`,
+      stateType: 'savestate',
+    };
+    setSaveStates((prev) => [newState, ...prev]);
+    showNotification(`Fichier ${file.name} importé avec succès !`, 'success');
+  };
+
+  const handleSaveBezelConfig = (config: BezelConfig) => {
+    playSelect();
+    setCurrentBezel(config);
+    showNotification(`Configuration Bezel CRT "${config.name}" enregistrée !`, 'success');
+  };
+
+  const handleCompleteDailyChallenge = (challengeId: string) => {
+    setDailyChallenges((prev) =>
+      prev.map((dc) => (dc.id === challengeId ? { ...dc, isCompleted: true } : dc))
+    );
+    playUnlock();
+    showNotification('🎯 Défi du Jour complété ! +XP ajouté à votre profil.', 'success');
+  };
+
   const handleRefreshBios = async () => {
     if (isKioskMode) return;
     playSelect();
@@ -397,6 +650,84 @@ export const App: React.FC = () => {
       showNotification('Paramètres enregistrés.', 'success');
       handleRefreshBios();
     }
+  };
+
+  const handleSaveGames = async (newGames: Game[]) => {
+    setGames(newGames);
+    if (window.api?.saveGames) {
+      await window.api.saveGames(newGames);
+    }
+    showNotification('Catalogue de jeux mis à jour.', 'success');
+  };
+
+  const handleSaveSingleGame = async (updatedGame: Game) => {
+    const newGames = games.map((g) => (g.id === updatedGame.id ? updatedGame : g));
+    setGames(newGames);
+    if (selectedGame?.id === updatedGame.id) {
+      setSelectedGame(updatedGame);
+    }
+    if (window.api?.saveGames) {
+      await window.api.saveGames(newGames);
+    }
+    showNotification(`Jeu "${updatedGame.cleanTitle}" modifié avec succès !`, 'success');
+  };
+
+  const handleSaveSystems = async (newSystems: System[]) => {
+    setSystems(newSystems);
+    if (window.api?.saveSystems) {
+      await window.api.saveSystems(newSystems);
+    }
+    showNotification('Consoles et systèmes enregistrés.', 'success');
+  };
+
+  const handleSaveSingleSystem = async (updatedSystem: System) => {
+    const newSystems = systems.map((s) => (s.id === updatedSystem.id ? updatedSystem : s));
+    setSystems(newSystems);
+    if (exhibitionSystem?.id === updatedSystem.id) {
+      setExhibitionSystem(updatedSystem);
+    }
+    if (window.api?.saveSystems) {
+      await window.api.saveSystems(newSystems);
+    }
+    showNotification(`Console "${updatedSystem.name}" mise à jour !`, 'success');
+  };
+
+  const handleSaveCompanies = async (newCompanies: Company[]) => {
+    setCompanies(newCompanies);
+    if (window.api?.saveCompanies) {
+      await window.api.saveCompanies(newCompanies);
+    }
+    showNotification('Firmes et constructeurs enregistrés.', 'success');
+  };
+
+  const handleSaveSingleCompany = async (updatedCompany: Company) => {
+    const newCompanies = companies.map((c) => (c.id === updatedCompany.id ? updatedCompany : c));
+    setCompanies(newCompanies);
+    if (exhibitionCompany?.id === updatedCompany.id) {
+      setExhibitionCompany(updatedCompany);
+    }
+    if (window.api?.saveCompanies) {
+      await window.api.saveCompanies(newCompanies);
+    }
+    showNotification(`Firme "${updatedCompany.name}" mise à jour !`, 'success');
+  };
+
+  const handleSaveEmulators = async (newEmulators: EmulatorProfile[]) => {
+    setEmulators(newEmulators);
+    if (window.api?.saveEmulators) {
+      await window.api.saveEmulators(newEmulators);
+    }
+    showNotification('Profils d\'émulateurs enregistrés.', 'success');
+  };
+
+  const handleResetDefaults = async () => {
+    setSystems(DEFAULT_SYSTEMS);
+    setCompanies(DEFAULT_COMPANIES);
+    setEmulators(BUILTIN_EMULATORS);
+    if (window.api?.saveSystems) await window.api.saveSystems(DEFAULT_SYSTEMS);
+    if (window.api?.saveCompanies) await window.api.saveCompanies(DEFAULT_COMPANIES);
+    if (window.api?.saveEmulators) await window.api.saveEmulators(BUILTIN_EMULATORS);
+    showNotification('Consoles, firmes et émulateurs réinitialisés aux valeurs d\'usine.', 'success');
   };
 
   // Navigation manette
@@ -543,12 +874,48 @@ export const App: React.FC = () => {
             onToggleSound={() => setSettings((s) => ({ ...s, soundEnabled: !s.soundEnabled }))}
             crtEnabled={!!settings.crtEffect}
             onToggleCrt={handleToggleCrt}
-            bgmActive={isBgmActive}
-            onToggleBgm={handleToggleBgm}
+            bgmActive={jukebox.isPlaying || isBgmActive}
+            onToggleBgm={() => {
+              jukebox.togglePlay();
+              handleToggleBgm();
+            }}
             totalGames={visibleGames.length}
             isKioskMode={isKioskMode}
             onEnterKiosk={handleEnterKiosk}
             onUnlockKiosk={() => setIsPinModalOpen(true)}
+            onOpenRoulette={() => {
+              playDice();
+              setIsRouletteModalOpen(true);
+            }}
+            onOpenAchievements={() => {
+              playSelect();
+              setIsAchievementsModalOpen(true);
+            }}
+            onOpenJukebox={() => {
+              playSelect();
+              setIsJukeboxModalOpen(true);
+            }}
+            onOpenTournament={() => {
+              playSelect();
+              setIsTournamentModalOpen(true);
+            }}
+            onOpenManuals={() => {
+              playSelect();
+              setActiveManualGameId(undefined);
+              setIsManualsModalOpen(true);
+            }}
+            onOpenBezelStudio={() => {
+              playSelect();
+              setIsBezelStudioModalOpen(true);
+            }}
+            onOpenCheats={() => {
+              playSelect();
+              setIsCheatsModalOpen(true);
+            }}
+            onOpenSaveStates={() => {
+              playSelect();
+              setIsSaveStatesModalOpen(true);
+            }}
           />
 
           {/* Vues principales */}
@@ -590,6 +957,10 @@ export const App: React.FC = () => {
                   setIsSettingsOpen(true);
                 }}
                 onPlayDice={playDice}
+                onOpenRoulette={() => {
+                  playDice();
+                  setIsRouletteModalOpen(true);
+                }}
               />
             </div>
           )}
@@ -607,6 +978,16 @@ export const App: React.FC = () => {
                 playSelect();
                 setExhibitionSystem(sys);
               }}
+              onOpenCompanyExhibition={(comp) => {
+                playSelect();
+                setExhibitionCompany(comp);
+              }}
+              onEditCompany={(comp) => {
+                if (!isKioskMode) {
+                  setDirectEditingCompany(comp);
+                }
+              }}
+              isKioskMode={isKioskMode}
             />
           )}
 
@@ -621,11 +1002,19 @@ export const App: React.FC = () => {
           )}
 
           {currentTab === 'settings' && (
-            <SettingsModal
-              settings={settings}
-              emulators={emulators}
+            <AdminHubModal
+              isOpen={currentTab === 'settings'}
               onClose={() => setCurrentTab('games')}
-              onSave={handleSaveSettings}
+              settings={settings}
+              onSaveSettings={handleSaveSettings}
+              games={games}
+              onSaveGames={handleSaveGames}
+              systems={systems}
+              onSaveSystems={handleSaveSystems}
+              companies={companies}
+              onSaveCompanies={handleSaveCompanies}
+              emulators={emulators}
+              onSaveEmulators={handleSaveEmulators}
               onSelectDirectory={async () => {
                 if (window.api) return window.api.selectDirectory();
                 return null;
@@ -633,6 +1022,64 @@ export const App: React.FC = () => {
               onOpenExtensions={() => {
                 playSelect();
                 setIsExtensionsModalOpen(true);
+              }}
+              onDetectEmulators={async () => {
+                if (window.api?.detectEmulators) return window.api.detectEmulators();
+                return emulators;
+              }}
+              onResetDefaults={handleResetDefaults}
+              onOpenSystemExhibition={(sys) => {
+                setCurrentTab('games');
+                setExhibitionSystem(sys);
+              }}
+              onOpenCompanyExhibition={(comp) => {
+                setCurrentTab('companies');
+                setExhibitionCompany(comp);
+              }}
+              onScanRoms={handleScanRoms}
+              isScanningRoms={isScanning}
+              onStartScrapeBatch={handleStartScrapeBatch}
+              onScrapeGame={handleScrapeSingleGame}
+              isScrapingBatch={isScrapingBatch}
+              scrapeProgress={scrapeState}
+              onLaunchGame={handleLaunchGame}
+              onToggleFavorite={handleToggleFavorite}
+              biosStatuses={biosStatuses}
+              isCheckingBios={isCheckingBios}
+              onCheckBios={handleRefreshBios}
+              onCreateRomsFolders={window.api?.createRomsFolders}
+              onOpenRoulette={() => {
+                playDice();
+                setIsRouletteModalOpen(true);
+              }}
+              onOpenAchievements={() => {
+                playSelect();
+                setIsAchievementsModalOpen(true);
+              }}
+              onOpenJukebox={() => {
+                playSelect();
+                setIsJukeboxModalOpen(true);
+              }}
+              onOpenTournament={() => {
+                playSelect();
+                setIsTournamentModalOpen(true);
+              }}
+              onOpenManuals={() => {
+                playSelect();
+                setActiveManualGameId(undefined);
+                setIsManualsModalOpen(true);
+              }}
+              onOpenBezelStudio={() => {
+                playSelect();
+                setIsBezelStudioModalOpen(true);
+              }}
+              onOpenCheats={() => {
+                playSelect();
+                setIsCheatsModalOpen(true);
+              }}
+              onOpenSaveStates={() => {
+                playSelect();
+                setIsSaveStatesModalOpen(true);
               }}
             />
           )}
@@ -651,19 +1098,50 @@ export const App: React.FC = () => {
         onLaunch={handleLaunchGame}
         onToggleFavorite={handleToggleFavorite}
         onScrapeGame={handleScrapeSingleGame}
+        onEdit={(game) => {
+          if (!isKioskMode) {
+            setDirectEditingGame(game);
+          }
+        }}
+        isKioskMode={isKioskMode}
         isScraping={isScrapingBatch}
+        onOpenAchievements={(_g) => {
+          playSelect();
+          setIsAchievementsModalOpen(true);
+        }}
+        onOpenCheats={(_g) => {
+          playSelect();
+          setIsCheatsModalOpen(true);
+        }}
+        onOpenSaveStates={(_g) => {
+          playSelect();
+          setIsSaveStatesModalOpen(true);
+        }}
+        onOpenManual={(g) => {
+          playSelect();
+          setActiveManualGameId(g.id);
+          setIsManualsModalOpen(true);
+        }}
       />
 
-      {/* Modale Paramètres (si déclenchée en superposition) */}
+      {/* Centre d'Administration en superposition */}
       {!isKioskMode && isSettingsOpen && (
-        <SettingsModal
-          settings={settings}
-          emulators={emulators}
+        <AdminHubModal
+          isOpen={isSettingsOpen}
           onClose={() => {
             playBack();
             setIsSettingsOpen(false);
           }}
-          onSave={handleSaveSettings}
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          games={games}
+          onSaveGames={handleSaveGames}
+          systems={systems}
+          onSaveSystems={handleSaveSystems}
+          companies={companies}
+          onSaveCompanies={handleSaveCompanies}
+          emulators={emulators}
+          onSaveEmulators={handleSaveEmulators}
           onSelectDirectory={async () => {
             if (window.api) return window.api.selectDirectory();
             return null;
@@ -671,6 +1149,64 @@ export const App: React.FC = () => {
           onOpenExtensions={() => {
             playSelect();
             setIsExtensionsModalOpen(true);
+          }}
+          onDetectEmulators={async () => {
+            if (window.api?.detectEmulators) return window.api.detectEmulators();
+            return emulators;
+          }}
+          onResetDefaults={handleResetDefaults}
+          onOpenSystemExhibition={(sys) => {
+            setIsSettingsOpen(false);
+            setExhibitionSystem(sys);
+          }}
+          onOpenCompanyExhibition={(comp) => {
+            setIsSettingsOpen(false);
+            setExhibitionCompany(comp);
+          }}
+          onScanRoms={handleScanRoms}
+          isScanningRoms={isScanning}
+          onStartScrapeBatch={handleStartScrapeBatch}
+          onScrapeGame={handleScrapeSingleGame}
+          isScrapingBatch={isScrapingBatch}
+          scrapeProgress={scrapeState}
+          onLaunchGame={handleLaunchGame}
+          onToggleFavorite={handleToggleFavorite}
+          biosStatuses={biosStatuses}
+          isCheckingBios={isCheckingBios}
+          onCheckBios={handleRefreshBios}
+          onCreateRomsFolders={window.api?.createRomsFolders}
+          onOpenRoulette={() => {
+            playDice();
+            setIsRouletteModalOpen(true);
+          }}
+          onOpenAchievements={() => {
+            playSelect();
+            setIsAchievementsModalOpen(true);
+          }}
+          onOpenJukebox={() => {
+            playSelect();
+            setIsJukeboxModalOpen(true);
+          }}
+          onOpenTournament={() => {
+            playSelect();
+            setIsTournamentModalOpen(true);
+          }}
+          onOpenManuals={() => {
+            playSelect();
+            setActiveManualGameId(undefined);
+            setIsManualsModalOpen(true);
+          }}
+          onOpenBezelStudio={() => {
+            playSelect();
+            setIsBezelStudioModalOpen(true);
+          }}
+          onOpenCheats={() => {
+            playSelect();
+            setIsCheatsModalOpen(true);
+          }}
+          onOpenSaveStates={() => {
+            playSelect();
+            setIsSaveStatesModalOpen(true);
           }}
         />
       )}
@@ -719,7 +1255,80 @@ export const App: React.FC = () => {
           setSelectedSystemId(sys.id);
           setCurrentTab('games');
         }}
+        onOpenCompanyMuseum={(companyId) => {
+          playSelect();
+          const comp = companies.find((c) => c.id === companyId);
+          if (comp) {
+            setExhibitionSystem(null);
+            setExhibitionCompany(comp);
+          }
+        }}
+        onEditSystem={(sys) => {
+          if (!isKioskMode) {
+            setDirectEditingSystem(sys);
+          }
+        }}
+        isKioskMode={isKioskMode}
       />
+
+      {/* Modale d'Exposition Permanente & Grand Musée de la Firme */}
+      <CompanyExhibitionModal
+        company={exhibitionCompany}
+        systems={systems.filter((s) => s.companyId === exhibitionCompany?.id)}
+        isOpen={!!exhibitionCompany}
+        onClose={() => {
+          playBack();
+          setExhibitionCompany(null);
+        }}
+        onOpenSystemExhibition={(sys) => {
+          setExhibitionCompany(null);
+          setExhibitionSystem(sys);
+        }}
+        onExploreGames={(sysId) => {
+          setExhibitionCompany(null);
+          setSelectedSystemId(sysId);
+          setCurrentTab('games');
+        }}
+        onEditCompany={(comp) => {
+          if (!isKioskMode) {
+            setDirectEditingCompany(comp);
+          }
+        }}
+        isKioskMode={isKioskMode}
+      />
+
+      {/* Modale d'Édition Directe de Jeu (Admin) */}
+      {!isKioskMode && directEditingGame && (
+        <GameEditModal
+          game={directEditingGame}
+          systems={systems}
+          emulators={emulators}
+          isOpen={!!directEditingGame}
+          onClose={() => setDirectEditingGame(null)}
+          onSave={handleSaveSingleGame}
+        />
+      )}
+
+      {/* Modale d'Édition Directe de Console (Admin) */}
+      {!isKioskMode && directEditingSystem && (
+        <SystemEditModal
+          system={directEditingSystem}
+          companies={companies}
+          isOpen={!!directEditingSystem}
+          onClose={() => setDirectEditingSystem(null)}
+          onSave={handleSaveSingleSystem}
+        />
+      )}
+
+      {/* Modale d'Édition Directe de Firme (Admin) */}
+      {!isKioskMode && directEditingCompany && (
+        <CompanyEditModal
+          company={directEditingCompany}
+          isOpen={!!directEditingCompany}
+          onClose={() => setDirectEditingCompany(null)}
+          onSave={handleSaveSingleCompany}
+        />
+      )}
 
       {/* Notification Toast */}
       {notification && (
@@ -771,6 +1380,115 @@ export const App: React.FC = () => {
           setIsAttractMode(false);
           resetAttractTimer();
         }}
+      />
+
+      {/* ======================================================== */}
+      {/* LES 8 NOUVELLES FONCTIONNALITÉS DU LABO RÉTRO */}
+      {/* ======================================================== */}
+
+      {/* 1. Roulette Rétro & Défis du Jour */}
+      <RetroRouletteDailyChallengeModal
+        isOpen={isRouletteModalOpen}
+        onClose={() => setIsRouletteModalOpen(false)}
+        games={games}
+        systems={systems}
+        onLaunchGame={handleLaunchGame}
+        onSelectGame={(g: Game) => {
+          setSelectedGame(g);
+          setIsRouletteModalOpen(false);
+        }}
+        challenges={dailyChallenges}
+        onCompleteChallenge={handleCompleteDailyChallenge}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 2. RetroAchievements & Trophées */}
+      <RetroAchievementsModal
+        isOpen={isAchievementsModalOpen}
+        onClose={() => setIsAchievementsModalOpen(false)}
+        achievements={achievements}
+        profile={playerProfile}
+        games={games}
+        selectedGameId={selectedGame?.id}
+        onUnlockAchievement={handleToggleUnlockAchievement}
+        onLaunchGame={(gameId: string) => {
+          const g = games.find((item) => item.id === gameId);
+          if (g) handleLaunchGame(g);
+        }}
+      />
+
+      {/* 3. Jukebox Chiptune 8/16-Bit */}
+      <RetroJukeboxModal
+        isOpen={isJukeboxModalOpen}
+        onClose={() => setIsJukeboxModalOpen(false)}
+        jukebox={jukebox}
+      />
+
+      {/* Mini-Lecteur Flottant Jukebox */}
+      <RetroJukeboxFloatingPlayer
+        jukebox={jukebox}
+        onOpenModal={() => setIsJukeboxModalOpen(true)}
+      />
+
+      {/* 4. Tournois Arcade Multijoueur */}
+      <ArcadeTournamentModal
+        isOpen={isTournamentModalOpen}
+        onClose={() => setIsTournamentModalOpen(false)}
+        games={games}
+        onLaunchGame={handleLaunchGame}
+      />
+
+      {/* 5. Liseuse de Notices & Manuels d'Époque */}
+      <RetroManualsViewerModal
+        isOpen={isManualsModalOpen}
+        onClose={() => {
+          setIsManualsModalOpen(false);
+          setActiveManualGameId(undefined);
+        }}
+        manuals={INITIAL_MANUALS}
+        games={games}
+        initialGameId={activeManualGameId}
+        onLaunchGame={(g: Game) => {
+          setIsManualsModalOpen(false);
+          handleLaunchGame(g);
+        }}
+      />
+
+      {/* 6. Studio Bezels & Shaders CRT */}
+      <BezelStudioModal
+        isOpen={isBezelStudioModalOpen}
+        onClose={() => setIsBezelStudioModalOpen(false)}
+        currentConfig={currentBezel}
+        onSaveConfig={handleSaveBezelConfig}
+      />
+
+      {/* 7. Codes Cheats & Game Genie */}
+      <RetroCheatsModal
+        isOpen={isCheatsModalOpen}
+        onClose={() => setIsCheatsModalOpen(false)}
+        cheats={cheats}
+        games={games}
+        selectedGameId={selectedGame?.id}
+        onToggleCheat={handleToggleCheat}
+        onAddCheat={handleAddCheat}
+        onDeleteCheat={handleDeleteCheat}
+      />
+
+      {/* 8. Gestionnaire de Save States & Cartes Mémoires */}
+      <RetroSaveStatesModal
+        isOpen={isSaveStatesModalOpen}
+        onClose={() => setIsSaveStatesModalOpen(false)}
+        saveStates={saveStates}
+        games={games}
+        selectedGameId={selectedGame?.id}
+        onLoadState={handleLoadSaveState}
+        onCreateState={handleCreateSaveState}
+        onDeleteState={handleDeleteSaveState}
+        onImportState={handleImportSaveState}
       />
     </div>
   );

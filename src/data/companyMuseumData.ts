@@ -1,0 +1,408 @@
+import { CompanyMuseumExhibition } from '../types';
+
+export const COMPANY_MUSEUM_DATA: Record<string, CompanyMuseumExhibition> = {
+  nintendo: {
+    tagline: "De l'atelier artisanal de cartes Hanafuda à Kyoto au géant planétaire du divertissement familial.",
+    curatorIntro: "Fondée le 23 septembre 1889 par Fusajiro Yamauchi sous le nom de 'Nintendo Koppai', la vénérable maison kyotoïte fabriquait à l'origine des cartes à jouer peintes à la main. Sous l'impulsion visionnaire de Hiroshi Yamauchi, puis de génies créatifs tels que Gunpei Yokoi, Shigeru Miyamoto et Masayuki Uemura, Nintendo a réinventé le jouet mécanique, l'arcade, la console de salon et le jeu nomade, sauvant l'industrie du krach de 1983.",
+    eras: [
+      {
+        era: "1889 - 1969",
+        period: "L'artisanat du jeu traditionnel",
+        title: "Les cartes Hanafuda et l'héritage Yamauchi",
+        description: "Pendant huit décennies, Nintendo prospère grâce aux cartes traditionnelles japonaises, avant que Hiroshi Yamauchi n'oriente la firme vers les jouets électroniques et les jeux de tir optoélectroniques.",
+      },
+      {
+        era: "1970 - 1983",
+        period: "L'éveil technologique",
+        title: "L'Ultra Hand, les Game & Watch et Donkey Kong",
+        description: "Gunpei Yokoi invente les Game & Watch et la croix directionnelle (D-Pad). Shigeru Miyamoto conçoit Donkey Kong en 1981, créant Jumpman (futur Mario) et propulsant Nintendo sur la scène arcade mondiale.",
+      },
+      {
+        era: "1983 - 1996",
+        period: "L'âge d'or 8-bit et 16-bit",
+        title: "La renaissance NES et le chef-d'œuvre Super Nintendo",
+        description: "La Famicom/NES relance à elle seule l'industrie mondiale après le krach de 1983 grâce à son label de qualité. La Super Nintendo consacre l'apogée du pixel art avec le Mode 7 et le processeur audio Sony.",
+      },
+      {
+        era: "1996 - 2006",
+        period: "La révolution 3D et le jeu tactile",
+        title: "Nintendo 64, GameCube et la déferlante Nintendo DS",
+        description: "Super Mario 64 pose la grammaire du jeu d'aventure 3D et du stick analogique. La Nintendo DS invente le double écran tactile et conquiert le grand public mondial.",
+      },
+      {
+        era: "2006 - Présent",
+        period: "L'ère du motion gaming et de l'hybride",
+        title: "Le phénomène Wii et le triomphe de la Nintendo Switch",
+        description: "Avec la Wii puis la Switch, Nintendo transcende les générations en réunissant console de salon et console portable dans un concept universel plébiscité par plus de 140 millions de joueurs.",
+      },
+    ],
+    milestones: [
+      { year: 1889, title: "Fondation à Kyoto", description: "Fusajiro Yamauchi fonde Nintendo Koppai pour fabriquer des cartes de Hanafuda." },
+      { year: 1980, title: "Lancement des Game & Watch", description: "Invention de la première console portable grand public avec écran LCD et croix multidirectionnelle." },
+      { year: 1981, title: "Donkey Kong en Arcade", description: "Shigeru Miyamoto invente le jeu de plateforme narratif avec Donkey Kong et Mario." },
+      { year: 1983, title: "Lancement de la Famicom / NES", description: "La console qui sauva l'industrie du jeu vidéo et instaura le Nintendo Seal of Quality." },
+      { year: 1989, title: "Révolution Game Boy & Tetris", description: "Le phénomène mondial nomade associant la robuste portable grise au chef-d'œuvre Tetris." },
+      { year: 1990, title: "Super Famicom / SNES", description: "L'âge d'or du 16-bit, de Super Mario World et de The Legend of Zelda: A Link to the Past." },
+      { year: 1996, title: "Nintendo 64 & Mario 64", description: "Introduction du stick analogique et révolution de la caméra 3D libre." },
+      { year: 2006, title: "Le raz-de-marée Wii", description: "Démocratisation du motion gaming avec la Wiimote et plus de 101 millions de machines vendues." },
+    ],
+    keyFigures: [
+      { name: "Hiroshi Yamauchi", role: "Président légendaire (1949-2002)", contribution: "A transformé la petite fabrique artisanale de cartes en titan mondial du divertissement avec une autorité et un flair légendaires." },
+      { name: "Gunpei Yokoi", role: "Créateur & Ingénieur en chef", contribution: "Père de l'Ultra Hand, des Game & Watch, de la Game Boy et de la croix directionnelle. Inventeur de la 'pensée latérale des technologies éprouvées'." },
+      { name: "Shigeru Miyamoto", role: "Concepteur & Démiurge de génie", contribution: "Créateur de Mario, Zelda, Donkey Kong, Star Fox et Pikmin. Souvent qualifié de 'Walt Disney du jeu vidéo'." },
+      { name: "Satoru Iwata", role: "Président (2002-2015)", contribution: "Programmeur de génie devenu président bien-aimé, architecte des succès pharamineux de la Nintendo DS et de la Wii." },
+    ],
+    philosophy: "« La pensée latérale des technologies éprouvées » : plutôt que de courir après la puissance brute la plus onéreuse, utiliser des composants matures et peu coûteux pour inventer des mécaniques de jeu inédites et émerveiller le joueur.",
+    culturalImpact: "Mario est un visage plus universellement reconnu que Mickey Mouse. Les thèmes de Koji Kondo sont joués par les plus grands orchestres philharmoniques du monde, et la Switch est l'une des consoles les plus vendues de tous les temps.",
+    franchiseHistories: [
+      { name: "Super Mario", year: 1981, description: "Mascotte intemporelle ayant défini la plateforme 2D avec Super Mario Bros. et la plateforme 3D avec Super Mario 64." },
+      { name: "The Legend of Zelda", year: 1986, description: "Pionnier de l'exploration ouverte, de la sauvegarde cartouche et du sentiment d'aventure chevaleresque." },
+      { name: "Pokémon", year: 1996, description: "Créé par Satoshi Tajiri sur Game Boy, devenu la franchise médiatique la plus lucrative de toute l'histoire de l'humanité." },
+      { name: "Metroid", year: 1986, description: "Atmosphère de science-fiction sombre et fondation du genre 'Metroidvania' avec l'héroïne Samus Aran." },
+    ],
+    anecdotes: [
+      "Le nom 'Nintendo' (任天堂) est traditionnellement interprété comme 'Laissez la chance au ciel' ou 'Le destin entre les mains du ciel'.",
+      "Avant de se concentrer sur les jouets électroniques, Nintendo a expérimenté dans les années 1960 des compagnies de taxis (Daiya), des hôtels d'amour et même des portions de riz instantané !",
+      "Gunpei Yokoi a eu l'idée des Game & Watch dans le Shinkansen en observant un homme d'affaires ennuyé qui appuyait machinalement sur les touches de sa calculatrice LCD.",
+    ],
+    totalConsolesSoldEstimate: "+850 Millions de machines (salon + portables)",
+    bestSellingConsole: "Nintendo DS (154 millions) & Nintendo Switch (143+ millions)",
+    bestSellingGame: "Wii Sports (82,9 millions d'exemplaires)",
+    youtubeId: "in4X7qOUxEg",
+  },
+
+  sega: {
+    tagline: "L'esprit rebelle des salles d'arcade devenu le rival le plus féroce et flamboyant de l'histoire du jeu vidéo.",
+    curatorIntro: "Née de la fusion en 1965 entre Service Games (spécialiste des juke-box et machines à sous pour les bases militaires américaines) et Rosen Enterprises, SEGA s'est imposée comme le roi incontesté de l'arcade mondiale. À la fin des années 80, SEGA défie Nintendo avec la Mega Drive et une campagne publicitaire iconique ('Sega c'est plus fort que toi' / 'Genesis does what Nintendon't'), propulsée par le hérisson bleu Sonic.",
+    eras: [
+      {
+        era: "1960 - 1983",
+        period: "L'essor de l'arcade japonaise",
+        title: "Des juke-box aux bornes électromécaniques",
+        description: "SEGA conçoit des bornes comme Periscope en 1966, puis se lance dans l'arcade vidéo avec Frogger, Zaxxon et la première console SG-1000 sortie le même jour que la Famicom en 1983.",
+      },
+      {
+        era: "1985 - 1990",
+        period: "La révolution Super Scaler de Yu Suzuki",
+        title: "Hang-On, OutRun, Space Harrier et After Burner",
+        description: "L'équipe AM2 de Yu Suzuki crée des chefs-d'œuvre avec des moteurs hydrauliques et la technologie de zoom de sprites 2.5D, définissant la supériorité technique de SEGA.",
+      },
+      {
+        era: "1988 - 1995",
+        period: "La guerre des consoles 16-bit",
+        title: "La Mega Drive et le phénomène supersonique Sonic",
+        description: "Menée par Tom Kalinske en Occident et Yuji Naka au Japon, la Mega Drive conquiert les adolescents avec une esthétique 'cool', agressive et rapide, s'emparant de plus de 50% du marché américain.",
+      },
+      {
+        era: "1994 - 2001",
+        period: "Audace technologique et chant du cygne",
+        title: "Saturn, Virtua Fighter et l'incomparable Dreamcast",
+        description: "Après une Saturn difficile malgré des chefs-d'œuvre arcade, SEGA lance en 1998 la Dreamcast avec modem Internet intégré et Shenmue. Malgré ses qualités visionnaires, SEGA se retire du hardware en 2001 pour devenir éditeur tiers.",
+      },
+    ],
+    milestones: [
+      { year: 1965, title: "Création officielle de SEGA Enterprises", description: "Fusion entre Service Games et Rosen Enterprises sous la direction de David Rosen." },
+      { year: 1985, title: "Lancement de Hang-On & Master System", description: "Yu Suzuki révolutionne l'arcade avec la moto interactive et SEGA lance la Master System." },
+      { year: 1988, title: "Sortie de la Mega Drive (Genesis)", description: "La console 16-bit noire au design inspiré des chaînes hi-fi japonaises." },
+      { year: 1991, title: "Naissance de Sonic The Hedgehog", description: "Conçu par Yuji Naka et Naoto Ohshima pour rivaliser avec Mario à une vitesse supersonique." },
+      { year: 1993, title: "Virtua Fighter en Arcade", description: "Premier jeu de combat en 3D polygonale en temps réel de l'histoire, conçu par Yu Suzuki." },
+      { year: 1998, title: "Lancement de la Dreamcast", description: "Première console 128-bit de l'histoire, dotée d'un modem 56k, d'un VMU et de Shenmue." },
+    ],
+    keyFigures: [
+      { name: "Hayao Nakayama", role: "Président charismatique de SEGA", contribution: "A impulsé l'offensive agressive contre Nintendo et approuvé le projet Mega Drive." },
+      { name: "Yu Suzuki", role: "Maître d'œuvre du département AM2", contribution: "Créateur de Hang-On, OutRun, Space Harrier, After Burner, Virtua Fighter et Shenmue." },
+      { name: "Yuji Naka", role: "Chef de la Sonic Team & Programmeur de génie", contribution: "A développé le moteur physique ultra-rapide de Sonic The Hedgehog et de Nights into Dreams." },
+      { name: "Tom Kalinske", role: "PDG de Sega of America", contribution: "Architecte de la stratégie agressive 'Genesis does what Nintendon't' qui a fait vaciller le monopole de Nintendo." },
+    ],
+    philosophy: "« Welcome to the Next Level » : audace esthétique, vitesse frénétique, culture arcade pure et ton provocateur destiné aux joueurs grandissants qui voulaient s'affranchir de l'image enfantine des consoles.",
+    culturalImpact: "Le son d'intro « SEEE-GAAA » occupait à lui seul un huitième de la mémoire cartouche de Sonic 1. La Mega Drive a imposé les jeux de sport réalistes avec EA Sports et démocratisé les bandes-son techno/synthwave composées sur puce Yamaha YM2612.",
+    franchiseHistories: [
+      { name: "Sonic The Hedgehog", year: 1991, description: "L'icône absolue de la vitesse, conçue pour démontrer la supériorité du processeur Motorola 68000." },
+      { name: "Streets of Rage", year: 1991, description: "Le beat 'em up urbain ultime doté de la bande-son électronique révolutionnaire de Yuzo Koshiro." },
+      { name: "Shenmue", year: 1999, description: "Créé par Yu Suzuki sur Dreamcast, l'ancêtre fondateur de tous les mondes ouverts modernes (FREE genre)." },
+      { name: "Virtua Fighter", year: 1993, description: "Pionnier des arts martiaux en 3D polygonale, intronisé au Smithsonian Museum de Washington." },
+    ],
+    anecdotes: [
+      "Le nom 'SEGA' est la contraction de 'SErvice GAmes', entreprise fondée à Hawaï en 1940.",
+      "Michael Jackson était un fan absolu de SEGA : il a collaboré secrètement sur la bande-son de Sonic 3 et a supervisé le jeu d'arcade Moonwalker.",
+      "La manette de la Dreamcast intégrait le VMU (Visual Memory Unit), une carte mémoire pourvue d'un écran LCD autonome qui permettait de jouer à des mini-jeux dans la poche.",
+    ],
+    totalConsolesSoldEstimate: "~75 Millions de consoles de salon et portables",
+    bestSellingConsole: "Mega Drive / Genesis (~35 millions d'exemplaires)",
+    bestSellingGame: "Sonic The Hedgehog (~15 millions en bundle)",
+    youtubeId: "F-25xDO5Qc4",
+  },
+
+  sony: {
+    tagline: "La révolution du disque optique et de la 3D démocratisée ayant propulsé le jeu vidéo au rang de culture de masse.",
+    curatorIntro: "Initialement alliée à Nintendo pour fabriquer la puce audio de la Super Nintendo puis un lecteur de CD-ROM ('Play Station'), Sony subit une humiliation publique au CES de 1991 quand Nintendo annonce son alliance avec Philips. Piqué au vif, le jeune ingénieur Ken Kutaragi persuade le président Norio Ohga de créer une console Sony autonome entièrement vouée à la 3D polygonale. Lancée en 1994, la PlayStation pulvérise tous les records et dépasse les 100 millions d'exemplaires.",
+    eras: [
+      {
+        era: "1988 - 1993",
+        period: "La genèse secrète et la trahison",
+        title: "Le projet SNES-CD et la riposte de Ken Kutaragi",
+        description: "Ken Kutaragi conçoit la puce audio SPC700 de la SNES. Après la rupture fracassante de Nintendo, Ohga autorise Kutaragi à bâtir la division PlayStation chez Sony Music Entertainment.",
+      },
+      {
+        era: "1994 - 2000",
+        period: "La déferlante 32-bit PlayStation",
+        title: "Le format CD-ROM, Ridge Racer et Final Fantasy VII",
+        description: "En offrant des coûts de pressage dérisoires et une architecture 3D limpide, Sony attire tous les éditeurs tiers (Squaresoft, Capcom, Konami, Namco) et séduit la génération clubbing et grand public.",
+      },
+      {
+        era: "2000 - 2006",
+        period: "Le triomphe de la PlayStation 2",
+        title: "La console la plus vendue de tous les temps",
+        description: "Équipée de l'Emotion Engine et d'un lecteur DVD bon marché, la PS2 devient le centre multimédia de chaque foyer mondial, franchissant le cap historique de 155 millions d'unités.",
+      },
+      {
+        era: "2006 - Présent",
+        period: "Haute Définition et cinématographie interactive",
+        title: "Le processeur Cell, le Blu-ray et les chefs-d'œuvre narratifs",
+        description: "Malgré un départ complexe avec la PS3, Sony redéfinit les blockbusters narratifs avec Naughty Dog (Uncharted, The Last of Us) et Santa Monica (God of War).",
+      },
+    ],
+    milestones: [
+      { year: 1991, title: "L'affront du CES de Chicago", description: "Nintendo trahit publiquement Sony en annonçant un partenariat avec le néerlandais Philips." },
+      { year: 1994, title: "Sortie japonaise de la PlayStation (PS1)", description: "Lancement historique le 3 décembre 1994 au Japon, propulsé par Ridge Racer." },
+      { year: 1997, title: "Final Fantasy VII change l'industrie", description: "Squaresoft abandonne Nintendo pour la PlayStation, vendant 10 millions d'exemplaires sur 3 CD-ROMs." },
+      { year: 2000, title: "Lancement de la PlayStation 2", description: "La machine de tous les records, introduisant le DVD vidéo dans les salons du monde entier." },
+      { year: 2004, title: "La PlayStation Portable (PSP)", description: "L'arrivée fracassante de Sony sur le marché portable avec un somptueux écran 16:9." },
+    ],
+    keyFigures: [
+      { name: "Ken Kutaragi", role: "Le « Père de la PlayStation »", contribution: "Visionnaire absolu qui a cru avant tout le monde en la 3D en temps réel et a tenu tête à l'establishment de Sony." },
+      { name: "Norio Ohga", role: "Président de Sony Corporation", contribution: "Musicien et dirigeant visionnaire qui a soutenu Kutaragi par orgueil et ambition après l'affront de Nintendo." },
+      { name: "Shuhei Yoshida", role: "Président des studios PlayStation (SIE Worldwide Studios)", contribution: "A piloté le développement des plus grands studios first-party et soutenu sans relâche les créateurs indépendants." },
+    ],
+    philosophy: "« Do Not Underestimate the Power of PlayStation » : technologie de pointe, accessibilité optimale pour les créateurs de jeux, mariage entre culture urbaine, musique électronique et cinématiques immersives.",
+    culturalImpact: "La PlayStation a fait sortir le jeu vidéo de la chambre des enfants pour l'installer dans les salons des jeunes adultes et les clubs branchés. C'est elle qui a imposé les symboles universels Croix, Carré, Rond, Triangle.",
+    franchiseHistories: [
+      { name: "Gran Turismo", year: 1997, description: "Conçu pendant 5 ans par Kazunori Yamauchi, devenant la simulation automobile la plus vendue au monde." },
+      { name: "Metal Gear Solid", year: 1998, description: "Hideo Kojima fusionne cinéma hollywoodien et infiltration 3D dans une œuvre d'auteur inoubliable." },
+      { name: "Crash Bandicoot", year: 1996, description: "Naughty Dog crée la mascotte officieuse de la PS1 en repoussant les limites graphiques du hardware." },
+      { name: "God of War", year: 2005, description: "Kratos bouscule le genre du beat 'em up avec une mise en scène mythologique titanesque." },
+    ],
+    anecdotes: [
+      "Le designer Teiyu Goto a expliqué le sens des 4 boutons de la manette : le Triangle représente le point de vue ou la direction, le Carré une feuille de papier (menus), le Rond la validation (O) et la Croix l'annulation (X).",
+      "Le son de démarrage de la PS1, composé par Takafumi Fujisawa, a été pensé pour signifier aux joueurs qu'ils entraient dans une toute nouvelle dimension sonore et visuelle.",
+      "La PlayStation 2 a été classée comme équipement à usage militaire potentiel par le ministère du commerce japonais lors de sa sortie en raison de la puissance de calcul vectoriel de l'Emotion Engine.",
+    ],
+    totalConsolesSoldEstimate: "+550 Millions de consoles de salon et portables",
+    bestSellingConsole: "PlayStation 2 (155+ millions d'exemplaires - record mondial absolu)",
+    bestSellingGame: "Grand Theft Auto: San Andreas (PS2 - 17,3 millions)",
+    youtubeId: "oAhvQoLpvsM",
+  },
+
+  microsoft: {
+    tagline: "L'irruption du géant de l'informatique pour réinventer le jeu multijoueur en ligne et l'architecture moderne.",
+    curatorIntro: "Inquiets de voir la PlayStation 2 de Sony menacer le PC comme centre de divertissement du salon, quatre ingénieurs de Microsoft (Seamus Blackley, Kevin Bachus, Ted Hase et Otto Berkes) conçoivent en secret la 'DirectX Box'. Bill Gates donne son feu vert pour ce qui deviendra la console la plus puissante de sa génération, dotée d'un disque dur interne et d'un port Ethernet, inaugurant le service Xbox Live qui transformera à jamais le jeu multijoueur.",
+    eras: [
+      {
+        era: "1999 - 2001",
+        period: "La croisade de la DirectX Box",
+        title: "Des sous-sols de Redmond au Consumer Electronics Show",
+        description: "Conçue avec des composants PC standards (processeur Intel Pentium III et puce graphique NVIDIA), la Xbox originale est dévoilée par Bill Gates et The Rock avant de frapper un grand coup avec Halo.",
+      },
+      {
+        era: "2001 - 2005",
+        period: "Halo et la naissance du Xbox Live",
+        title: "Combat Evolved et la révolution du jeu en réseau",
+        description: "L'acquisition de Bungie Studios offre à Microsoft son chef-d'œuvre absolu : Halo: Combat Evolved. En novembre 2002, le Xbox Live lance le jeu en ligne avec micro-casque et liste d'amis unifiée.",
+      },
+      {
+        era: "2005 - 2013",
+        period: "L'apogée de la Xbox 360",
+        title: "La reine du jeu HD et les Succès (Achievements)",
+        description: "Sortie un an avant ses rivales, la Xbox 360 s'impose comme la référence de la génération HD avec Gears of War, Forza, les jeux Xbox Live Arcade (Braid, Limbo) et le système universel des Succès.",
+      },
+    ],
+    milestones: [
+      { year: 2001, title: "Lancement de la Xbox et de Halo", description: "Sortie le 15 novembre 2001 aux USA, instaurant le Master Chief comme icône planétaire." },
+      { year: 2002, title: "Lancement du Xbox Live", description: "Le premier service de jeu en ligne console unifié avec gamertag et communication vocale." },
+      { year: 2005, title: "Sortie de la Xbox 360", description: "La machine qui a défini le jeu moderne avec les Succès (Gamerscore) et le marché XBLA." },
+      { year: 2007, title: "Halo 3 : « Finish the Fight »", description: "Le plus grand lancement culturel de l'histoire du divertissement de l'époque avec 300 M$ en une semaine." },
+    ],
+    keyFigures: [
+      { name: "Seamus Blackley", role: "Concepteur et évangéliste de la Xbox", contribution: "Physicien et concepteur de jeux, il a porté le projet Xbox en interne et convaincu les éditeurs tiers." },
+      { name: "Peter Moore", role: "Vice-président de la division interactive", contribution: "A orchestré la montée en puissance de la Xbox 360 et s'est fait tatouer les dates de sortie de Halo 2 et GTA IV." },
+      { name: "Phil Spencer", role: "Directeur de Microsoft Gaming", contribution: "A replacé le jeu au cœur de la stratégie de Microsoft avec le Xbox Game Pass et l'acquisition de Bethesda et Activision-Blizzard." },
+    ],
+    philosophy: "« Jump In » : puissance hardware sans concession, infrastructures réseau irréprochables, convivialité multijoueur et convergence transparente entre l'écosystème console et PC.",
+    culturalImpact: "Le Master Chief est devenu le soldat spartiate le plus célèbre du XXIe siècle. Le système de succès (Gamerscore) a été copié par l'ensemble de l'industrie (Trophées PlayStation, Steam Achievements).",
+    franchiseHistories: [
+      { name: "Halo", year: 2001, description: "Révolution du FPS sur console avec une jouabilité à deux sticks analogiques et une épopée orchestrale." },
+      { name: "Gears of War", year: 2006, description: "A inventé la grammaire du tir de couverture à la troisième personne sous l'Unreal Engine 3." },
+      { name: "Forza Motorsport / Horizon", year: 2005, description: "Référence absolue de la simulation puis du festival automobile en monde ouvert." },
+    ],
+    anecdotes: [
+      "La toute première manette Xbox, surnommée 'The Duke', était si volumineuse que les joueurs japonais ont refusé de l'utiliser, forçant Microsoft à créer la manette S.",
+      "Pour sauver la Xbox 360 de la crise du 'Ring of Death' (RROD), le patron de Microsoft Steve Ballmer a signé sans hésiter un chèque de plus d'un milliard de dollars pour réparer gratuitement toutes les consoles.",
+      "Le nom de code original était 'DirectX Box'. L'équipe marketing a tenté de trouver des dizaines d'autres noms, mais les testeurs préféraient systématiquement 'Xbox'.",
+    ],
+    totalConsolesSoldEstimate: "~180 Millions de consoles de salon",
+    bestSellingConsole: "Xbox 360 (~85 millions d'exemplaires)",
+    bestSellingGame: "Kinect Adventures (bundle 24M) & Halo 3 (14,5M)",
+    youtubeId: "oADANrDGhoQ",
+  },
+
+  atari: {
+    tagline: "Les pionniers absolus qui ont allumé l'étincelle et inventé l'industrie commerciale du jeu vidéo.",
+    curatorIntro: "Fondée en juin 1972 en Californie par Nolan Bushnell et Ted Dabney, Atari a transformé une simple ligne blanche renvoyant un carré lumineux en phénomène de société avec Pong. En commercialisant l'Atari 2600 (VCS) en 1977 avec son boîtier habillé de faux bois et ses cartouches interchangeables, Atari a inventé le jeu vidéo de salon avant de subir de plein fouet le krach historique de 1983.",
+    eras: [
+      {
+        era: "1972 - 1976",
+        period: "La genèse de la Silicon Valley",
+        title: "Pong et l'invention du divertissement à pièces",
+        description: "Nolan Bushnell et Al Alcorn conçoivent Pong dans une taverne de Sunnyvale. La borne déborde de pièces de 25 cents dès le premier soir, enfantant une nouvelle industrie.",
+      },
+      {
+        era: "1977 - 1982",
+        period: "Le règne impérial de l'Atari 2600",
+        title: "Space Invaders, Pac-Man et la folie des cartouches",
+        description: "L'Atari Video Computer System (VCS) s'installe dans des millions de foyers avec son joystick mythique, générant des milliards de dollars de chiffre d'affaires.",
+      },
+      {
+        era: "1983 - 1984",
+        period: "La saturation et le grand krach",
+        title: "E.T., surproduction et enfouissement dans le désert",
+        description: "La multiplication de jeux bâclés par des éditeurs tiers sans contrôle de qualité entraîne l'effondrement du marché américain et l'enfouissement légendaire de cartouches à Alamogordo.",
+      },
+    ],
+    milestones: [
+      { year: 1972, title: "Création d'Atari & Pong", description: "Nolan Bushnell et Ted Dabney fondent Atari et installent le prototype de Pong à l'Andy Capp's Tavern." },
+      { year: 1977, title: "Lancement de l'Atari 2600 (VCS)", description: "La console pionnière aux finitions boisées qui a démocratisé les cartouches interchangeables." },
+      { year: 1980, title: "Portage de Space Invaders", description: "Premier portage officiel d'arcade quadruplant les ventes de l'Atari 2600." },
+      { year: 1983, title: "Le grand krach du jeu vidéo", description: "Effondrement financier de l'industrie américaine suite à la saturation du marché." },
+    ],
+    keyFigures: [
+      { name: "Nolan Bushnell", role: "Co-fondateur & Entrepreneur visionnaire", contribution: "Père fondateur charismatique ayant recruté Steve Jobs et Steve Wozniak chez Atari." },
+      { name: "Allan Alcorn", role: "Ingénieur en chef", contribution: "Concepteur technique de la borne originale Pong et de l'architecture de base des jeux Atari." },
+      { name: "Warren Robinett", role: "Programmeur d'Adventure", contribution: "A créé le premier 'Easter Egg' (œuf de Pâques) secret de l'histoire du jeu vidéo pour inscrire son nom." },
+    ],
+    philosophy: "« Easy to learn, difficult to master » (Le principe de Bushnell) : une règle d'or du game design stipulant que tout jeu d'arcade doit être immédiatement compréhensible en trois secondes mais offrir une courbe de progression infinie.",
+    culturalImpact: "Le logo d'Atari (le fameux 'Fuji') est devenu un symbole intemporel de la pop culture geek, immortalisé dans Blade Runner, Matrix et Stranger Things.",
+    franchiseHistories: [
+      { name: "Pong", year: 1972, description: "Le jeu fondateur du jeu vidéo commercial mondial." },
+      { name: "Asteroids", year: 1979, description: "Graphismes vectoriels étincelants et records d'affluence dans les salles d'arcade." },
+      { name: "Centipede", year: 1981, description: "Co-conçu par Dona Bailey, l'un des premiers jeux vidéo conçus par une femme." },
+    ],
+    anecdotes: [
+      "Steve Jobs et Steve Wozniak travaillaient chez Atari avant de fonder Apple. Wozniak a d'ailleurs conçu le circuit électronique du jeu Breakout en quelques nuits blanches !",
+      "En 2014, des fouilles archéologiques officielles dans le désert d'Alamogordo au Nouveau-Mexique ont confirmé la légende urbaine en déterrant des centaines de cartouches d'E.T. enfouies en 1983.",
+      "Le mot 'Atari' provient du jeu traditionnel japonais de Go (l'équivalent de l'annonce 'Échec' aux échecs).",
+    ],
+    totalConsolesSoldEstimate: "~40 Millions de consoles",
+    bestSellingConsole: "Atari 2600 (~30 millions d'exemplaires)",
+    bestSellingGame: "Pac-Man (Atari 2600 - 7,7 millions)",
+    youtubeId: "7qAadfsJrmM",
+  },
+
+  snk: {
+    tagline: "La Rolls-Royce de l'arcade 24-bit et l'apogée spectaculaire des jeux de combat 2D.",
+    curatorIntro: "Fondée en 1978 à Osaka par Eikichi Kawasaki, SNK (Shin Nihon Kikaku) a révolutionné les salles d'arcade avec son système modulaire Neo-Geo MVS (Multi Video System). En 1990, SNK ose l'impensable : commercialiser la Neo-Geo AES de salon, équipée exactement de la même carte mère arcade que dans les salles. Les cartouches géantes de plus de 100 mégabits et les animations titanesques ont fait de la Neo-Geo le graal absolu des joueurs passionnés.",
+    eras: [
+      {
+        era: "1978 - 1989",
+        period: "L'époque pré-Neo-Geo",
+        title: "Ikari Warriors, Alpha Mission et l'arcade pure",
+        description: "SNK développe des bornes à succès avec commandes à joystick rotatif (Ikari Warriors, Psycho Soldier) avant de concevoir son système arcade unifié.",
+      },
+      {
+        era: "1990 - 2000",
+        period: "L'ère dorée Neo-Geo AES & MVS",
+        title: "100 Mega Shock ! et la royauté de la baston 2D",
+        description: "Pendant dix ans, SNK enchaîne les chefs-d'œuvre avec Fatal Fury, Samurai Shodown, The King of Fighters et Metal Slug, rivalisant avec Capcom dans tous les tournois mondiaux.",
+      },
+    ],
+    milestones: [
+      { year: 1978, title: "Fondation de Shin Nihon Kikaku", description: "Eikichi Kawasaki crée l'entreprise à Osaka pour concevoir des jeux d'arcade." },
+      { year: 1990, title: "Lancement du système Neo-Geo", description: "Arrivée simultanée du système MVS en arcade et de la luxueuse console de salon AES." },
+      { year: 1994, title: "Premier The King of Fighters ('94)", description: "Le crossover légendaire réunissant les héros de Fatal Fury, Art of Fighting et Ikari Warriors." },
+      { year: 1996, title: "Lancement de Metal Slug", description: "Le sommet absolu de l'animation de pixels 2D dessiné à la main par l'équipe Nazca." },
+    ],
+    keyFigures: [
+      { name: "Eikichi Kawasaki", role: "Fondateur de SNK", contribution: "Ancien boxeur professionnel devenu entrepreneur visionnaire ayant bâti l'empire de la Neo-Geo." },
+      { name: "Shinkiro (Toshiaki Mori)", role: "Illustrateur officiel mythique", contribution: "A peint les jaquettes et portraits hyper-réalistes légendaires des héros de KOF et Fatal Fury." },
+    ],
+    philosophy: "« The Future is Now » : aucune concession technique. Offrir la puissance démesurée de l'arcade dans son salon sans aucune dégradation graphique ni baisse de framerate.",
+    culturalImpact: "La Neo-Geo reste le symbole absolu de l'élitisme retro. Les tournois KOF en Amérique latine et en Asie déchaînent des foules comparables aux grandes compétitions sportives.",
+    franchiseHistories: [
+      { name: "The King of Fighters", year: 1994, description: "Le système de combat en équipe 3 contre 3 le plus compétitif et technique des années 90." },
+      { name: "Metal Slug", year: 1996, description: "Run and gun frénétique regorgeant d'humour, d'explosions spectaculaires et de véhicules délirants." },
+      { name: "Samurai Shodown", year: 1993, description: "Combat à l'arme blanche féodal avec système de tension et découpes sanglantes spectaculaires." },
+    ],
+    anecdotes: [
+      "Les cartouches de la Neo-Geo AES étaient si gigantesques qu'elles mesuraient la taille d'un dictionnaire et pesaient près d'un demi-kilo chacune !",
+      "Au lancement en 1990, la console AES coûtait 650 dollars et les cartouches de jeu entre 200 et 300 dollars l'unité, réservant la machine à une élite fortunée.",
+      "La mascotte originelle de SNK était le logo 'G-Mantle', un mystérieux homme masqué au chapeau haut-de-forme qui présentait les jeux dans les publicités japonaises.",
+    ],
+    totalConsolesSoldEstimate: "~1,2 Million de systèmes AES et CD",
+    bestSellingConsole: "Neo-Geo AES & Neo-Geo CD",
+    bestSellingGame: "The King of Fighters '95 / '98",
+    youtubeId: "RhrKkg6BYu4",
+  },
+
+  nec: {
+    tagline: "L'alliance de l'électronique de pointe et du génie d'Hudson Soft ayant devancé la Super Nintendo.",
+    curatorIntro: "Association brillante entre le géant des semi-conducteurs NEC et l'éditeur culte Hudson Soft (Bomberman), la PC Engine / TurboGrafx-16 est sortie au Japon en octobre 1987. D'une compacité sidérante avec ses jeux sur cartes de crédit (HuCards), elle a battu la Famicom au Japon et a été la toute première console de salon à adopter un lecteur CD-ROM en 1988, inaugurant les cinématiques animées et les voix japonaises.",
+    eras: [
+      {
+        era: "1987 - 1994",
+        period: "L'épopée PC Engine",
+        title: "La reine des Shoot 'em up et des HuCards",
+        description: "Avec son architecture graphique 16-bit véloce et ses extensions CD-ROM² puis Super CD-ROM², la PC Engine devient le paradis des shmups (R-Type, Gradius) et des RPGs avec Dracula X: Rondo of Blood.",
+      },
+    ],
+    milestones: [
+      { year: 1987, title: "Sortie de la PC Engine au Japon", description: "La plus petite console de salon de l'histoire, rivalisant avec la Famicom." },
+      { year: 1988, title: "Lancement du lecteur CD-ROM²", description: "Première console de l'histoire à utiliser le format CD-ROM pour les jeux vidéo." },
+      { year: 1993, title: "Castlevania: Rondo of Blood", description: "Le chef-d'œuvre de Konami démontrant la puissance du format Super CD-ROM²." },
+    ],
+    keyFigures: [
+      { name: "Yuji Kudo", role: "Président d'Hudson Soft", contribution: "A conçu avec ses ingénieurs le chipset C62 qui a donné vie à la console de NEC." },
+    ],
+    philosophy: "Miniaturisation extrême et avance technologique précoce sur le stockage optique.",
+    culturalImpact: "Un culte absolu auprès des importateurs et des puristes de shoot 'em up des années 90.",
+    anecdotes: [
+      "La PC Engine était si populaire au Japon qu'elle s'est vendue à plus d'exemplaires que la Mega Drive de SEGA sur le territoire nippon.",
+      "Les jeux tenaient sur des 'HuCards' de la taille exacte d'une carte bancaire, sans aucune pile de sauvegarde requise dans la carte.",
+    ],
+    totalConsolesSoldEstimate: "~10 Millions d'unités",
+    bestSellingConsole: "PC Engine / TurboGrafx-16",
+    bestSellingGame: "Bonk's Adventure / Super Star Soldier",
+    youtubeId: "osIMDXgfo1g",
+  },
+
+  commodore: {
+    tagline: "« Des ordinateurs pour les masses, pas pour les classes » : le géant qui a démocratisé le jeu sur micro.",
+    curatorIntro: "Fondée par le rescapé d'Auschwitz Jack Tramiel, Commodore International a façonné l'histoire de la micro-informatique. En sortant le Commodore 64 en août 1982 avec sa puce sonore SID 6581 conçue par Bob Yannes, Commodore a vendu plus de 17 millions de machines (record Guinness). Puis avec l'Amiga 500 en 1987, Commodore a inventé le multimédia grand public avec un processeur 16/32-bit et un affichage graphique à couper le souffle.",
+    eras: [
+      {
+        era: "1982 - 1993",
+        period: "Le règne du C64 et de l'Amiga",
+        title: "L'ordinateur le plus vendu au monde et la déferlante Amiga",
+        description: "Des chambres d'ados aux studios de démo-scène européenne, le C64 et l'Amiga 500 ont vu naître les plus grands studios de développement européens (DICE, Psygnosis, DMA Design / Rockstar).",
+      },
+    ],
+    milestones: [
+      { year: 1982, title: "Lancement du Commodore 64", description: "L'ordinateur individuel le plus vendu de tous les temps, homologué au Livre Guinness." },
+      { year: 1985, title: "Sortie de l'Amiga 1000", description: "Révélé par Andy Warhol, premier micro-ordinateur multitâche préemptif grand public." },
+      { year: 1987, title: "L'Amiga 500 dans chaque foyer", description: "La machine de prédilection de la demoscene et des jeux micro européens." },
+    ],
+    keyFigures: [
+      { name: "Jack Tramiel", role: "Fondateur pugnace de Commodore", contribution: "A imposé des guerres de prix féroces pour rendre l'informatique accessible à tous les budgets modestes." },
+      { name: "Jay Miner", role: "Père de l'Amiga", contribution: "Ingénieur de génie ayant conçu les chipsets personnalisés (Paula, Denise, Agnus) de l'Amiga." },
+      { name: "Bob Yannes", role: "Concepteur de la puce SID 6581", contribution: "A conçu la puce audio la plus expressive et influente de la musique électronique 8-bit chiptune." },
+    ],
+    philosophy: "Accessibilité maximale, ouverture aux bidouilleurs et puissance multimédia démocratisée.",
+    culturalImpact: "La puce SID du C64 continue d'être utilisée par les musiciens électroniques contemporains (Daft Punk, Timbaland, Zombie Nation).",
+    anecdotes: [
+      "Jack Tramiel avait pour devise : 'Les affaires, c'est la guerre. Si vous n'êtes pas prêts à tuer, ne venez pas.'",
+      "L'Amiga était si en avance sur son temps qu'Andy Warhol et Debbie Harry ont réalisé des portraits en direct lors de la présentation officielle à New York en 1985.",
+    ],
+    totalConsolesSoldEstimate: "+30 Millions d'ordinateurs C64 et Amiga",
+    bestSellingConsole: "Commodore 64 (~17 millions d'exemplaires - Record du Monde)",
+    bestSellingGame: "The Great Giana Sisters / Sensible Soccer / Lemmings",
+    youtubeId: "-ga41edXw3A",
+  },
+};

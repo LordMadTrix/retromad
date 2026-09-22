@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress } from './types';
+import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company } from './types';
 
 export const API = {
   // Paramètres
@@ -8,8 +8,10 @@ export const API = {
   selectDirectory: (): Promise<string | null> => ipcRenderer.invoke('select-directory'),
 
   // Données de base
-  getSystems: () => ipcRenderer.invoke('get-systems'),
-  getCompanies: () => ipcRenderer.invoke('get-companies'),
+  getSystems: (): Promise<System[]> => ipcRenderer.invoke('get-systems'),
+  saveSystems: (systems: System[]): Promise<System[]> => ipcRenderer.invoke('save-systems', systems),
+  getCompanies: (): Promise<Company[]> => ipcRenderer.invoke('get-companies'),
+  saveCompanies: (companies: Company[]): Promise<Company[]> => ipcRenderer.invoke('save-companies', companies),
 
   // Gestion des ROMs
   getGames: (): Promise<Game[]> => ipcRenderer.invoke('get-games'),
@@ -40,6 +42,7 @@ export const API = {
   launchGame: (game: Game, emulatorId?: string): Promise<{ success: boolean; message: string }> =>
     ipcRenderer.invoke('launch-game', game, emulatorId),
   getEmulators: (): Promise<EmulatorProfile[]> => ipcRenderer.invoke('get-emulators'),
+  saveEmulators: (emulators: EmulatorProfile[]): Promise<EmulatorProfile[]> => ipcRenderer.invoke('save-emulators', emulators),
   detectEmulators: (): Promise<EmulatorProfile[]> => ipcRenderer.invoke('detect-emulators'),
 
   // Gestion des Extensions & Cœurs

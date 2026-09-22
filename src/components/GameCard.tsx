@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Game, System } from '../types';
 import { Heart, Play, Eye } from 'lucide-react';
+import { resolveMediaUrl } from '../utils/media';
 
 interface GameCardProps {
   game: Game;
@@ -44,10 +45,8 @@ export const GameCard: React.FC<GameCardProps> = ({
     }
   };
 
-  // Convertir le chemin relatif du média en URL de protocole sécurisé Electron
-  const boxartUrl = game.media?.boxart2d 
-    ? `retromad-media://${game.media.boxart2d}`
-    : null;
+  // Convertir l'URL du média (Web ou protocole sécurisé Electron)
+  const boxartUrl = resolveMediaUrl(game.media?.boxart2d) || null;
 
   return (
     <div

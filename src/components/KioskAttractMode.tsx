@@ -46,7 +46,6 @@ export const KioskAttractMode: React.FC<KioskAttractModeProps> = ({
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [gameIdx, setGameIdx] = useState(0);
   const [isFlashing, setIsFlashing] = useState(true);
-  const [scanlinePhase, setScanlinePhase] = useState(0);
   const systemsMap = useRef(new Map(systems.map((s) => [s.id, s])));
 
   // Actualiser la map quand systems change
@@ -85,13 +84,6 @@ export const KioskAttractMode: React.FC<KioskAttractModeProps> = ({
     return () => clearInterval(timer);
   }, [isActive, displayGames.length]);
 
-  // Animation scanlines
-  useEffect(() => {
-    if (!isActive) return;
-    const timer = setInterval(() => setScanlinePhase((p) => (p + 1) % 4), 150);
-    return () => clearInterval(timer);
-  }, [isActive]);
-
   // Écouter tout input utilisateur pour réveiller
   const handleWakeUp = useCallback(() => {
     if (isActive) onWakeUp();
@@ -115,7 +107,6 @@ export const KioskAttractMode: React.FC<KioskAttractModeProps> = ({
 
   // Couleur thème console actuelle
   const themeColor = currentSystem?.themeColor || '#00f2fe';
-  const rgbColor = hexToRgb(themeColor);
 
   return (
     <div
@@ -241,9 +232,3 @@ export const KioskAttractMode: React.FC<KioskAttractModeProps> = ({
     </div>
   );
 };
-
-function hexToRgb(hex: string): string {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return '0, 242, 254';
-  return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
-}

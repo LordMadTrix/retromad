@@ -1,3 +1,40 @@
+export interface CompanyMilestone {
+  year: number;
+  title: string;
+  description: string;
+}
+
+export interface CompanyFigure {
+  name: string;
+  role: string;
+  contribution: string;
+}
+
+export interface CompanyMuseumExhibition {
+  tagline: string;
+  curatorIntro: string;
+  eras: {
+    era: string;
+    period: string;
+    title: string;
+    description: string;
+  }[];
+  milestones: CompanyMilestone[];
+  keyFigures: CompanyFigure[];
+  philosophy: string;
+  culturalImpact: string;
+  franchiseHistories?: {
+    name: string;
+    year: number;
+    description: string;
+  }[];
+  anecdotes: string[];
+  totalConsolesSoldEstimate?: string;
+  bestSellingConsole?: string;
+  bestSellingGame?: string;
+  youtubeId?: string;
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -8,6 +45,9 @@ export interface Company {
   description: string;
   famousFranchises: string[];
   consoles: string[];
+  videoUrl?: string;
+  youtubeId?: string;
+  museum?: CompanyMuseumExhibition;
 }
 
 export interface SystemSpecs {

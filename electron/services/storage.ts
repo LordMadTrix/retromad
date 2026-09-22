@@ -1,12 +1,18 @@
 import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
-import { AppSettings, Game } from '../types';
+import { AppSettings, Game, System, Company, EmulatorProfile } from '../types';
+import { SYSTEMS } from '../data/systems';
+import { COMPANIES } from '../data/companies';
+import { BUILTIN_EMULATORS } from '../data/emulators';
 
 export class StorageService {
   private dataDir: string;
   private settingsFile: string;
   private gamesFile: string;
+  private systemsFile: string;
+  private companiesFile: string;
+  private emulatorsFile: string;
   public mediaDir: string;
 
   constructor() {
@@ -22,6 +28,9 @@ export class StorageService {
 
     this.settingsFile = path.join(this.dataDir, 'settings.json');
     this.gamesFile = path.join(this.dataDir, 'games.json');
+    this.systemsFile = path.join(this.dataDir, 'systems.json');
+    this.companiesFile = path.join(this.dataDir, 'companies.json');
+    this.emulatorsFile = path.join(this.dataDir, 'emulators.json');
   }
 
   private writeJsonAtomically(filePath: string, value: unknown): void {
@@ -98,6 +107,57 @@ export class StorageService {
 
   saveGames(games: Game[]): void {
     this.writeJsonAtomically(this.gamesFile, games);
+  }
+
+  getSystems(): System[] {
+    try {
+      if (fs.existsSync(this.systemsFile)) {
+        const data = fs.readFileSync(this.systemsFile, 'utf-8');
+        return JSON.parse(data);
+      }
+    } catch (e) {
+      console.error('Erreur lecture systems.json:', e);
+    }
+    return SYSTEMS;
+  }
+
+  saveSystems(systems: System[]): System[] {
+    this.writeJsonAtomically(this.systemsFile, systems);
+    return systems;
+  }
+
+  getCompanies(): Company[] {
+    try {
+      if (fs.existsSync(this.companiesFile)) {
+        const data = fs.readFileSync(this.companiesFile, 'utf-8');
+        return JSON.parse(data);
+      }
+    } catch (e) {
+      console.error('Erreur lecture companies.json:', e);
+    }
+    return COMPANIES;
+  }
+
+  saveCompanies(companies: Company[]): Company[] {
+    this.writeJsonAtomically(this.companiesFile, companies);
+    return companies;
+  }
+
+  getEmulators(): EmulatorProfile[] {
+    try {
+      if (fs.existsSync(this.emulatorsFile)) {
+        const data = fs.readFileSync(this.emulatorsFile, 'utf-8');
+        return JSON.parse(data);
+      }
+    } catch (e) {
+      console.error('Erreur lecture emulators.json:', e);
+    }
+    return BUILTIN_EMULATORS;
+  }
+
+  saveEmulators(emulators: EmulatorProfile[]): EmulatorProfile[] {
+    this.writeJsonAtomically(this.emulatorsFile, emulators);
+    return emulators;
   }
 
   getDataDir(): string {

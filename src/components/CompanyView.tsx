@@ -2,13 +2,18 @@ import React, { useState } from 'react';
 import { Company, System } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
-import { Landmark, Calendar, MapPin, ChevronRight, Cpu, Tv, HardDrive } from 'lucide-react';
+import { CompanyBackgroundVideo, CompanyTvWidget } from './CompanyBackgroundVideo';
+import { CompanyExhibitionModal } from './CompanyExhibitionModal';
+import { Landmark, Calendar, MapPin, ChevronRight, Cpu, Tv, HardDrive, Sparkles, Pencil } from 'lucide-react';
 
 interface CompanyViewProps {
   companies: Company[];
   systems: System[];
   onSelectSystemFilter: (systemId: string) => void;
   onOpenExhibition?: (system: System) => void;
+  onOpenCompanyExhibition?: (company: Company) => void;
+  onEditCompany?: (company: Company) => void;
+  isKioskMode?: boolean;
 }
 
 export const CompanyView: React.FC<CompanyViewProps> = ({
@@ -16,8 +21,12 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
   systems,
   onSelectSystemFilter,
   onOpenExhibition,
+  onOpenCompanyExhibition,
+  onEditCompany,
+  isKioskMode = false,
 }) => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>(companies[0]?.id || 'nintendo');
+  const [isFirmMuseumOpen, setIsFirmMuseumOpen] = useState(false);
 
   const selectedCompany = companies.find((c) => c.id === selectedCompanyId) || companies[0];
 
@@ -25,7 +34,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-retro-900/40">
-      {/* Sélecteur horizontal des Firmes avec VRAIS LOGOS */}
+      {/* Sélecteur horizontal des Firmes avec VRAIS LOGOS et VIDÉOS en fond */}
       <div className="h-28 border-b border-cyan-300/20 px-6 py-4 flex items-center space-x-4 bg-retro-900/70 overflow-x-auto no-scrollbar shrink-0">
         {companies.map((company) => {
           const isSelected = company.id === selectedCompanyId;
@@ -36,13 +45,17 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
               style={{
                 borderColor: isSelected ? company.accentColor : undefined,
               }}
-              className={`company-selector-button flex items-center justify-center px-5 py-3 min-w-[150px] rounded-2xl shrink-0 transition-all ${
+              className={`group relative company-selector-button flex items-center justify-center px-5 py-3 min-w-[150px] rounded-2xl shrink-0 transition-all overflow-hidden ${
                 isSelected
                 ? 'company-selector-active bg-slate-800/95 border-2 shadow-neon scale-[1.02]'
                 : 'bg-retro-800/70 hover:bg-slate-700 border border-slate-600 hover:scale-102 opacity-80 hover:opacity-100'
               }`}
             >
-              <CompanyLogo companyId={company.id} size="sm" />
+              {/* Vidéo de fond miniature dans l'encadré */}
+              <CompanyBackgroundVideo company={company} mode="mini" />
+              <div className="relative z-10 flex items-center justify-center">
+                <CompanyLogo companyId={company.id} size="sm" />
+              </div>
             </button>
           );
         })}
@@ -51,16 +64,18 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
       {/* Contenu principal de la firme sélectionnée */}
       <div className="flex-1 overflow-y-auto">
         <div key={selectedCompanyId} className="company-content-enter p-8 space-y-8">
-        {/* Bannière Présentation de la Firme */}
+        {/* Bannière Présentation de la Firme avec Vidéo en Fond et Widget TV */}
         <div
           style={{
             borderColor: `${selectedCompany.accentColor}55`,
-            background: `linear-gradient(135deg, ${selectedCompany.accentColor}15 0%, #121622 100%)`,
           }}
-          className="relative rounded-3xl p-8 border shadow-xl overflow-hidden"
+          className="relative rounded-3xl p-6 sm:p-8 border shadow-2xl overflow-hidden min-h-[280px]"
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
+          {/* Vidéo en fond de l'encadré de la firme avec contrôles interactifs */}
+          <CompanyBackgroundVideo company={selectedCompany} mode="banner" />
+
+          <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            <div className="flex-1">
               <div className="flex items-center space-x-3 mb-2">
                 <span
                   style={{ backgroundColor: selectedCompany.accentColor }}
@@ -68,39 +83,81 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                 >
                   FIRME HISTORIQUE
                 </span>
-                <span className="text-slate-400 text-xs flex items-center space-x-1">
-                  <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-slate-300 text-xs flex items-center space-x-1 drop-shadow">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
                   <span>{selectedCompany.country}</span>
                 </span>
-                <span className="text-slate-400 text-xs flex items-center space-x-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-slate-300 text-xs flex items-center space-x-1 drop-shadow">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <span>Fondée en {selectedCompany.founded}</span>
                 </span>
               </div>
 
-              <div className="company-logo-reveal my-3">
+              <div className="company-logo-reveal my-3 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
                 <CompanyLogo companyId={selectedCompany.id} size="xl" />
               </div>
 
-              <p className="text-sm text-slate-300 max-w-3xl mt-3 leading-relaxed">
+              <p className="text-sm text-slate-200 max-w-2xl mt-3 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-medium">
                 {selectedCompany.description}
               </p>
+
+              <div className="mt-4">
+                <span className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block mb-2 drop-shadow">
+                  Franchises Légendaires
+                </span>
+                <div className="flex flex-wrap gap-1.5 max-w-lg">
+                  {selectedCompany.famousFranchises.map((franchise, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-slate-700/80 text-xs font-semibold text-white shadow"
+                    >
+                      {franchise}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bouton d'accès au Grand Musée de la Firme */}
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (onOpenCompanyExhibition) {
+                      onOpenCompanyExhibition(selectedCompany);
+                    } else {
+                      setIsFirmMuseumOpen(true);
+                    }
+                  }}
+                  style={{
+                    backgroundColor: selectedCompany.accentColor,
+                    boxShadow: `0 0 25px ${selectedCompany.accentColor}77`,
+                  }}
+                  className="px-5 py-2.5 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center space-x-2.5 hover:scale-105 active:scale-95 transition shadow-2xl border border-white/30 backdrop-blur-md group"
+                >
+                  <Landmark className="w-4 h-4 text-white group-hover:rotate-6 transition-transform" />
+                  <span>Musée Virtuel de {selectedCompany.name}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                </button>
+
+                {!isKioskMode && onEditCompany && (
+                  <button
+                    onClick={() => onEditCompany(selectedCompany)}
+                    className="px-4 py-2.5 rounded-2xl bg-black/50 hover:bg-black/70 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-500 text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md"
+                    title={`Éditer les données, le musée et les vidéos de ${selectedCompany.name}`}
+                  >
+                    <Pencil className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Modifier la Firme</span>
+                  </button>
+                )}
+
+                <span className="text-[11px] text-slate-300 font-medium drop-shadow hidden sm:inline-block">
+                  Épopée historique • Chronologie • Pères fondateurs • Archives vidéo
+                </span>
+              </div>
             </div>
 
-            <div className="shrink-0 text-right">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-2">
-                Franchises Légendaires
-              </span>
-              <div className="flex flex-wrap md:justify-end gap-1.5 max-w-xs">
-                {selectedCompany.famousFranchises.map((franchise, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2.5 py-1 rounded-lg bg-black/40 border border-slate-700/60 text-xs font-semibold text-slate-200"
-                  >
-                    {franchise}
-                  </span>
-                ))}
-              </div>
+            {/* Écran Rétro TV Dédié YouTube intégré directement dans l'encadré */}
+            <div className="shrink-0 w-full xl:w-88 max-w-md self-center xl:self-auto">
+              <CompanyTvWidget company={selectedCompany} />
             </div>
           </div>
         </div>
@@ -199,6 +256,24 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Modale Dédiée Musée Virtuel de la Firme */}
+      <CompanyExhibitionModal
+        company={selectedCompany}
+        systems={companySystems}
+        isOpen={isFirmMuseumOpen}
+        onClose={() => setIsFirmMuseumOpen(false)}
+        onOpenSystemExhibition={(sys) => {
+          setIsFirmMuseumOpen(false);
+          if (onOpenExhibition) {
+            onOpenExhibition(sys);
+          }
+        }}
+        onExploreGames={(sysId) => {
+          setIsFirmMuseumOpen(false);
+          onSelectSystemFilter(sysId);
+        }}
+      />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { Game, System } from '../types';
 import { GameCard } from './GameCard';
 import { Search, SlidersHorizontal, FolderPlus, Dices, X } from 'lucide-react';
 
-type Collection = 'all' | 'favorites' | 'recent' | 'topplayed' | 'gems';
+type Collection = 'all' | 'favorites' | 'recent' | 'topplayed' | 'gems' | 'multiplayer';
 
 interface GameGridProps {
   games: Game[];
@@ -16,6 +16,7 @@ interface GameGridProps {
   onScanPrompt: () => void;
   selectedSystemId: string | null;
   onPlayDice?: () => void;
+  onOpenRoulette?: () => void;
 }
 
 export const GameGrid: React.FC<GameGridProps> = ({
@@ -29,6 +30,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
   onScanPrompt,
   selectedSystemId,
   onPlayDice,
+  onOpenRoulette,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [collection, setCollection] = useState<Collection>('all');
@@ -54,6 +56,14 @@ export const GameGrid: React.FC<GameGridProps> = ({
         if (collection === 'recent' && !game.lastPlayed) return false;
         if (collection === 'topplayed' && game.playCount < 1) return false;
         if (collection === 'gems' && (!game.metadata?.rating || game.metadata.rating < 80)) return false;
+        if (collection === 'multiplayer') {
+          const isMulti =
+            parseInt(String(game.metadata?.players || '1'), 10) > 1 ||
+            game.metadata?.genres?.some((g) =>
+              /combat|fight|course|race|versus|party|sport/i.test(g)
+            );
+          if (!isMulti) return false;
+        }
         // Recherche textuelle
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
@@ -79,6 +89,10 @@ export const GameGrid: React.FC<GameGridProps> = ({
   }, [games, selectedSystemId, collection, searchTerm, sortBy]);
 
   const handleRandomPick = () => {
+    if (onOpenRoulette) {
+      onOpenRoulette();
+      return;
+    }
     if (filteredGames.length === 0) return;
     onPlayDice?.();
     const randomIndex = Math.floor(Math.random() * filteredGames.length);
@@ -166,6 +180,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
             { id: 'recent', label: 'Récents', emoji: '🕒', count: games.filter(g => g.lastPlayed && (!selectedSystemId || g.systemId === selectedSystemId)).length },
             { id: 'topplayed', label: 'Top Joués', emoji: '🔥', count: games.filter(g => g.playCount > 0 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
             { id: 'gems', label: 'Pépites', emoji: '🏆', count: games.filter(g => (g.metadata?.rating || 0) >= 80 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
+            { id: 'multiplayer', label: 'Multijoueur', emoji: '👥', count: games.filter(g => (!selectedSystemId || g.systemId === selectedSystemId) && (parseInt(String(g.metadata?.players || '1'), 10) > 1 || g.metadata?.genres?.some(x => /combat|fight|course|race|versus|party|sport/i.test(x)))).length },
           ] as const).map((col) => (
             <button
               key={col.id}
@@ -231,7 +246,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
               <button
                 onClick={() => {
                   setSearchTerm('');
-                  setFavoritesOnly(false);
+                  setCollection('all');
                   setSortBy('alpha');
                 }}
                 className="flex items-center space-x-2 px-5 py-2.5 rounded-xl border border-slate-600 text-slate-200 hover:bg-slate-800 transition text-sm font-semibold"

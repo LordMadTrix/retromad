@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Gamepad2, Landmark, Cpu, Settings, RefreshCw, Sparkles,
   Volume2, VolumeX, Lock, Unlock, ShieldCheck, DownloadCloud,
-  Tv, Music, Music2, Search, ChevronDown, ScanLine
+  Tv, Search, ChevronDown, Dices, Trophy,
+  BookOpen, Swords, HardDrive, Code2, Disc3
 } from 'lucide-react';
 
 export type NavTab = 'games' | 'companies' | 'bios' | 'settings';
@@ -25,6 +26,15 @@ interface NavigationProps {
   isKioskMode: boolean;
   onEnterKiosk: () => void;
   onUnlockKiosk: () => void;
+  // 8 Features Rétro
+  onOpenRoulette?: () => void;
+  onOpenAchievements?: () => void;
+  onOpenJukebox?: () => void;
+  onOpenTournament?: () => void;
+  onOpenManuals?: () => void;
+  onOpenBezelStudio?: () => void;
+  onOpenCheats?: () => void;
+  onOpenSaveStates?: () => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
@@ -45,15 +55,28 @@ export const Navigation: React.FC<NavigationProps> = ({
   isKioskMode,
   onEnterKiosk,
   onUnlockKiosk,
+  onOpenRoulette,
+  onOpenAchievements,
+  onOpenJukebox,
+  onOpenTournament,
+  onOpenManuals,
+  onOpenBezelStudio,
+  onOpenCheats,
+  onOpenSaveStates,
 }) => {
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const [retroLabOpen, setRetroLabOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const retroLabRef = useRef<HTMLDivElement>(null);
 
-  // Fermer le menu admin si clic ailleurs
+  // Fermer les menus déroulants si clic ailleurs
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setAdminMenuOpen(false);
+      }
+      if (retroLabRef.current && !retroLabRef.current.contains(e.target as Node)) {
+        setRetroLabOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -61,7 +84,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   }, []);
 
   return (
-    <header className="h-14 bg-gradient-to-r from-[#0d1b3e] via-[#162b6d] to-[#2d1258] border-b-2 border-cyan-400/40 shadow-[0_4px_24px_rgba(0,242,254,0.2)] px-3 flex items-center gap-3 z-30 select-none shrink-0">
+    <header className="h-14 bg-gradient-to-r from-[#0d1b3e] via-[#162b6d] to-[#2d1258] border-b-2 border-cyan-400/40 shadow-[0_4px_24px_rgba(0,242,254,0.2)] px-3 flex items-center gap-2.5 z-30 select-none shrink-0">
 
       {/* ── Logo ── */}
       <div
@@ -109,6 +132,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           onClick={() => onTabChange('companies')}
           icon={<Landmark className="w-4 h-4" />}
           label="Firmes"
+          badge="Vidéos"
         />
         {!isKioskMode && (
           <>
@@ -122,11 +146,86 @@ export const Navigation: React.FC<NavigationProps> = ({
               active={currentTab === 'settings'}
               onClick={() => onTabChange('settings')}
               icon={<Settings className="w-4 h-4" />}
-              label="Réglages"
+              label="Centre Admin"
             />
           </>
         )}
       </nav>
+
+      {/* ── Menu Déroulant Labo Rétro (Les 8 Fonctionnalités Spéciales) ── */}
+      <div className="relative shrink-0" ref={retroLabRef}>
+        <button
+          onClick={() => setRetroLabOpen((p) => !p)}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm ${
+            retroLabOpen
+              ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(0,242,254,0.3)]'
+              : 'bg-gradient-to-r from-purple-900/60 to-indigo-900/60 border-purple-500/40 text-purple-200 hover:text-white hover:border-purple-400'
+          }`}
+          title="Outils & Expériences Rétrogaming"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+          <span className="hidden md:inline">Labo Rétro</span>
+          <ChevronDown className={`w-3 h-3 transition-transform ${retroLabOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {retroLabOpen && (
+          <div className="absolute left-0 top-full mt-1.5 w-64 bg-[#0a122a]/98 border border-cyan-500/30 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] backdrop-blur-2xl z-50 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-3.5 py-1 text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
+              <span>EXPÉRIENCES & MODULES</span>
+              <span className="font-mono text-slate-500">8 NOUVEAUTÉS</span>
+            </div>
+
+            <MenuAction
+              icon={<Dices className="w-4 h-4 text-cyan-400" />}
+              label="Roulette Rétro & Défi du Jour"
+              onClick={() => { onOpenRoulette?.(); setRetroLabOpen(false); }}
+              className="text-cyan-200 hover:bg-cyan-500/15"
+            />
+            <MenuAction
+              icon={<Trophy className="w-4 h-4 text-amber-400" />}
+              label="RetroAchievements & Trophées"
+              onClick={() => { onOpenAchievements?.(); setRetroLabOpen(false); }}
+              className="text-amber-200 hover:bg-amber-500/15"
+            />
+            <MenuAction
+              icon={<Disc3 className="w-4 h-4 text-pink-400" />}
+              label="Jukebox Chiptune 8/16-Bit"
+              onClick={() => { onOpenJukebox?.(); setRetroLabOpen(false); }}
+              className="text-pink-200 hover:bg-pink-500/15"
+            />
+            <MenuAction
+              icon={<Swords className="w-4 h-4 text-orange-400" />}
+              label="Tournois Arcade Multijoueur"
+              onClick={() => { onOpenTournament?.(); setRetroLabOpen(false); }}
+              className="text-orange-200 hover:bg-orange-500/15"
+            />
+            <MenuAction
+              icon={<BookOpen className="w-4 h-4 text-emerald-400" />}
+              label="Manuels & Notices d'Époque"
+              onClick={() => { onOpenManuals?.(); setRetroLabOpen(false); }}
+              className="text-emerald-200 hover:bg-emerald-500/15"
+            />
+            <MenuAction
+              icon={<Tv className="w-4 h-4 text-blue-400" />}
+              label="Studio Bezels & Shaders CRT"
+              onClick={() => { onOpenBezelStudio?.(); setRetroLabOpen(false); }}
+              className="text-blue-200 hover:bg-blue-500/15"
+            />
+            <MenuAction
+              icon={<Code2 className="w-4 h-4 text-purple-400" />}
+              label="Codes Cheats (Game Genie)"
+              onClick={() => { onOpenCheats?.(); setRetroLabOpen(false); }}
+              className="text-purple-200 hover:bg-purple-500/15"
+            />
+            <MenuAction
+              icon={<HardDrive className="w-4 h-4 text-teal-400" />}
+              label="Save States & Cartes Mémoires"
+              onClick={() => { onOpenSaveStates?.(); setRetroLabOpen(false); }}
+              className="text-teal-200 hover:bg-teal-500/15"
+            />
+          </div>
+        )}
+      </div>
 
       {/* ── Spacer flex ── */}
       <div className="flex-1" />
@@ -143,20 +242,18 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* ── Contrôles Audio ── */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* BGM Chiptune */}
-        {onToggleBgm && (
-          <button
-            onClick={onToggleBgm}
-            title={bgmActive ? 'Stopper la musique d\'ambiance' : 'Musique chiptune d\'ambiance 🎵'}
-            className={`p-2 rounded-lg border transition ${
-              bgmActive
-                ? 'bg-purple-500/20 border-purple-500/50 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.25)]'
-                : 'bg-slate-800/70 border-slate-700/40 text-slate-500 hover:text-white hover:bg-slate-700/70'
-            }`}
-          >
-            {bgmActive ? <Music className="w-3.5 h-3.5" /> : <Music2 className="w-3.5 h-3.5" />}
-          </button>
-        )}
+        {/* Jukebox BGM Chiptune */}
+        <button
+          onClick={onOpenJukebox || onToggleBgm}
+          title="Ouvrir le Jukebox Chiptune 🎵"
+          className={`p-2 rounded-lg border transition ${
+            bgmActive
+              ? 'bg-pink-500/20 border-pink-500/50 text-pink-300 shadow-[0_0_10px_rgba(236,72,153,0.3)]'
+              : 'bg-slate-800/70 border-slate-700/40 text-slate-500 hover:text-white hover:bg-slate-700/70'
+          }`}
+        >
+          <Disc3 className={`w-3.5 h-3.5 ${bgmActive ? 'animate-spin' : ''}`} />
+        </button>
 
         {/* Sons FX */}
         <button
@@ -171,10 +268,10 @@ export const Navigation: React.FC<NavigationProps> = ({
           {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
         </button>
 
-        {/* Filtre CRT */}
+        {/* Studio Bezels & Shaders CRT */}
         <button
-          onClick={onToggleCrt}
-          title={crtEnabled ? 'Désactiver le filtre CRT' : 'Activer le filtre CRT Scanlines'}
+          onClick={onOpenBezelStudio || onToggleCrt}
+          title="Studio Bezels & Shaders CRT"
           className={`p-2 rounded-lg border transition ${
             crtEnabled
               ? 'bg-retro-accent/15 border-retro-accent/50 text-retro-accent shadow-[0_0_10px_rgba(0,242,254,0.2)]'

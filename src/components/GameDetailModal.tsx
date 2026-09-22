@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Game, System, EmulatorProfile } from '../types';
-import { X, Play, Heart, RefreshCw, Calendar, Users, Star, Award, HardDrive, Hash, Terminal } from 'lucide-react';
+import { X, Play, Heart, RefreshCw, Calendar, Users, Star, Award, HardDrive, Hash, Terminal, Pencil, Trophy, Code2, BookOpen } from 'lucide-react';
 import { ConsoleLogo } from './ConsoleLogo';
+import { resolveMediaUrl } from '../utils/media';
 
 interface GameDetailModalProps {
   game: Game | null;
@@ -11,7 +12,13 @@ interface GameDetailModalProps {
   onLaunch: (game: Game, emulatorId?: string) => void;
   onToggleFavorite: (gameId: string) => void;
   onScrapeGame: (game: Game) => void;
+  onEdit?: (game: Game) => void;
+  isKioskMode?: boolean;
   isScraping?: boolean;
+  onOpenAchievements?: (game: Game) => void;
+  onOpenCheats?: (game: Game) => void;
+  onOpenSaveStates?: (game: Game) => void;
+  onOpenManual?: (game: Game) => void;
 }
 
 export const GameDetailModal: React.FC<GameDetailModalProps> = ({
@@ -22,15 +29,21 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
   onLaunch,
   onToggleFavorite,
   onScrapeGame,
+  onEdit,
+  isKioskMode = false,
   isScraping,
+  onOpenAchievements,
+  onOpenCheats,
+  onOpenSaveStates,
+  onOpenManual,
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'boxart' | 'snap'>('boxart');
   const [selectedEmulatorId, setSelectedEmulatorId] = useState<string>('retroarch');
 
   if (!game) return null;
 
-  const boxartUrl = game.media?.boxart2d ? `retromad-media://${game.media.boxart2d}` : null;
-  const snapUrl = game.media?.snap ? `retromad-media://${game.media.snap}` : null;
+  const boxartUrl = resolveMediaUrl(game.media?.boxart2d) || null;
+  const snapUrl = resolveMediaUrl(game.media?.snap) || null;
 
   // Taille formatée
   const sizeMb = (game.size / (1024 * 1024)).toFixed(2);
@@ -57,12 +70,25 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
             </h2>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-700/60 text-slate-400 hover:text-white transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            {!isKioskMode && onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(game)}
+                className="px-3 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 text-xs font-bold transition flex items-center space-x-1.5 shadow"
+                title="Éditer les informations de ce jeu"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Éditer</span>
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-slate-700/60 text-slate-400 hover:text-white transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Corps de la modale */}
@@ -215,6 +241,49 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               </div>
             </div>
 
+            {/* Barre Outils Rétro (Succès, Cheats, Save States, Manuel) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => onOpenAchievements?.(game)}
+                className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center space-x-1.5 transition"
+                title="Consulter les trophées et succès pour ce jeu"
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                <span>Succès</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenCheats?.(game)}
+                className="px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center justify-center space-x-1.5 transition"
+                title="Codes de triche Game Genie & Action Replay"
+              >
+                <Code2 className="w-3.5 h-3.5" />
+                <span>Cheats</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenSaveStates?.(game)}
+                className="px-2.5 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 text-xs font-bold flex items-center justify-center space-x-1.5 transition"
+                title="Gestionnaire d'instantanés et sauvegardes cartouches"
+              >
+                <HardDrive className="w-3.5 h-3.5" />
+                <span>Save States</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenManual?.(game)}
+                className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center space-x-1.5 transition"
+                title="Lire la notice et le manuel officiel d'époque"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Manuel</span>
+              </button>
+            </div>
+
             {/* Sélecteur d'émulateur si plusieurs choix possibles */}
             {emulators.length > 0 && (
               <div className="flex items-center space-x-2 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
@@ -257,6 +326,16 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               >
                 <Heart className={`w-5 h-5 ${game.favorite ? 'fill-current' : ''}`} />
               </button>
+
+              {!isKioskMode && onEdit && (
+                <button
+                  onClick={() => onEdit(game)}
+                  className="p-3 rounded-xl bg-slate-800/80 text-cyan-300 border border-slate-700 hover:border-cyan-500/50 hover:bg-cyan-500/20 transition font-bold"
+                  title="Éditer les données, jaquette et options de ce jeu"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+              )}
 
               <button
                 onClick={() => onScrapeGame(game)}

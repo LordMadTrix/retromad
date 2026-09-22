@@ -3,6 +3,8 @@ import { Game, System, Company, EmulatorProfile } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
 import { ConsoleExhibitionModal } from './ConsoleExhibitionModal';
+import { CompanyExhibitionModal } from './CompanyExhibitionModal';
+import { CompanyBackgroundVideo } from './CompanyBackgroundVideo';
 import {
   Play,
   Heart,
@@ -23,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
+import { resolveMediaUrl } from '../utils/media';
 
 interface KioskArcadeViewProps {
   games: Game[];
@@ -206,6 +209,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
   // Exposition virtuelle & musée du rétrogaming
   const [exhibitionSystem, setExhibitionSystem] = useState<System | null>(null);
+  const [exhibitionCompany, setExhibitionCompany] = useState<Company | null>(null);
 
   // Index de navigation au sein de chaque niveau
   const [companyIndex, setCompanyIndex] = useState<number>(0);
@@ -347,6 +351,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         }
       },
       onConfirm: () => {
+        if (exhibitionCompany) return;
         if (exhibitionSystem) {
           const sys = exhibitionSystem;
           setExhibitionSystem(null);
@@ -367,7 +372,13 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         }
       },
       onCancel: () => {
+        if (exhibitionCompany) {
+          playBack();
+          setExhibitionCompany(null);
+          return;
+        }
         if (exhibitionSystem) {
+          playBack();
           setExhibitionSystem(null);
           return;
         }
@@ -380,8 +391,14 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         }
       },
       onFavorite: () => {
-        if (exhibitionSystem) return;
-        if (step === 'consoles') {
+        if (exhibitionSystem || exhibitionCompany) return;
+        if (step === 'companies') {
+          const comp = companies[companyIndex];
+          if (comp) {
+            playSelect();
+            setExhibitionCompany(comp);
+          }
+        } else if (step === 'consoles') {
           const sys = companySystems[consoleIndex];
           if (sys) {
             playSelect();
@@ -393,8 +410,14 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         }
       },
       onDetails: () => {
-        if (exhibitionSystem) return;
-        if (step === 'consoles') {
+        if (exhibitionSystem || exhibitionCompany) return;
+        if (step === 'companies') {
+          const comp = companies[companyIndex];
+          if (comp) {
+            playSelect();
+            setExhibitionCompany(comp);
+          }
+        } else if (step === 'consoles') {
           const sys = companySystems[consoleIndex];
           if (sys) {
             playSelect();
@@ -420,7 +443,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
-        if (exhibitionSystem) return;
+        if (exhibitionSystem || exhibitionCompany) return;
         playMove();
         if (step === 'companies') {
           setCompanyIndex((prev) => (prev > 0 ? prev - 1 : companies.length - 1));
@@ -430,7 +453,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           setGameIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, consoleGames.length - 1)));
         }
       } else if (e.key === 'ArrowRight') {
-        if (exhibitionSystem) return;
+        if (exhibitionSystem || exhibitionCompany) return;
         playMove();
         if (step === 'companies') {
           setCompanyIndex((prev) => (prev < companies.length - 1 ? prev + 1 : 0));
@@ -440,6 +463,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           setGameIndex((prev) => (prev < consoleGames.length - 1 ? prev + 1 : 0));
         }
       } else if (e.key === 'Enter' || e.key === ' ') {
+        if (exhibitionCompany) return;
         if (exhibitionSystem) {
           const sys = exhibitionSystem;
           setExhibitionSystem(null);
@@ -459,7 +483,13 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           }
         }
       } else if (e.key === 'Escape' || e.key === 'Backspace') {
+        if (exhibitionCompany) {
+          playBack();
+          setExhibitionCompany(null);
+          return;
+        }
         if (exhibitionSystem) {
+          playBack();
           setExhibitionSystem(null);
           return;
         }
@@ -471,7 +501,13 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           onUnlockAdmin();
         }
       } else if (e.key.toLowerCase() === 'm' || e.key.toLowerCase() === 'e') {
-        if (step === 'consoles') {
+        if (step === 'companies') {
+          const comp = companies[companyIndex];
+          if (comp) {
+            playSelect();
+            setExhibitionCompany(comp);
+          }
+        } else if (step === 'consoles') {
           const sys = companySystems[consoleIndex];
           if (sys) {
             playSelect();
@@ -486,12 +522,12 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       } else if (e.key.toLowerCase() === 'c') {
         onToggleCrt?.();
       } else if (e.key.toLowerCase() === 'f') {
-        if (step === 'games' && currentGame && !exhibitionSystem) {
+        if (step === 'games' && currentGame && !exhibitionSystem && !exhibitionCompany) {
           playFavorite();
           onToggleFavorite(currentGame.id);
         }
       } else if (e.key.toLowerCase() === 'x' || e.key.toLowerCase() === 'd') {
-        if (step === 'games' && currentGame && !exhibitionSystem) {
+        if (step === 'games' && currentGame && !exhibitionSystem && !exhibitionCompany) {
           playSelect();
           onViewDetails(currentGame);
         }
@@ -503,6 +539,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   }, [
     step,
     exhibitionSystem,
+    exhibitionCompany,
     companyIndex,
     consoleIndex,
     gameIndex,
@@ -524,6 +561,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     playMove,
     playLaunch,
     playSelect,
+    playBack,
     playFavorite,
   ]);
 
@@ -715,54 +753,60 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     borderColor: isFocused ? company.accentColor : 'rgba(51, 65, 85, 0.6)',
                     boxShadow: isFocused ? `0 0 25px ${company.accentColor}55` : undefined,
                   }}
-                  className={`group relative rounded-3xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
+                  className={`group relative rounded-3xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden min-h-[340px] ${
                     isFocused
                       ? 'bg-slate-900/95 scale-105 border-2 z-10'
                       : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100'
                   }`}
                 >
+                  {/* Vidéo de fond de l'encadré de la firme */}
+                  <CompanyBackgroundVideo company={company} mode="card" />
+
                   {/* Halo lumineux d'arrière-plan avec la couleur de la firme */}
                   <div
                     className="absolute inset-0 rounded-3xl opacity-15 blur-2xl transition-opacity group-hover:opacity-30 pointer-events-none"
                     style={{ backgroundColor: company.accentColor }}
                   />
 
-                  {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND */}
-                  <div className="w-full h-24 flex items-center justify-center my-2 transition-transform duration-300 group-hover:scale-110">
-                    <CompanyLogo companyId={company.id} size="xl" />
-                  </div>
-
-                  {/* Nom de la firme */}
-                  <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">
-                    {company.name}
-                  </h3>
-
-                  {/* Badges de statistiques */}
-                  <div className="flex items-center space-x-2 my-2">
-                    <span className="px-2.5 py-1 rounded-xl bg-slate-800/80 border border-slate-700 text-[11px] font-bold text-slate-300">
-                      {consoleCount} Console{consoleCount > 1 ? 's' : ''}
-                    </span>
-                    <span
-                      style={{
-                        backgroundColor: romCount > 0 ? `${company.accentColor}25` : undefined,
-                        borderColor: romCount > 0 ? `${company.accentColor}50` : undefined,
-                        color: romCount > 0 ? company.accentColor : '#94a3b8',
-                      }}
-                      className="px-2.5 py-1 rounded-xl border text-[11px] font-black"
-                    >
-                      {romCount} ROM{romCount > 1 ? 's' : ''}
-                    </span>
-                  </div>
-
-                  {/* Citation / Mascotte */}
-                  {heroes.length > 0 && (
-                    <div className="mt-2 text-[10px] text-slate-400 italic line-clamp-1">
-                      "{heroes[0].quote}"
+                  {/* Contenu de la carte positionné au-dessus de la vidéo */}
+                  <div className="relative z-10 w-full flex flex-col items-center justify-between flex-1">
+                    {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND */}
+                    <div className="w-full h-24 flex items-center justify-center my-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                      <CompanyLogo companyId={company.id} size="xl" />
                     </div>
-                  )}
 
-                  {/* Bouton d'entrée */}
-                  <div className="w-full mt-5 pt-3 border-t border-slate-800/80">
+                    {/* Nom de la firme */}
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2 drop-shadow">
+                      {company.name}
+                    </h3>
+
+                    {/* Badges de statistiques */}
+                    <div className="flex items-center space-x-2 my-2">
+                      <span className="px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-[11px] font-bold text-slate-200 shadow">
+                        {consoleCount} Console{consoleCount > 1 ? 's' : ''}
+                      </span>
+                      <span
+                        style={{
+                          backgroundColor: romCount > 0 ? `${company.accentColor}30` : undefined,
+                          borderColor: romCount > 0 ? `${company.accentColor}70` : undefined,
+                          color: romCount > 0 ? company.accentColor : '#94a3b8',
+                        }}
+                        className="px-2.5 py-1 rounded-xl border text-[11px] font-black backdrop-blur-md shadow"
+                      >
+                        {romCount} ROM{romCount > 1 ? 's' : ''}
+                      </span>
+                    </div>
+
+                    {/* Citation / Mascotte */}
+                    {heroes.length > 0 && (
+                      <div className="mt-2 text-[10px] text-slate-300 italic line-clamp-1 drop-shadow">
+                        "{heroes[0].quote}"
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Boutons d'action */}
+                  <div className="relative z-10 w-full mt-4 pt-3 border-t border-slate-800/80 space-y-2">
                     <button
                       type="button"
                       style={{
@@ -772,17 +816,60 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                       className={`w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
                         isFocused
                           ? 'shadow-neon font-black'
-                          : 'bg-slate-800 group-hover:bg-slate-700 text-slate-300'
+                          : 'bg-slate-900/80 backdrop-blur-md group-hover:bg-slate-800 text-slate-200 border border-slate-700'
                       }`}
                     >
                       <span>Consoles {company.name}</span>
                       <ChevronRight className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playSelect();
+                        setExhibitionCompany(company);
+                      }}
+                      style={{
+                        borderColor: isFocused ? `${company.accentColor}80` : 'rgba(100, 116, 139, 0.4)',
+                        backgroundColor: isFocused ? `${company.accentColor}25` : 'rgba(15, 23, 42, 0.7)',
+                        color: isFocused ? '#ffffff' : '#cbd5e1',
+                      }}
+                      className="w-full py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border shadow backdrop-blur-md hover:scale-102 hover:text-white group/mus"
+                      title={`Découvrir l'histoire complète, les fondateurs et archives de ${company.name} (Touche Y ou M)`}
+                    >
+                      <Landmark className="w-3.5 h-3.5 text-amber-400 group-hover/mus:rotate-6 transition-transform" />
+                      <span>🏛️ Musée Virtuel</span>
+                      <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
                     </button>
                   </div>
                 </div>
               );
             })}
           </div>
+
+          {/* Raccourci vers le Grand Musée Virtuel de la firme sélectionnée */}
+          {companies[companyIndex] && (
+            <div className="mt-8 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  playSelect();
+                  setExhibitionCompany(companies[companyIndex]);
+                }}
+                style={{
+                  backgroundColor: `${companies[companyIndex].accentColor}25`,
+                  borderColor: `${companies[companyIndex].accentColor}80`,
+                  color: '#ffffff',
+                  boxShadow: `0 0 25px ${companies[companyIndex].accentColor}44`,
+                }}
+                className="px-6 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md group"
+              >
+                <Landmark className="w-4 h-4 text-amber-400 group-hover:rotate-6 transition-transform" />
+                <span>Visiter le Grand Musée Virtuel de {companies[companyIndex].name}</span>
+                <span className="px-1.5 py-0.5 rounded bg-black/50 text-[10px] font-mono border border-white/20 text-amber-300">Y / M</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -802,6 +889,27 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               {companySystems.length} consoles disponibles • Cliquez sur une console pour explorer sa ludothèque
             </p>
+
+            {/* Bouton d'accès direct au Grand Musée de la firme */}
+            <div className="mt-3 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  playSelect();
+                  setExhibitionCompany(selectedCompany);
+                }}
+                style={{
+                  backgroundColor: `${selectedCompany.accentColor}20`,
+                  borderColor: `${selectedCompany.accentColor}70`,
+                  boxShadow: `0 0 15px ${selectedCompany.accentColor}33`,
+                }}
+                className="px-4 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 backdrop-blur-md hover:scale-105 active:scale-95 shadow"
+                title={`Explorer le Musée historique complet de ${selectedCompany.name}`}
+              >
+                <Landmark className="w-3.5 h-3.5 text-amber-400" />
+                <span>Musée Virtuel {selectedCompany.name} (Épopée, Archives, Secrets)</span>
+                <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+              </button>
+            </div>
           </div>
 
           {/* Grille des Consoles en Grand au Centre */}
@@ -916,7 +1024,25 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
               className="px-6 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center space-x-2 border border-slate-700 shadow"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Retourner au choix des Firmes (B / Échap)</span>
+              <span>Retourner aux Firmes (B / Échap)</span>
+            </button>
+
+            {/* Accès direct Grand Musée de la Firme */}
+            <button
+              onClick={() => {
+                playSelect();
+                setExhibitionCompany(selectedCompany);
+              }}
+              style={{
+                backgroundColor: `${selectedCompany.accentColor}25`,
+                borderColor: `${selectedCompany.accentColor}70`,
+              }}
+              className="px-6 py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md hover:scale-105 active:scale-95 cursor-pointer"
+              title={`Consulter le Grand Musée de la firme ${selectedCompany.name}`}
+            >
+              <Landmark className="w-4 h-4 text-amber-400" />
+              <span>Musée Firme : {selectedCompany.name}</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             </button>
 
             {companySystems[consoleIndex] && (
@@ -957,7 +1083,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   <div className="relative aspect-[3/4] w-72 sm:w-80 rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl p-4 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
                     {currentGame.media?.boxart2d ? (
                       <img
-                        src={`retromad-media://${currentGame.media.boxart2d}`}
+                        src={resolveMediaUrl(currentGame.media.boxart2d)}
                         alt={currentGame.title}
                         className="w-full h-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
                       />
@@ -1203,7 +1329,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     >
                       {game.media?.boxart2d ? (
                         <img
-                          src={`retromad-media://${game.media.boxart2d}`}
+                          src={resolveMediaUrl(game.media.boxart2d)}
                           alt={game.title}
                           className="w-full h-full object-contain p-0.5"
                         />
@@ -1248,6 +1374,15 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </span>
             <span>{step === 'games' ? 'Lancer le Jeu' : 'Sélectionner'}</span>
           </span>
+
+          {step === 'companies' && (
+            <span className="flex items-center space-x-1.5">
+              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
+                Y / M
+              </span>
+              <span>Musée Firme</span>
+            </span>
+          )}
 
           {step !== 'companies' && (
             <span className="flex items-center space-x-1.5">
@@ -1307,6 +1442,36 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         onPlayGames={(sys) => {
           setExhibitionSystem(null);
           handleSelectConsole(sys);
+        }}
+        onOpenCompanyMuseum={(companyId) => {
+          playSelect();
+          const comp = companies.find((c) => c.id === companyId);
+          if (comp) {
+            setExhibitionSystem(null);
+            setExhibitionCompany(comp);
+          }
+        }}
+      />
+
+      {/* MODALE DU GRAND MUSÉE VIRTUEL DE LA FIRME DANS LE MODE KIOSK */}
+      <CompanyExhibitionModal
+        company={exhibitionCompany}
+        systems={systems.filter((s) => s.companyId === exhibitionCompany?.id)}
+        isOpen={!!exhibitionCompany}
+        onClose={() => {
+          playBack();
+          setExhibitionCompany(null);
+        }}
+        onOpenSystemExhibition={(sys) => {
+          setExhibitionCompany(null);
+          setExhibitionSystem(sys);
+        }}
+        onExploreGames={(sysId) => {
+          setExhibitionCompany(null);
+          const targetSystem = systems.find((s) => s.id === sysId);
+          if (targetSystem) {
+            handleSelectConsole(targetSystem);
+          }
         }}
       />
     </div>

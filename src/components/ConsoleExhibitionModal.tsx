@@ -17,6 +17,7 @@ import {
   HelpCircle,
   Flame,
   ShieldCheck,
+  Pencil,
 } from 'lucide-react';
 
 interface ConsoleExhibitionModalProps {
@@ -24,6 +25,9 @@ interface ConsoleExhibitionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPlayGames?: (system: System) => void;
+  onOpenCompanyMuseum?: (companyId: string) => void;
+  onEditSystem?: (system: System) => void;
+  isKioskMode?: boolean;
 }
 
 type ExhibitionTab = 'history' | 'hardware' | 'innovations' | 'legacy';
@@ -33,6 +37,9 @@ export const ConsoleExhibitionModal: React.FC<ConsoleExhibitionModalProps> = ({
   isOpen,
   onClose,
   onPlayGames,
+  onOpenCompanyMuseum,
+  onEditSystem,
+  isKioskMode = false,
 }) => {
   const [activeTab, setActiveTab] = useState<ExhibitionTab>('history');
 
@@ -117,14 +124,38 @@ export const ConsoleExhibitionModal: React.FC<ConsoleExhibitionModalProps> = ({
             </div>
           </div>
 
-          {/* Bouton de Fermeture */}
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition"
-            title="Fermer l'exposition (Échap)"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {/* Actions Droite : Musée de la Firme & Fermeture */}
+          <div className="flex items-center space-x-2">
+            {onOpenCompanyMuseum && (
+              <button
+                onClick={() => onOpenCompanyMuseum(system.companyId)}
+                className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 hover:text-white transition shadow"
+                title={`Visiter le Musée de la firme ${system.manufacturer}`}
+              >
+                <Landmark className="w-3.5 h-3.5 text-amber-400" />
+                <span>Musée {system.manufacturer}</span>
+              </button>
+            )}
+
+            {!isKioskMode && onEditSystem && (
+              <button
+                onClick={() => onEditSystem(system)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-xs font-bold text-cyan-300 transition shadow"
+                title="Éditer les informations, spécifications et récit de cette console"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Modifier la Console</span>
+              </button>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              title="Fermer l'exposition (Échap)"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {/* BARRE D'ONGLETS DU MUSÉE */}
