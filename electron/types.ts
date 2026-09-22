@@ -44,7 +44,9 @@ export interface MuseumExhibition {
   hardwareHighlights: HardwareHighlights; // Détails techniques d'ingénierie
   rivalry?: string;                 // Rivalité historique majeure
   curatorNote?: string;             // Note du conservateur de l'exposition
+  youtubeId?: string;              // ID de la vidéo YouTube (pub de lancement, documentaire historique)
 }
+
 
 export interface System {
   id: string;

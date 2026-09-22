@@ -529,6 +529,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col bg-[#06080d] text-slate-100 select-none overflow-hidden relative">
+      <div className="kiosk-animated-background absolute inset-0 z-0 pointer-events-none" />
       {/* Texture CRT & Scanlines Arcade */}
       <div className="absolute inset-0 scanlines opacity-35 z-20 pointer-events-none" />
       <div className="absolute inset-0 crt-vignette z-20 pointer-events-none" />
@@ -676,7 +677,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       {/* NIVEAU 1 : LES FIRMES EN GRAND AU CENTRE                                   */}
       {/* ========================================================================= */}
       {step === 'companies' && (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-start p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {/* Titre & Guide central */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">
@@ -789,7 +790,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       {/* NIVEAU 2 : LES CONSOLES DE LA FIRME EN GRAND AU CENTRE                     */}
       {/* ========================================================================= */}
       {step === 'consoles' && selectedCompany && (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-start p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {/* En-tête centré avec logo firme */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center space-x-3 mb-2">

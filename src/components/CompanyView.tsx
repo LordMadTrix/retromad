@@ -26,7 +26,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-retro-900/40">
       {/* Sélecteur horizontal des Firmes avec VRAIS LOGOS */}
-      <div className="h-24 border-b border-cyan-300/20 px-6 flex items-center space-x-4 bg-retro-900/70 overflow-x-auto no-scrollbar shrink-0">
+      <div className="h-28 border-b border-cyan-300/20 px-6 py-4 flex items-center space-x-4 bg-retro-900/70 overflow-x-auto no-scrollbar shrink-0">
         {companies.map((company) => {
           const isSelected = company.id === selectedCompanyId;
           return (
@@ -36,9 +36,9 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
               style={{
                 borderColor: isSelected ? company.accentColor : undefined,
               }}
-              className={`flex items-center justify-center px-5 py-3 min-w-[150px] rounded-2xl shrink-0 transition-all ${
+              className={`company-selector-button flex items-center justify-center px-5 py-3 min-w-[150px] rounded-2xl shrink-0 transition-all ${
                 isSelected
-                ? 'bg-slate-800/95 border-2 shadow-neon scale-105'
+                ? 'company-selector-active bg-slate-800/95 border-2 shadow-neon scale-[1.02]'
                 : 'bg-retro-800/70 hover:bg-slate-700 border border-slate-600 hover:scale-102 opacity-80 hover:opacity-100'
               }`}
             >
@@ -49,7 +49,8 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
       </div>
 
       {/* Contenu principal de la firme sélectionnée */}
-      <div className="flex-1 overflow-y-auto p-8 space-y-8">
+      <div className="flex-1 overflow-y-auto">
+        <div key={selectedCompanyId} className="company-content-enter p-8 space-y-8">
         {/* Bannière Présentation de la Firme */}
         <div
           style={{
@@ -77,7 +78,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                 </span>
               </div>
 
-              <div className="my-3">
+              <div className="company-logo-reveal my-3">
                 <CompanyLogo companyId={selectedCompany.id} size="xl" />
               </div>
 
@@ -115,10 +116,11 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {companySystems.map((sys) => (
+            {companySystems.map((sys, index) => (
               <div
                 key={sys.id}
-                className="rounded-2xl bg-retro-800/80 border border-slate-800/90 hover:border-slate-600 transition-all p-5 flex flex-col justify-between shadow-md group"
+                style={{ animationDelay: `${index * 65}ms` }}
+                className="company-console-card rounded-2xl bg-retro-800/80 border border-slate-800/90 hover:border-slate-600 hover:-translate-y-1 transition-all p-5 flex flex-col justify-between shadow-md group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -137,7 +139,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-3 mb-2">
+                  <div className="console-identity flex items-center space-x-3 mb-2">
                     <ConsoleLogo system={sys} size="sm" />
                     <h3 className="text-base font-black text-white group-hover:text-retro-accent transition">
                       {sys.name}
@@ -196,6 +198,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
             ))}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

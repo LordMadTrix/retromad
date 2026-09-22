@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Game, System } from '../types';
 import { GameCard } from './GameCard';
-import { Search, Heart, SlidersHorizontal, FolderPlus, Dices, X } from 'lucide-react';
+import { Search, SlidersHorizontal, FolderPlus, Dices, X } from 'lucide-react';
+
+type Collection = 'all' | 'favorites' | 'recent' | 'topplayed' | 'gems';
 
 interface GameGridProps {
   games: Game[];
@@ -29,7 +31,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
   onPlayDice,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [collection, setCollection] = useState<Collection>('all');
   const [sortBy, setSortBy] = useState<'alpha' | 'recent' | 'played'>('alpha');
 
   const systemsMap = useMemo(() => {
@@ -37,7 +39,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
   }, [systems]);
 
   const selectedSystem = selectedSystemId ? systemsMap.get(selectedSystemId) : undefined;
-  const hasActiveFilters = Boolean(searchTerm.trim()) || favoritesOnly || sortBy !== 'alpha';
+  const hasActiveFilters = Boolean(searchTerm.trim()) || collection !== 'all' || sortBy !== 'alpha';
 
   // Filtrage et tri des jeux
   const filteredGames = useMemo(() => {
@@ -47,10 +49,11 @@ export const GameGrid: React.FC<GameGridProps> = ({
         if (selectedSystemId && game.systemId !== selectedSystemId) {
           return false;
         }
-        // Filtre favoris
-        if (favoritesOnly && !game.favorite) {
-          return false;
-        }
+        // Filtre par collection
+        if (collection === 'favorites' && !game.favorite) return false;
+        if (collection === 'recent' && !game.lastPlayed) return false;
+        if (collection === 'topplayed' && game.playCount < 1) return false;
+        if (collection === 'gems' && (!game.metadata?.rating || game.metadata.rating < 80)) return false;
         // Recherche textuelle
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
@@ -62,15 +65,18 @@ export const GameGrid: React.FC<GameGridProps> = ({
         return true;
       })
       .sort((a, b) => {
-        if (sortBy === 'played') {
+        if (collection === 'topplayed' || sortBy === 'played') {
           return (b.playCount || 0) - (a.playCount || 0);
         }
-        if (sortBy === 'recent') {
+        if (collection === 'recent' || sortBy === 'recent') {
           return (b.lastPlayed || '').localeCompare(a.lastPlayed || '');
+        }
+        if (collection === 'gems') {
+          return (b.metadata?.rating || 0) - (a.metadata?.rating || 0);
         }
         return a.cleanTitle.localeCompare(b.cleanTitle);
       });
-  }, [games, selectedSystemId, favoritesOnly, searchTerm, sortBy]);
+  }, [games, selectedSystemId, collection, searchTerm, sortBy]);
 
   const handleRandomPick = () => {
     if (filteredGames.length === 0) return;
@@ -81,98 +87,100 @@ export const GameGrid: React.FC<GameGridProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#111d43]/55">
-      {/* Barre d'outils, recherche et filtres */}
-      <div className="border-b border-cyan-300/25 px-4 lg:px-6 py-3 bg-gradient-to-r from-[#132555]/95 via-[#1e3575]/90 to-[#2c1b60]/90 backdrop-blur shrink-0">
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className="w-1 h-9 rounded-full shrink-0"
-              style={{ backgroundColor: selectedSystem?.themeColor || '#00f2fe' }}
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#0a1230]/80">
+      {/* ── Barre d'outils compacte ── */}
+      <div className="border-b border-cyan-300/20 px-4 py-2.5 bg-gradient-to-r from-[#0f1e47]/98 via-[#172d6d]/95 to-[#1e1450]/95 backdrop-blur shrink-0">
+
+        {/* Ligne 1 : titre + badge + barre de recherche */}
+        <div className="flex items-center gap-3">
+          {/* Indicateur couleur console */}
+          <div
+            className="w-0.5 h-7 rounded-full shrink-0"
+            style={{ backgroundColor: selectedSystem?.themeColor || '#00f2fe' }}
+          />
+          {/* Titre & compteur */}
+          <div className="min-w-0 shrink-0">
+            <h2 className="text-sm font-bold text-slate-100 leading-tight truncate max-w-[200px]">
+              {selectedSystem ? selectedSystem.shortName : 'Toutes les consoles'}
+            </h2>
+            <p className="text-[10px] text-slate-500 font-mono">
+              {filteredGames.length} jeu{filteredGames.length > 1 ? 'x' : ''}
+            </p>
+          </div>
+
+          {/* Recherche locale (flex-1) */}
+          <div className="relative flex-1 max-w-xs">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Rechercher…"
+              aria-label="Rechercher un jeu ou un studio"
+              className="w-full bg-[#0b1534]/80 border border-slate-700/50 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-retro-accent/60 focus:ring-1 focus:ring-retro-accent/20 transition"
             />
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500 font-bold">
-                Bibliothèque
-              </p>
-              <h2 className="text-sm font-bold text-slate-100 truncate">
-                {selectedSystem ? selectedSystem.name : 'Toutes les consoles'}
-                <span className="ml-2 text-xs font-normal text-slate-400">
-                  {filteredGames.length} résultat{filteredGames.length > 1 ? 's' : ''}
-                </span>
-              </h2>
-            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Rechercher un jeu, un studio..."
-                aria-label="Rechercher un jeu ou un studio"
-                className="w-full bg-[#0b1534]/75 border border-cyan-200/30 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-retro-accent focus:ring-1 focus:ring-retro-accent/30 transition"
-              />
-            </div>
-
-            {hasActiveFilters && (
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setFavoritesOnly(false);
-                  setSortBy('alpha');
-                }}
-                className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                title="Réinitialiser les filtres"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Réinitialiser</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Options de tri et favoris */}
-        <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
-          {/* Bouton Jeu au Hasard */}
-          <button
-            onClick={handleRandomPick}
-            disabled={filteredGames.length === 0}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-white transition disabled:opacity-40 shadow-sm"
-            title="Choisir un jeu au hasard parmi cette sélection"
-          >
-            <Dices className="w-3.5 h-3.5 text-amber-400" />
-            <span>Surprenez-moi !</span>
-          </button>
-
-          {/* Bouton Favoris Only */}
-          <button
-            onClick={() => setFavoritesOnly(!favoritesOnly)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border transition ${
-              favoritesOnly
-                ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
-                : 'bg-slate-800/50 text-slate-400 border-slate-700/60 hover:text-slate-200'
-            }`}
-          >
-            <Heart className={`w-3.5 h-3.5 ${favoritesOnly ? 'fill-current' : ''}`} />
-            <span>Favoris ({games.filter((g) => g.favorite).length})</span>
-          </button>
-
-          {/* Sélecteur de tri */}
-          <div className="flex items-center space-x-1.5 bg-slate-800/50 border border-slate-700/60 rounded-xl px-2.5 py-1.5 text-slate-400">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
+          {/* Tri */}
+          <div className="flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/40 rounded-lg px-2 py-1.5 text-slate-400 text-xs shrink-0">
+            <SlidersHorizontal className="w-3 h-3" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
+              className="bg-transparent text-slate-300 focus:outline-none cursor-pointer text-xs"
             >
-              <option value="alpha" className="bg-retro-800">Ordre alphabétique</option>
-              <option value="played" className="bg-retro-800">Plus joués</option>
-              <option value="recent" className="bg-retro-800">Récemment joués</option>
+              <option value="alpha" className="bg-slate-900">A → Z</option>
+              <option value="played" className="bg-slate-900">Plus joués</option>
+              <option value="recent" className="bg-slate-900">Récents</option>
             </select>
           </div>
 
+          {/* Jeu au hasard */}
+          <button
+            onClick={handleRandomPick}
+            disabled={filteredGames.length === 0}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 hover:text-white text-xs font-semibold transition disabled:opacity-40 shrink-0"
+            title="Jeu au hasard"
+          >
+            <Dices className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Surprise</span>
+          </button>
+
+          {/* Reset filtres */}
+          {hasActiveFilters && (
+            <button
+              onClick={() => { setSearchTerm(''); setCollection('all'); setSortBy('alpha'); }}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition shrink-0"
+              title="Réinitialiser les filtres"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Ligne 2 : Collections Pills */}
+        <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-0.5">
+          {([
+            { id: 'all', label: 'Tous', emoji: '🎮', count: games.filter(g => !selectedSystemId || g.systemId === selectedSystemId).length },
+            { id: 'favorites', label: 'Favoris', emoji: '⭐', count: games.filter(g => g.favorite && (!selectedSystemId || g.systemId === selectedSystemId)).length },
+            { id: 'recent', label: 'Récents', emoji: '🕒', count: games.filter(g => g.lastPlayed && (!selectedSystemId || g.systemId === selectedSystemId)).length },
+            { id: 'topplayed', label: 'Top Joués', emoji: '🔥', count: games.filter(g => g.playCount > 0 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
+            { id: 'gems', label: 'Pépites', emoji: '🏆', count: games.filter(g => (g.metadata?.rating || 0) >= 80 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
+          ] as const).map((col) => (
+            <button
+              key={col.id}
+              onClick={() => setCollection(col.id as Collection)}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
+                collection === col.id
+                  ? 'bg-retro-accent/20 text-retro-accent border-retro-accent/50 shadow-[0_0_8px_rgba(0,242,254,0.18)]'
+                  : 'bg-slate-800/40 text-slate-400 border-slate-700/40 hover:text-slate-200 hover:border-slate-600'
+              }`}
+            >
+              <span>{col.emoji}</span>
+              <span>{col.label}</span>
+              <span className="text-[10px] font-mono opacity-50">({col.count})</span>
+            </button>
+          ))}
         </div>
       </div>
 

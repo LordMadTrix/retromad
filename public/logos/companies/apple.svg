@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <rect width="400" height="120" fill="none"/>
+  <!-- Apple-like logo simplified -->
+  <path d="M 155 25 C 155 15 165 8 175 10 C 174 20 163 26 155 25 Z M 140 40 C 130 40 118 52 118 65 C 118 88 140 108 155 108 C 163 108 168 103 178 103 C 188 103 192 108 202 108 C 218 108 238 88 240 65 C 228 62 220 52 220 40 C 220 30 228 22 238 18 C 232 10 222 5 212 5 C 202 5 196 10 188 10 C 180 10 172 5 162 5 C 148 5 136 12 130 22 C 135 26 140 33 140 40 Z" fill="#a8a8a8"/>
+  <text x="270" y="82" font-family="Arial, sans-serif" font-size="52" font-weight="300" text-anchor="start" fill="#a8a8a8" letter-spacing="-1">apple</text>
+</svg>

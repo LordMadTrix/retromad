@@ -160,9 +160,18 @@ export const GameCard: React.FC<GameCardProps> = ({
           </div>
         </div>
 
-        {game.playCount > 0 && (
+        {(game.playCount > 0 || game.playTimeMinutes) && (
           <div className="mt-2 pt-1.5 border-t border-slate-700/50 flex items-center justify-between text-[10px] text-slate-400">
-            <span>Parties : {game.playCount}</span>
+            <div className="flex items-center space-x-2">
+              {game.playCount > 0 && <span>×{game.playCount}</span>}
+              {game.playTimeMinutes && game.playTimeMinutes >= 1 && (
+                <span className="text-emerald-400 font-mono font-bold">
+                  {game.playTimeMinutes >= 60
+                    ? `${Math.floor(game.playTimeMinutes / 60)}h${game.playTimeMinutes % 60 > 0 ? `${game.playTimeMinutes % 60}m` : ''}`
+                    : `${game.playTimeMinutes}m`}
+                </span>
+              )}
+            </div>
             {game.metadata?.rating && (
               <span className="text-amber-400 font-bold">★ {game.metadata.rating}%</span>
             )}

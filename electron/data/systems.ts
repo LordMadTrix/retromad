@@ -759,6 +759,806 @@ const RAW_SYSTEMS: System[] = [
     themeColor: '#52b043',
     logoUrl: './logos/consoles/xbox360.png',
     biosList: []
+  },
+
+  // ATARI SUPPLÉMENTAIRES
+  {
+    id: 'atari7800',
+    name: 'Atari 7800 ProSystem',
+    shortName: 'Atari 7800',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1986,
+    generation: '3e génération (8-bit)',
+    specs: {
+      cpu: 'MOS Technology 6502C @ 1.79 MHz',
+      gpuOrAudio: 'Maria (160 sprites couleur simultanés)',
+      resolution: '160x240 ou 320x240',
+      media: 'Cartouches ROM (4 KB - 48 KB)',
+      unitsSold: '3.77 millions'
+    },
+    extensions: ['.a78', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Atari_-_7800',
+    defaultCoreLinux: 'prosystem_libretro.so',
+    defaultCoreWindows: 'prosystem_libretro.dll',
+    subfolder: 'atari7800',
+    icon: 'Gamepad2',
+    themeColor: '#f0a500',
+    logoUrl: './logos/consoles/atari7800.png',
+    biosList: [
+      { filename: '7800 BIOS (U).rom', description: 'Atari 7800 BIOS US', md5: '0763f1ffb006ddbe32e52d497ee848ae', optional: true }
+    ]
+  },
+  {
+    id: 'lynx',
+    name: 'Atari Lynx',
+    shortName: 'Lynx',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1989,
+    generation: '4e génération (Portable 16-bit)',
+    specs: {
+      cpu: 'WDC 65SC02 @ 4 MHz + Motorola 6502 custom',
+      gpuOrAudio: 'Suzy (co-processeur graphique matériel) + Mikey (son)',
+      resolution: '160x102 pixels (4096 couleurs !)',
+      media: 'Cartouches Lynx (128 KB - 512 KB)',
+      unitsSold: '2 millions'
+    },
+    extensions: ['.lnx', '.zip', '.7z'],
+    libretroSystemName: 'Atari_-_Lynx',
+    defaultCoreLinux: 'mednafen_lynx_libretro.so',
+    defaultCoreWindows: 'mednafen_lynx_libretro.dll',
+    subfolder: 'lynx',
+    icon: 'Smartphone',
+    themeColor: '#ff6b35',
+    logoUrl: './logos/consoles/lynx.png',
+    biosList: [
+      { filename: 'lynxboot.img', description: 'Atari Lynx Boot ROM', md5: 'fcd403db69f54290b51035d82f835e7b', optional: false }
+    ]
+  },
+
+  // SEGA SUPPLÉMENTAIRE
+  {
+    id: 'sega32x',
+    name: 'Sega 32X (Super 32X)',
+    shortName: 'Sega 32X',
+    companyId: 'sega',
+    manufacturer: 'SEGA',
+    releaseYear: 1994,
+    generation: '5e génération (32-bit, extension Mega Drive)',
+    specs: {
+      cpu: '2x Hitachi SH-2 @ 23 MHz',
+      gpuOrAudio: 'VDP custom + PWM stéréo 2 canaux',
+      resolution: '320x224 (32 768 couleurs simultanées !)',
+      media: 'Cartouches 32X sur Mega Drive',
+      unitsSold: '800 000 (commercial échec)'
+    },
+    extensions: ['.32x', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Sega_-_32X',
+    defaultCoreLinux: 'picodrive_libretro.so',
+    defaultCoreWindows: 'picodrive_libretro.dll',
+    subfolder: 'sega32x',
+    icon: 'Gamepad2',
+    themeColor: '#cc0000',
+    logoUrl: './logos/consoles/sega32x.png',
+    biosList: []
+  },
+
+  // SNK SUPPLÉMENTAIRE
+  {
+    id: 'ngpc',
+    name: 'SNK Neo Geo Pocket Color',
+    shortName: 'Neo Geo Pocket Color',
+    companyId: 'snk',
+    manufacturer: 'SNK',
+    releaseYear: 1999,
+    generation: '5e génération (Portable 16-bit)',
+    specs: {
+      cpu: 'Toshiba TLCS-900H (16-bit) @ 6.144 MHz + Z80 @ 3.072 MHz',
+      gpuOrAudio: 'Écran LCD couleur TFT 2.7 pouces (146 couleurs parmi 4096)',
+      resolution: '160x152 pixels',
+      media: 'Cartouches Neo Geo Pocket',
+      unitsSold: '2 millions'
+    },
+    extensions: ['.ngc', '.ngp', '.zip', '.7z'],
+    libretroSystemName: 'SNK_-_Neo_Geo_Pocket_Color',
+    defaultCoreLinux: 'mednafen_ngp_libretro.so',
+    defaultCoreWindows: 'mednafen_ngp_libretro.dll',
+    subfolder: 'ngpc',
+    icon: 'Smartphone',
+    themeColor: '#e6b800',
+    logoUrl: './logos/consoles/ngpc.png',
+    biosList: []
+  },
+
+  // COMMODORE
+  {
+    id: 'c64',
+    name: 'Commodore 64',
+    shortName: 'C64',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1982,
+    generation: '2e génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'MOS Technology 6510 @ 0.985-1.023 MHz',
+      gpuOrAudio: 'VIC-II (16 couleurs, sprites hardware) + SID 6581 (3 voix oscillateurs)',
+      resolution: '320x200 ou 160x200 en multicoleur',
+      media: 'Cassettes, Disquettes 5.25" et Cartouches ROM',
+      unitsSold: "17 millions (ordinateur le plus vendu de l'Histoire !)"
+    },
+    extensions: ['.d64', '.t64', '.tap', '.prg', '.crt', '.zip', '.7z'],
+    libretroSystemName: 'Commodore_-_64',
+    defaultCoreLinux: 'vice_x64_libretro.so',
+    defaultCoreWindows: 'vice_x64_libretro.dll',
+    subfolder: 'c64',
+    icon: 'Cpu',
+    themeColor: '#8b6fc2',
+    logoUrl: './logos/consoles/c64.png',
+    biosList: []
+  },
+  {
+    id: 'amiga',
+    name: 'Commodore Amiga 500',
+    shortName: 'Amiga',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1987,
+    generation: '4e génération (Micro-ordinateur 16/32-bit)',
+    specs: {
+      cpu: 'Motorola 68000 @ 7.09 MHz + co-processeurs Agnus, Denise, Paula',
+      gpuOrAudio: 'Custom chipset 32 couleurs / 64 EHB / 4096 HAM + 4 canaux audio Paula',
+      resolution: '320x200 à 720x576 (toutes résolutions !)',
+      media: 'Disquettes 3.5" Double Densité (880 KB) et CD-ROM (sur Amiga 1200/CD32)',
+      unitsSold: '4.85 millions'
+    },
+    extensions: ['.adf', '.adz', '.dms', '.fdi', '.ipf', '.hdf', '.lha', '.zip', '.7z'],
+    libretroSystemName: 'Commodore_-_Amiga',
+    defaultCoreLinux: 'puae_libretro.so',
+    defaultCoreWindows: 'puae_libretro.dll',
+    subfolder: 'amiga',
+    icon: 'Cpu',
+    themeColor: '#ff6600',
+    logoUrl: './logos/consoles/amiga.png',
+    biosList: [
+      { filename: 'kick34005.A500', description: 'AmigaOS Kickstart ROM v1.3 (Amiga 500 - indispensable)', md5: '82a21c1890cae844b3df741f2762d48d', optional: false },
+      { filename: 'kick40063.A600', description: 'AmigaOS Kickstart ROM v3.1 (Amiga 600)', md5: 'e40a5dfb3d017ba8779faba30cbd1c8e', optional: true }
+    ]
+  },
+
+  // ARCADE / MULTI-SYSTÈMES
+  {
+    id: 'mame',
+    name: 'Arcade MAME / FinalBurn Neo',
+    shortName: 'Arcade',
+    companyId: 'multiple',
+    manufacturer: 'Multi-fabricants',
+    releaseYear: 1978,
+    generation: 'Arcade multi-systèmes',
+    specs: {
+      cpu: 'Multi-architectures (Z80, 68000, ARM, x86...)',
+      gpuOrAudio: "Authentique audio d'arcade (YM2151, YM3812, CPS)",
+      resolution: 'Variable (240p à 480p selon le jeu)',
+      media: 'Archives ZIP de ROMs Arcade',
+      unitsSold: 'Des millions de bornes dans le monde'
+    },
+    extensions: ['.zip', '.7z', '.chd'],
+    libretroSystemName: 'MAME',
+    defaultCoreLinux: 'mame_libretro.so',
+    defaultCoreWindows: 'mame_libretro.dll',
+    subfolder: 'arcade',
+    icon: 'Joystick',
+    themeColor: '#ff0080',
+    logoUrl: './logos/consoles/arcade.png',
+    biosList: []
+  },
+  {
+    id: 'msx2',
+    name: 'MSX2 (Standard Japonais)',
+    shortName: 'MSX2',
+    companyId: 'multiple',
+    manufacturer: 'Multi-fabricants',
+    releaseYear: 1985,
+    generation: '3e génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.58 MHz',
+      gpuOrAudio: 'V9938 MSX-Video (512 couleurs, sprites hardware) + AY-3-8910 PSG 3 voix',
+      resolution: '256x192 à 512x212',
+      media: 'Cartouches ROM et Disquettes 3.5"',
+      unitsSold: '5 millions'
+    },
+    extensions: ['.rom', '.ri', '.mx1', '.mx2', '.dsk', '.cas', '.zip', '.7z'],
+    libretroSystemName: 'Microsoft_-_MSX2',
+    defaultCoreLinux: 'bluemsx_libretro.so',
+    defaultCoreWindows: 'bluemsx_libretro.dll',
+    subfolder: 'msx2',
+    icon: 'Cpu',
+    themeColor: '#1e90ff',
+    logoUrl: './logos/consoles/msx2.png',
+    biosList: [
+      { filename: 'MSX2.ROM', description: 'MSX2 BIOS ROM (indispensable)', optional: false },
+      { filename: 'MSX2EXT.ROM', description: 'MSX2 Extended BIOS ROM', optional: false }
+    ]
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — NINTENDO
+  // ==========================================
+
+  {
+    id: 'virtualboy',
+    name: 'Nintendo Virtual Boy',
+    shortName: 'Virtual Boy',
+    companyId: 'nintendo',
+    manufacturer: 'Nintendo',
+    releaseYear: 1995,
+    generation: '5e génération (3D stéréoscopique)',
+    specs: {
+      cpu: 'NEC V810 (32-bit RISC) @ 20 MHz',
+      gpuOrAudio: 'VIP (Virtual Image Processor) — rendu stéréoscopique rouge monochrome',
+      resolution: '384x224 pixels par œil (rouge monochrome uniquement)',
+      media: 'Cartouches Virtual Boy (512 KB - 16 MB)',
+      unitsSold: '0.77 million (échec commercial)'
+    },
+    extensions: ['.vb', '.vboy', '.zip', '.7z'],
+    libretroSystemName: 'Nintendo_-_Virtual_Boy',
+    defaultCoreLinux: 'mednafen_vb_libretro.so',
+    defaultCoreWindows: 'mednafen_vb_libretro.dll',
+    subfolder: 'virtualboy',
+    icon: 'Eye',
+    themeColor: '#cc0000',
+    logoUrl: './logos/consoles/virtualboy.png',
+    biosList: []
+  },
+  {
+    id: 'n64dd',
+    name: 'Nintendo 64DD',
+    shortName: 'N64DD',
+    companyId: 'nintendo',
+    manufacturer: 'Nintendo',
+    releaseYear: 1999,
+    generation: '5e génération (Extension disque magnétique)',
+    specs: {
+      cpu: 'NEC VR4300 64-bit RISC @ 93.75 MHz (N64 + extension DD)',
+      gpuOrAudio: 'SGI RCP + Disque magnétique amovible 64 MB réinscriptible',
+      resolution: '320x240 à 640x480 (identique N64)',
+      media: 'Disques magnétiques 64DD (64 MB, réinscriptibles)',
+      unitsSold: '~15 000 (Japon uniquement, abonnement service Randnet)'
+    },
+    extensions: ['.ndd', '.zip'],
+    libretroSystemName: 'Nintendo_-_Nintendo_64DD',
+    defaultCoreLinux: 'mupen64plus_next_libretro.so',
+    defaultCoreWindows: 'mupen64plus_next_libretro.dll',
+    subfolder: 'n64dd',
+    icon: 'Disc',
+    themeColor: '#e60012',
+    logoUrl: './logos/consoles/n64.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — SEGA
+  // ==========================================
+
+  {
+    id: 'segacd',
+    name: 'Sega Mega-CD / Sega CD',
+    shortName: 'Mega-CD',
+    companyId: 'sega',
+    manufacturer: 'SEGA',
+    releaseYear: 1991,
+    generation: '4e génération (Extension CD-ROM)',
+    specs: {
+      cpu: 'Motorola 68000 @ 12.5 MHz (add-on) + 68000 Mega Drive @ 7.6 MHz',
+      gpuOrAudio: 'Puce PCM 8 canaux + CD-ROM simple vitesse 650 MB + mise à l\'échelle/rotation hardware',
+      resolution: '320x224 (héritée Mega Drive) avec transitions et effets CD',
+      media: 'CD-ROM simple vitesse (650 MB)',
+      unitsSold: '6 millions (cumulé Sega CD + Mega-CD)'
+    },
+    extensions: ['.bin', '.iso', '.chd', '.cue', '.zip'],
+    libretroSystemName: 'Sega_-_Mega_CD_-_Sega_CD',
+    defaultCoreLinux: 'genesis_plus_gx_libretro.so',
+    defaultCoreWindows: 'genesis_plus_gx_libretro.dll',
+    subfolder: 'segacd',
+    icon: 'Disc',
+    themeColor: '#00a0dc',
+    logoUrl: './logos/consoles/segacd.png',
+    biosList: [
+      { filename: 'bios_CD_E.bin', description: 'Mega-CD Europe BIOS (PAL)', md5: 'e66fa1dc5820d254611fdcdba0662372', optional: false },
+      { filename: 'bios_CD_J.bin', description: 'Mega-CD Japon BIOS (NTSC-J)', md5: '278a9397d192149e84e820ac621a8edd', optional: false },
+      { filename: 'bios_CD_U.bin', description: 'Sega CD USA BIOS (NTSC-U)', md5: '2efd74e3232ff260e371b099e9e3d790', optional: false }
+    ]
+  },
+  {
+    id: 'sg1000',
+    name: 'Sega SG-1000',
+    shortName: 'SG-1000',
+    companyId: 'sega',
+    manufacturer: 'SEGA',
+    releaseYear: 1983,
+    generation: '2e génération (8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.58 MHz',
+      gpuOrAudio: 'Texas Instruments TMS9918A + SN76489 PSG 3 voix',
+      resolution: '256x192 pixels (16 couleurs)',
+      media: 'Cartouches ROM (8 KB - 48 KB)',
+      unitsSold: '~400 000 (Japon, Océanie, Asie)'
+    },
+    extensions: ['.sg', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Sega_-_SG-1000',
+    defaultCoreLinux: 'gearsystem_libretro.so',
+    defaultCoreWindows: 'gearsystem_libretro.dll',
+    subfolder: 'sg1000',
+    icon: 'Gamepad2',
+    themeColor: '#1a1a2e',
+    logoUrl: './logos/consoles/sg1000.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — ATARI
+  // ==========================================
+
+  {
+    id: 'atari5200',
+    name: 'Atari 5200 SuperSystem',
+    shortName: 'Atari 5200',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1982,
+    generation: '2e génération (8-bit)',
+    specs: {
+      cpu: 'MOS 6502C @ 1.79 MHz',
+      gpuOrAudio: 'GTIA + POKEY (4 voix audio, timer, entrées) + ANTIC (co-processeur affichage)',
+      resolution: '320x192 (256 couleurs)',
+      media: 'Cartouches ROM (16 KB - 32 KB)',
+      unitsSold: '1 million'
+    },
+    extensions: ['.a52', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Atari_-_5200',
+    defaultCoreLinux: 'a5200_libretro.so',
+    defaultCoreWindows: 'a5200_libretro.dll',
+    subfolder: 'atari5200',
+    icon: 'Gamepad2',
+    themeColor: '#d2691e',
+    logoUrl: './logos/consoles/atari5200.png',
+    biosList: [
+      { filename: '5200.rom', description: 'Atari 5200 BIOS (Requis)', md5: '281f20ea4320404ec820fb7ec0693b38', optional: false }
+    ]
+  },
+  {
+    id: 'jaguar',
+    name: 'Atari Jaguar',
+    shortName: 'Jaguar',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1993,
+    generation: '5e génération (64-bit marketing)',
+    specs: {
+      cpu: 'Motorola 68000 @ 13.3 MHz + Tom (RISC GPU) + Jerry (DSP audio) @ 26.6 MHz',
+      gpuOrAudio: 'Tom + Jerry (co-processeurs RISC 32-bit) — "64-bit" bus de données',
+      resolution: '320x200 à 720x576 (modes variables)',
+      media: 'Cartouches ROM (jusqu\'à 6 MB)',
+      unitsSold: '250 000 (échec commercial)'
+    },
+    extensions: ['.j64', '.jag', '.zip', '.7z'],
+    libretroSystemName: 'Atari_-_Jaguar',
+    defaultCoreLinux: 'virtualjaguar_libretro.so',
+    defaultCoreWindows: 'virtualjaguar_libretro.dll',
+    subfolder: 'jaguar',
+    icon: 'Gamepad2',
+    themeColor: '#c41e3a',
+    logoUrl: './logos/consoles/jaguar.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — MICROSOFT
+  // ==========================================
+
+  {
+    id: 'xboxone',
+    name: 'Microsoft Xbox One',
+    shortName: 'Xbox One',
+    companyId: 'microsoft',
+    manufacturer: 'Microsoft',
+    releaseYear: 2013,
+    generation: '8e génération (Full HD)',
+    specs: {
+      cpu: 'AMD x86-64 8 cœurs (Jaguar) @ 1.75 GHz',
+      gpuOrAudio: 'AMD GCN @ 853 MHz (1.4 TFLOPS), 8 GB mémoire DDR3 unifiée',
+      resolution: '1080p 60fps / 4K UHD partiel',
+      media: 'Disques Blu-ray 50 GB',
+      unitsSold: '58 millions (toutes versions Xbox One)'
+    },
+    extensions: ['.xbla', '.zip'],
+    libretroSystemName: 'Microsoft_-_Xbox_One',
+    defaultCoreLinux: 'xemu',
+    defaultCoreWindows: 'xemu.exe',
+    subfolder: 'xboxone',
+    icon: 'Tv',
+    themeColor: '#107c10',
+    logoUrl: './logos/consoles/xboxone.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — SNK
+  // ==========================================
+
+  {
+    id: 'ngp',
+    name: 'SNK Neo Geo Pocket',
+    shortName: 'Neo Geo Pocket',
+    companyId: 'snk',
+    manufacturer: 'SNK',
+    releaseYear: 1998,
+    generation: '5e génération (Portable 16-bit, monochrome)',
+    specs: {
+      cpu: 'Toshiba TLCS-900H (16-bit) @ 6.144 MHz + Z80 @ 3.072 MHz',
+      gpuOrAudio: 'Écran LCD monochrome 2.7 pouces (96 nuances de gris)',
+      resolution: '160x152 pixels',
+      media: 'Cartouches Neo Geo Pocket',
+      unitsSold: '~1 million (Japon, version mono)'
+    },
+    extensions: ['.ngp', '.zip', '.7z'],
+    libretroSystemName: 'SNK_-_Neo_Geo_Pocket',
+    defaultCoreLinux: 'mednafen_ngp_libretro.so',
+    defaultCoreWindows: 'mednafen_ngp_libretro.dll',
+    subfolder: 'ngp',
+    icon: 'Smartphone',
+    themeColor: '#888800',
+    logoUrl: './logos/consoles/ngp.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — AUTRES FABRICANTS
+  // ==========================================
+
+  {
+    id: '3do',
+    name: '3DO Interactive Multiplayer',
+    shortName: '3DO',
+    companyId: 'panasonic',
+    manufacturer: 'Panasonic / The 3DO Company',
+    releaseYear: 1993,
+    generation: '5e génération (32-bit)',
+    specs: {
+      cpu: 'ARM60 @ 12.5 MHz + 2 co-processeurs graphiques (CEL Engine)',
+      gpuOrAudio: 'DSP VDLP (Video Display List Processor) + 16 voix PCM stéréo',
+      resolution: '320x240 à 640x480',
+      media: 'CD-ROM simple vitesse (650 MB)',
+      unitsSold: '2 millions'
+    },
+    extensions: ['.iso', '.bin', '.chd', '.cue'],
+    libretroSystemName: 'The_3DO_Company_-_3DO',
+    defaultCoreLinux: 'opera_libretro.so',
+    defaultCoreWindows: 'opera_libretro.dll',
+    subfolder: '3do',
+    icon: 'Disc',
+    themeColor: '#4a4a8f',
+    logoUrl: './logos/consoles/3do.png',
+    biosList: [
+      { filename: 'panafz1.bin', description: 'Panasonic FZ-1 3DO BIOS (Requis)', md5: 'f47264dd47fe30f73ab3c010015c155b', optional: false }
+    ]
+  },
+  {
+    id: 'vectrex',
+    name: 'GCE Vectrex',
+    shortName: 'Vectrex',
+    companyId: 'gce',
+    manufacturer: 'GCE / Milton Bradley',
+    releaseYear: 1982,
+    generation: '2e génération (Vectoriel intégré)',
+    specs: {
+      cpu: 'Motorola MC68A09 (8/16-bit) @ 1.5 MHz',
+      gpuOrAudio: 'Affichage vectoriel intégré 9 pouces (noir et blanc) + AY-3-8912 PSG 3 voix',
+      resolution: 'Vectoriel (résolution infinie — pas de pixels !)',
+      media: 'Cartouches ROM (4 KB - 32 KB)',
+      unitsSold: '~500 000'
+    },
+    extensions: ['.vec', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'GCE_-_Vectrex',
+    defaultCoreLinux: 'vecx_libretro.so',
+    defaultCoreWindows: 'vecx_libretro.dll',
+    subfolder: 'vectrex',
+    icon: 'Monitor',
+    themeColor: '#f0f000',
+    logoUrl: './logos/consoles/vectrex.png',
+    biosList: []
+  },
+  {
+    id: 'colecovision',
+    name: 'ColecoVision',
+    shortName: 'ColecoVision',
+    companyId: 'coleco',
+    manufacturer: 'Coleco Industries',
+    releaseYear: 1982,
+    generation: '2e génération (8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.58 MHz',
+      gpuOrAudio: 'Texas Instruments TMS9928A + SN76489 PSG 3 voix + 1 bruit blanc',
+      resolution: '256x192 pixels (16 couleurs)',
+      media: 'Cartouches ROM (8 KB - 32 KB)',
+      unitsSold: '2 millions'
+    },
+    extensions: ['.col', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Coleco_-_ColecoVision',
+    defaultCoreLinux: 'bluemsx_libretro.so',
+    defaultCoreWindows: 'bluemsx_libretro.dll',
+    subfolder: 'colecovision',
+    icon: 'Gamepad2',
+    themeColor: '#1c1c6b',
+    logoUrl: './logos/consoles/colecovision.png',
+    biosList: [
+      { filename: 'colecovision.rom', description: 'ColecoVision BIOS (Requis)', md5: '2c66f5911e5b42b8ebe113403548eee7', optional: false }
+    ]
+  },
+  {
+    id: 'intellivision',
+    name: 'Mattel Intellivision',
+    shortName: 'Intellivision',
+    companyId: 'mattel',
+    manufacturer: 'Mattel Electronics',
+    releaseYear: 1979,
+    generation: '2e génération (16-bit)',
+    specs: {
+      cpu: 'General Instrument CP1610 (16-bit) @ 0.895 MHz',
+      gpuOrAudio: 'STIC (Standard Television Interface Chip) + PSG 3 voix GI AY-3-8914',
+      resolution: '159x96 pixels (16 couleurs)',
+      media: 'Cartouches ROM (4 KB - 52 KB)',
+      unitsSold: '3 millions'
+    },
+    extensions: ['.int', '.bin', '.zip', '.7z'],
+    libretroSystemName: 'Mattel_-_Intellivision',
+    defaultCoreLinux: 'freeintv_libretro.so',
+    defaultCoreWindows: 'freeintv_libretro.dll',
+    subfolder: 'intellivision',
+    icon: 'Gamepad2',
+    themeColor: '#8b4513',
+    logoUrl: './logos/consoles/intellivision.png',
+    biosList: [
+      { filename: 'exec.bin', description: 'Intellivision Executive ROM (Requis)', md5: 'cbfb3941d1ed91ceae9a9e0f7f0c3bf8', optional: false },
+      { filename: 'grom.bin', description: 'Intellivision GROM (Graphics ROM, Requis)', md5: '0cd5946c6473e42e8e4c2137785e427f', optional: false }
+    ]
+  },
+  {
+    id: 'pcenginecd',
+    name: 'NEC PC Engine CD-ROM²',
+    shortName: 'PC Engine CD',
+    companyId: 'nec',
+    manufacturer: 'NEC Home Electronics',
+    releaseYear: 1988,
+    generation: '4e génération (Extension CD-ROM)',
+    specs: {
+      cpu: 'Hudson Soft HuC6280 (8-bit) @ 7.16 MHz + lecteur CD-ROM simple vitesse',
+      gpuOrAudio: 'HuC6260 VCE + HuC6270 VDC + CD audio stéréo 44.1 kHz (qualité Hi-Fi)',
+      resolution: '256x240 à 512x240',
+      media: 'CD-ROM simple vitesse (650 MB)',
+      unitsSold: 'Inclus dans les 10 millions de PC Engine (extension très populaire au Japon)'
+    },
+    extensions: ['.pce', '.chd', '.cue', '.iso', '.zip'],
+    libretroSystemName: 'NEC_-_PC_Engine_CD_-_TurboGrafx_CD',
+    defaultCoreLinux: 'mednafen_pce_libretro.so',
+    defaultCoreWindows: 'mednafen_pce_libretro.dll',
+    subfolder: 'pcenginecd',
+    icon: 'Disc',
+    themeColor: '#ff4500',
+    logoUrl: './logos/consoles/pcenginecd.png',
+    biosList: [
+      { filename: 'syscard3.pce', description: 'Super CD-ROM² System Card v3.00 (Requis pour jeux CD)', md5: '3817d3243ac68a17234394364f9c2937', optional: false }
+    ]
+  },
+  {
+    id: 'wonderswan',
+    name: 'Bandai WonderSwan',
+    shortName: 'WonderSwan',
+    companyId: 'bandai',
+    manufacturer: 'Bandai',
+    releaseYear: 1999,
+    generation: '5e génération (Portable monochrome)',
+    specs: {
+      cpu: 'NEC V30MZ (16-bit, compatible x86) @ 3.072 MHz',
+      gpuOrAudio: 'Écran LCD monochrome 2.49 pouces + 4 voix audio (ondes carrées)',
+      resolution: '224x144 pixels (monochrome)',
+      media: 'Cartouches WonderSwan (1 MB - 64 MB)',
+      unitsSold: '3.5 millions (toutes versions WonderSwan confondues)'
+    },
+    extensions: ['.ws', '.zip', '.7z'],
+    libretroSystemName: 'Bandai_-_WonderSwan',
+    defaultCoreLinux: 'mednafen_wswan_libretro.so',
+    defaultCoreWindows: 'mednafen_wswan_libretro.dll',
+    subfolder: 'wonderswan',
+    icon: 'Smartphone',
+    themeColor: '#cccccc',
+    logoUrl: './logos/consoles/wonderswan.png',
+    biosList: []
+  },
+  {
+    id: 'wonderswancolor',
+    name: 'Bandai WonderSwan Color',
+    shortName: 'WonderSwan Color',
+    companyId: 'bandai',
+    manufacturer: 'Bandai',
+    releaseYear: 2000,
+    generation: '5e génération (Portable couleur)',
+    specs: {
+      cpu: 'NEC V30MZ (16-bit) @ 3.072 MHz',
+      gpuOrAudio: 'Écran LCD couleur TFT 2.49 pouces (241 couleurs parmi 4096)',
+      resolution: '224x144 pixels (4096 couleurs)',
+      media: 'Cartouches WonderSwan Color (1 MB - 64 MB)',
+      unitsSold: 'Inclus dans les 3.5 millions WonderSwan (version Color dominante)'
+    },
+    extensions: ['.wsc', '.zip', '.7z'],
+    libretroSystemName: 'Bandai_-_WonderSwan_Color',
+    defaultCoreLinux: 'mednafen_wswan_libretro.so',
+    defaultCoreWindows: 'mednafen_wswan_libretro.dll',
+    subfolder: 'wonderswancolor',
+    icon: 'Smartphone',
+    themeColor: '#ff6699',
+    logoUrl: './logos/consoles/wonderswancolor.png',
+    biosList: []
+  },
+
+  // ==========================================
+  // NOUVELLES CONSOLES — ORDINATEURS
+  // ==========================================
+
+  {
+    id: 'atarist',
+    name: 'Atari ST',
+    shortName: 'Atari ST',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1985,
+    generation: '4e génération (Micro-ordinateur 16/32-bit)',
+    specs: {
+      cpu: 'Motorola 68000 (16/32-bit) @ 8 MHz',
+      gpuOrAudio: 'Chip graphique personnalisé (16 couleurs parmi 512) + YM2149 PSG 3 voix',
+      resolution: '320x200 (16 couleurs) ou 640x400 (monochrome)',
+      media: 'Disquettes 3.5" 720 KB et 1.44 MB',
+      unitsSold: '~4 millions (succès massif en Europe)'
+    },
+    extensions: ['.st', '.stx', '.dim', '.msa', '.zip', '.7z'],
+    libretroSystemName: 'Atari_-_ST',
+    defaultCoreLinux: 'hatari_libretro.so',
+    defaultCoreWindows: 'hatari_libretro.dll',
+    subfolder: 'atarist',
+    icon: 'Cpu',
+    themeColor: '#888888',
+    logoUrl: './logos/consoles/atarist.png',
+    biosList: [
+      { filename: 'tos.img', description: 'Atari ST TOS ROM (Requis — TOS 1.02 recommandé)', optional: false }
+    ]
+  },
+  {
+    id: 'msx',
+    name: 'MSX (Standard Microsoft / ASCII)',
+    shortName: 'MSX',
+    companyId: 'multiple',
+    manufacturer: 'Multi-fabricants',
+    releaseYear: 1983,
+    generation: '2e génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'Zilog Z80 @ 3.58 MHz',
+      gpuOrAudio: 'TMS9918 / V9938 VDP + AY-3-8910 PSG 3 voix',
+      resolution: '256x192 pixels (16 couleurs)',
+      media: 'Cartouches ROM et Cassettes',
+      unitsSold: '~9 millions (Japon + Europe + Brésil)'
+    },
+    extensions: ['.rom', '.mx1', '.dsk', '.cas', '.zip', '.7z'],
+    libretroSystemName: 'Microsoft_-_MSX',
+    defaultCoreLinux: 'bluemsx_libretro.so',
+    defaultCoreWindows: 'bluemsx_libretro.dll',
+    subfolder: 'msx',
+    icon: 'Cpu',
+    themeColor: '#003d7a',
+    logoUrl: './logos/consoles/msx.png',
+    biosList: [
+      { filename: 'MSX.ROM', description: 'MSX BIOS ROM (Requis)', optional: false },
+      { filename: 'DISK.ROM', description: 'MSX Disk ROM (Pour les disquettes)', optional: true }
+    ]
+  },
+  {
+    id: 'scummvm',
+    name: 'ScummVM (Aventures Graphiques)',
+    shortName: 'ScummVM',
+    companyId: 'multiple',
+    manufacturer: 'Multi-plateformes (Émulateur logiciel)',
+    releaseYear: 2001,
+    generation: 'Multi-génération (Aventures point-and-click)',
+    specs: {
+      cpu: 'N/A — Émulateur multi-plateforme software',
+      gpuOrAudio: 'Émulation des moteurs : SCUMM, Sierra AGI/SCI, AdLib, Roland MT-32',
+      resolution: 'Variable selon le jeu (320x200 VGA à résolutions librement scalées)',
+      media: 'Archives de jeux numériques et CD-ROM de collection',
+      unitsSold: 'N/A (logiciel open-source)'
+    },
+    extensions: ['.scummvm', '.zip'],
+    libretroSystemName: 'ScummVM',
+    defaultCoreLinux: 'scummvm_libretro.so',
+    defaultCoreWindows: 'scummvm_libretro.dll',
+    subfolder: 'scummvm',
+    icon: 'BookOpen',
+    themeColor: '#c0392b',
+    logoUrl: './logos/consoles/scummvm.png',
+    biosList: []
+  },
+  {
+    id: 'appleii',
+    name: 'Apple II',
+    shortName: 'Apple II',
+    companyId: 'apple',
+    manufacturer: 'Apple Computer',
+    releaseYear: 1977,
+    generation: '1re génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'MOS Technology 6502 @ 1 MHz',
+      gpuOrAudio: 'Contrôleur graphique intégré (Lo-Res 40x48 / Hi-Res 280x192) + Haut-parleur 1 voix',
+      resolution: '280x192 pixels (6 couleurs) ou 40x24 texte',
+      media: 'Disquettes 5.25" (140 KB) et Cassettes',
+      unitsSold: '~5 à 6 millions (Apple II toutes versions)'
+    },
+    extensions: ['.dsk', '.po', '.nib', '.zip', '.7z'],
+    libretroSystemName: 'Apple_-_II',
+    defaultCoreLinux: 'minivmac_libretro.so',
+    defaultCoreWindows: 'minivmac_libretro.dll',
+    subfolder: 'appleii',
+    icon: 'Cpu',
+    themeColor: '#a8a8a8',
+    logoUrl: './logos/consoles/appleii.png',
+    biosList: []
+  },
+  {
+    id: 'msdos',
+    name: 'MS-DOS / PC DOS',
+    shortName: 'MS-DOS',
+    companyId: 'microsoft',
+    manufacturer: 'Microsoft / IBM PC Compatible',
+    releaseYear: 1981,
+    generation: 'Multi-génération (Micro-ordinateur x86)',
+    specs: {
+      cpu: 'Intel x86 8086/8088 (4.77 MHz) à Pentium 4 (selon l\'époque)',
+      gpuOrAudio: 'CGA / EGA / VGA / SVGA + Sound Blaster / AdLib / Roland MT-32',
+      resolution: 'De 320x200 (16 couleurs CGA) à 1024x768 SVGA (16.7M couleurs)',
+      media: 'Disquettes 5.25" / 3.5" et CD-ROM',
+      unitsSold: 'Des centaines de millions de PC compatibles IBM'
+    },
+    extensions: ['.exe', '.com', '.bat', '.zip'],
+    libretroSystemName: 'DOS',
+    defaultCoreLinux: 'dosbox_pure_libretro.so',
+    defaultCoreWindows: 'dosbox_pure_libretro.dll',
+    subfolder: 'msdos',
+    icon: 'Terminal',
+    themeColor: '#0078d7',
+    logoUrl: './logos/consoles/msdos.png',
+    biosList: []
+  },
+  {
+    id: 'amstradcpc',
+    name: 'Amstrad CPC',
+    shortName: 'Amstrad CPC',
+    companyId: 'amstrad',
+    manufacturer: 'Amstrad',
+    releaseYear: 1984,
+    generation: '3e génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 4 MHz',
+      gpuOrAudio: 'CRTC MC6845 (160x200/16c à 640x200/2c) + AY-3-8912 PSG 3 voix',
+      resolution: '160x200 (16 couleurs) à 640x200 (2 couleurs)',
+      media: 'Cassettes, Disquettes 3" (Amstrad DDI-1) et Cartouches (GX4000)',
+      unitsSold: '~3 millions (succès surtout au Royaume-Uni et en France)'
+    },
+    extensions: ['.dsk', '.cdt', '.sna', '.zip', '.7z'],
+    libretroSystemName: 'Amstrad_-_CPC',
+    defaultCoreLinux: 'crocods_libretro.so',
+    defaultCoreWindows: 'crocods_libretro.dll',
+    subfolder: 'amstradcpc',
+    icon: 'Cpu',
+    themeColor: '#0047ab',
+    logoUrl: './logos/consoles/amstradcpc.png',
+    biosList: []
   }
 ];
 

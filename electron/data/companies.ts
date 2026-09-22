@@ -43,7 +43,7 @@ export const COMPANIES: Company[] = [
     accentColor: '#107c10',
     description: 'Entrée fracassante dans le jeu vidéo de salon en 2001 avec la Xbox originale, puis la reine du multijoueur en ligne Xbox 360 et le Xbox Live. Pionnier du jeu en réseau moderne, des disques durs intégrés et des franchises d\'action spectaculaires.',
     famousFranchises: ['Halo (Master Chief)', 'Gears of War', 'Forza Motorsport / Horizon', 'Fable', 'Banjo-Kazooie'],
-    consoles: ['xbox', 'xbox360']
+    consoles: ['xbox', 'xbox360', 'xboxone', 'msdos']
   },
   {
     id: 'snk',
@@ -54,7 +54,7 @@ export const COMPANIES: Company[] = [
     accentColor: '#ffcc00',
     description: 'La Rolls-Royce du jeu vidéo d\'arcade et de salon avec le système Neo-Geo MVS/AES 24-bit. Des cartouches géantes ("100 Mega Shock!"), des sprites titanesques et l\'âge d\'or des jeux de combat 2D.',
     famousFranchises: ['The King of Fighters', 'Metal Slug', 'Fatal Fury', 'Samurai Shodown', 'Art of Fighting'],
-    consoles: ['neogeo']
+    consoles: ['neogeo', 'ngpc', 'ngp']
   },
   {
     id: 'atari',
@@ -65,17 +65,116 @@ export const COMPANIES: Company[] = [
     accentColor: '#e31b23',
     description: 'Créée par Nolan Bushnell et Ted Dabney, Atari a littéralement inventé l\'industrie commerciale du jeu vidéo avec Pong et la mythique console de salon Atari 2600 (VCS), marquant l\'âge d\'or des années 70-80.',
     famousFranchises: ['Pong', 'Asteroids', 'Centipede', 'Breakout', 'Tempest', 'Adventure'],
-    consoles: ['atari2600', 'atari7800', 'lynx']
+    consoles: ['atari2600', 'atari7800', 'lynx', 'atari5200', 'jaguar', 'atarist']
   },
   {
     id: 'nec',
     name: 'NEC Home Electronics',
     country: 'Japon (Tokyo)',
     founded: 1899,
-    logoText: 'PC-ENGINE',
-    accentColor: '#ea5404',
-    description: 'En partenariat avec Hudson Soft, le géant de l\'électronique NEC a conçu la PC-Engine (TurboGrafx-16), une merveille de compacité 8-bit boostée avec processeur graphique 16-bit et première console à adopter le format CD-ROM², très culte au Japon et en France.',
-    famousFranchises: ['Bonk (PC Kid)', 'Castlevania: Rondo of Blood', 'Ys', 'Bomberman', 'Air Zonk'],
-    consoles: ['pcengine']
+    logoText: 'NEC',
+    accentColor: '#ff4500',
+    description: 'NEC a lancé le PC Engine / TurboGrafx-16, première console 16-bit de facto avec sa puce HuC6280, et son extension CD-ROM² a révolutionné le jeu sur CD. En partenariat avec Hudson Soft, NEC a marqué l\'histoire du jeu vidéo japonais.',
+    famousFranchises: ['PC Engine', 'TurboGrafx-16', 'PC-FX', 'Bonk', 'Rondo of Blood'],
+    consoles: ['pcengine', 'pcenginecd']
+  },
+  {
+    id: 'commodore',
+    name: 'Commodore International',
+    country: 'États-Unis (West Chester)',
+    founded: 1954,
+    logoText: 'COMMODORE',
+    accentColor: '#8b6fc2',
+    description: "Fondée par Jack Tramiel avec le slogan \"Computers for the masses, not the classes\", Commodore International a commercialisé le micro-ordinateur le plus vendu de l'histoire avec le Commodore 64 (17 millions d'exemplaires) et révolutionné le multimédia grand public avec l'Amiga.",
+    famousFranchises: ['Commodore 64', 'Amiga', 'PET', 'VIC-20'],
+    consoles: ['c64', 'amiga']
+  },
+  {
+    id: 'panasonic',
+    name: 'Panasonic / The 3DO Company',
+    country: 'Japon / États-Unis',
+    founded: 1918,
+    logoText: '3DO',
+    accentColor: '#4a4a8f',
+    description: 'The 3DO Company, fondée par Trip Hawkins (cofondateur d\'EA), a créé la norme 3DO Interactive Multiplayer en 1993, licenciée à Panasonic, Goldstar et Sanyo. Premier système à miser sur le CD-ROM et les 32-bit à une époque où l\'industrie était encore 16-bit, mais victime d\'un prix prohibitif de 700 dollars au lancement.',
+    famousFranchises: ['3DO Interactive Multiplayer', 'Need for Speed (version originale)', 'Road Rash 3DO', 'Star Control II'],
+    consoles: ['3do']
+  },
+  {
+    id: 'gce',
+    name: 'GCE / Milton Bradley',
+    country: 'États-Unis',
+    founded: 1975,
+    logoText: 'VECTREX',
+    accentColor: '#f0f000',
+    description: 'GCE (General Consumer Electronics) a créé la Vectrex, seule console domestique de l\'histoire avec son propre écran vectoriel intégré. Unique en son genre avec sa technologie de lignes vectorielles au lieu de pixels, elle proposait des superpositions plastiques colorées posées sur l\'écran pour simuler les couleurs.',
+    famousFranchises: ['Vectrex', 'Minestorm', 'Scramble Vectrex', 'Berzerk Vectrex'],
+    consoles: ['vectrex']
+  },
+  {
+    id: 'coleco',
+    name: 'Coleco Industries',
+    country: 'États-Unis',
+    founded: 1932,
+    logoText: 'COLECO',
+    accentColor: '#1c1c6b',
+    description: 'Coleco Industries (Connecticut Leather Company) a produit la ColecoVision, réputée pour ses portages fidèles d\'arcade dont Donkey Kong considéré comme la meilleure version home. Avec son module d\'expansion permettant de jouer aux jeux Atari 2600, la ColecoVision visait à unifier les bibliothèques de jeux.',
+    famousFranchises: ['ColecoVision', 'Donkey Kong', 'Cabbage Patch Kids', 'Zaxxon'],
+    consoles: ['colecovision']
+  },
+  {
+    id: 'mattel',
+    name: 'Mattel Electronics',
+    country: 'États-Unis',
+    founded: 1945,
+    logoText: 'MATTEL',
+    accentColor: '#8b4513',
+    description: 'Mattel Electronics a commercialisé l\'Intellivision, rivale directe de l\'Atari 2600 avec des graphismes et sons supérieurs grâce à son processeur 16-bit CP1610. Premier système à proposer des jeux de sport sous licence officielle (NFL, MLB, NBA), elle a posé les bases du jeu de sport vidéo moderne.',
+    famousFranchises: ['Intellivision', 'NFL Football', 'Major League Baseball', 'B-17 Bomber', 'Astrosmash'],
+    consoles: ['intellivision']
+  },
+  {
+    id: 'bandai',
+    name: 'Bandai',
+    country: 'Japon',
+    founded: 1950,
+    logoText: 'BANDAI',
+    accentColor: '#ff6699',
+    description: 'Bandai a créé la WonderSwan, portable japonaise conçue par Gunpei Yokoi après son départ de Nintendo, connue pour sa faible consommation d\'énergie et ses jeux Final Fantasy exclusifs portés depuis la Super Famicom. La console tournait verticalement ou horizontalement grâce à ses boutons disposés sur les deux faces.',
+    famousFranchises: ['WonderSwan', 'Final Fantasy (WS)', 'Digimon', 'SD Gundam', 'Rockman & Forte'],
+    consoles: ['wonderswan', 'wonderswancolor']
+  },
+  {
+    id: 'apple',
+    name: 'Apple Computer',
+    country: 'États-Unis (Cupertino)',
+    founded: 1976,
+    logoText: 'APPLE',
+    accentColor: '#a8a8a8',
+    description: 'Apple Computer a créé le Apple II en 1977, l\'un des micro-ordinateurs les plus importants de l\'histoire, qui a démocratisé l\'informatique personnelle et le jeu sur ordinateur. Avec son bus d\'extension ouvert et son lecteur de disquettes Disk II, le Apple II est devenu la plateforme de référence pour les logiciels éducatifs et les premiers jeux commerciaux.',
+    famousFranchises: ['Apple II', 'Lode Runner', 'Oregon Trail', 'Prince of Persia', 'Ultima'],
+    consoles: ['appleii']
+  },
+  {
+    id: 'amstrad',
+    name: 'Amstrad',
+    country: 'Royaume-Uni',
+    founded: 1968,
+    logoText: 'AMSTRAD',
+    accentColor: '#0047ab',
+    description: 'Amstrad (Alan Michael Sugar Trading) a produit l\'Amstrad CPC, micro-ordinateur 8-bit très populaire en Europe et notamment en France et au Royaume-Uni, avec son moniteur couleur ou monochrome intégré vendu à prix abordable. L\'Amstrad CPC 464 a introduit des millions d\'enfants européens au jeu vidéo et à la programmation.',
+    famousFranchises: ['Amstrad CPC', 'Dizzy', 'R-Type CPC', 'Chase HQ', 'Batman (Ocean)'],
+    consoles: ['amstradcpc']
+  },
+  {
+    id: 'multiple',
+    name: 'Multi-fabricants (Arcade / MSX)',
+    country: 'Monde entier',
+    founded: 1978,
+    logoText: 'ARCADE',
+    accentColor: '#ff0080',
+    description: "Regroupant les classiques des salles d'arcade et les standards MSX développés par Microsoft et ASCII Corporation, cette catégorie célèbre l'âge d'or de l'arcade et la diversité du jeu sur micro-ordinateurs standards.",
+    famousFranchises: ['Pac-Man', 'Street Fighter', 'Metal Gear (MSX)', 'Space Invaders', 'Donkey Kong'],
+    consoles: ['mame', 'msx2', 'msx', 'scummvm']
   }
 ];

@@ -15,6 +15,8 @@ import { ExtensionsDownloaderModal } from './components/ExtensionsDownloaderModa
 import { KioskPinModal } from './components/KioskPinModal';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { ConsoleExhibitionModal } from './components/ConsoleExhibitionModal';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
+import { KioskAttractMode } from './components/KioskAttractMode';
 import { GamepadHint } from './components/GamepadHint';
 import { useGamepad } from './hooks/useGamepad';
 import { useAudio } from './hooks/useAudio';
@@ -61,6 +63,13 @@ export const App: React.FC = () => {
   const [isCheckingBios, setIsCheckingBios] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
+  // Recherche globale Spotlight
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Mode Attract (économiseur d'écran) Kiosk
+  const [isAttractMode, setIsAttractMode] = useState(false);
+  const attractTimerRef = React.useRef<any>(null);
+
   // Index de focus pour la manette
   const [focusedGameIndex, setFocusedGameIndex] = useState(0);
 
@@ -79,10 +88,12 @@ export const App: React.FC = () => {
     isComplete: false,
   });
 
-  // Audio Rétro avec Volume et Sons Spéciaux
-  const { playMove, playSelect, playBack, playLaunch, playCoin, playFavorite, playUnlock, playDice } = useAudio(
+  // Audio Rétro avec Volume, Sons Spéciaux et BGM Chiptune
+  const { playMove, playSelect, playBack, playLaunch, playCoin, playFavorite, playUnlock, playDice, toggleBgm, isBgmActive } = useAudio(
     settings.soundEnabled,
-    settings.soundVolume ?? 0.8
+    settings.soundVolume ?? 0.8,
+    settings.bgmEnabled ?? false,
+    settings.bgmVolume ?? 0.35
   );
 
   // Notifications éphémères
@@ -157,7 +168,7 @@ export const App: React.FC = () => {
     showNotification(newCrt ? 'Filtre CRT Scanlines & Phosphore activé 📺' : 'Filtre CRT désactivé 🖥️', 'info');
   }, [playSelect, settings.crtEffect, showNotification]);
 
-  // Raccourci clavier de déverrouillage (Ctrl+Shift+A ou F12)
+  // Raccourci clavier de déverrouillage (Ctrl+Shift+A ou F12) + Ctrl+K recherche
   useEffect(() => {
     const handleKeyShortcut = (e: KeyboardEvent) => {
       if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') || e.key === 'F12') {
@@ -166,14 +177,62 @@ export const App: React.FC = () => {
           playSelect();
           setIsPinModalOpen(true);
         }
+      } else if ((e.ctrlKey && (e.key === 'k' || e.key === 'K')) || (e.ctrlKey && (e.key === 'f' || e.key === 'F'))) {
+        e.preventDefault();
+        playSelect();
+        setIsSearchOpen(true);
+        resetAttractTimer();
       } else if (e.altKey && e.key.toLowerCase() === 'c') {
         e.preventDefault();
         handleToggleCrt();
       }
+      // Toute touche réinitialise le mode Attract
+      resetAttractTimer();
     };
     window.addEventListener('keydown', handleKeyShortcut);
     return () => window.removeEventListener('keydown', handleKeyShortcut);
   }, [isKioskMode, playSelect, handleToggleCrt]);
+
+  // Logique du timer Attract Mode (uniquement en mode Kiosk)
+  const resetAttractTimer = useCallback(() => {
+    if (isAttractMode) setIsAttractMode(false);
+    if (attractTimerRef.current) clearTimeout(attractTimerRef.current);
+    if (isKioskMode && (settings.attractMode ?? true)) {
+      const delay = (settings.attractDelaySeconds ?? 60) * 1000;
+      attractTimerRef.current = setTimeout(() => setIsAttractMode(true), delay);
+    }
+  }, [isKioskMode, isAttractMode, settings.attractMode, settings.attractDelaySeconds]);
+
+  // Démarrer le timer d'inactivité Attract Mode quand mode Kiosk change
+  useEffect(() => {
+    resetAttractTimer();
+    return () => {
+      if (attractTimerRef.current) clearTimeout(attractTimerRef.current);
+    };
+  }, [isKioskMode, settings.attractMode, settings.attractDelaySeconds]);
+
+  // Réinitialiser Attract Mode au clic/mouvement utilisateur
+  useEffect(() => {
+    const handleUserActivity = () => resetAttractTimer();
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('click', handleUserActivity);
+    window.addEventListener('touchstart', handleUserActivity);
+    return () => {
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('click', handleUserActivity);
+      window.removeEventListener('touchstart', handleUserActivity);
+    };
+  }, [resetAttractTimer]);
+
+  // Toggle BGM avec sauvegarde dans les settings
+  const handleToggleBgm = useCallback(async () => {
+    toggleBgm();
+    const newEnabled = !isBgmActive;
+    setSettings((prev) => ({ ...prev, bgmEnabled: newEnabled }));
+    if (window.api) {
+      await window.api.saveSettings({ bgmEnabled: newEnabled });
+    }
+  }, [toggleBgm, isBgmActive]);
 
   // Basculer vers le mode Kiosk
   const handleEnterKiosk = async () => {
@@ -475,11 +534,17 @@ export const App: React.FC = () => {
               playSelect();
               setIsExtensionsModalOpen(true);
             }}
+            onOpenSearch={() => {
+              playSelect();
+              setIsSearchOpen(true);
+            }}
             isScanning={isScanning}
             soundEnabled={settings.soundEnabled}
             onToggleSound={() => setSettings((s) => ({ ...s, soundEnabled: !s.soundEnabled }))}
             crtEnabled={!!settings.crtEffect}
             onToggleCrt={handleToggleCrt}
+            bgmActive={isBgmActive}
+            onToggleBgm={handleToggleBgm}
             totalGames={visibleGames.length}
             isKioskMode={isKioskMode}
             onEnterKiosk={handleEnterKiosk}
@@ -675,6 +740,38 @@ export const App: React.FC = () => {
 
       {/* Pied de page touches manette */}
       {!isKioskMode && <GamepadHint />}
+
+      {/* Recherche Globale Spotlight (Ctrl+K) */}
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        games={games}
+        systems={systems}
+        onClose={() => setIsSearchOpen(false)}
+        onLaunchGame={(game) => {
+          handleLaunchGame(game);
+          setIsSearchOpen(false);
+        }}
+        onViewGame={(game) => {
+          setSelectedGame(game);
+          setIsSearchOpen(false);
+        }}
+        onSelectSystem={(systemId) => {
+          setSelectedSystemId(systemId);
+          setCurrentTab('games');
+          setIsSearchOpen(false);
+        }}
+      />
+
+      {/* Attract Mode Kiosk (Screensaver) */}
+      <KioskAttractMode
+        isActive={isAttractMode}
+        games={games}
+        systems={systems}
+        onWakeUp={() => {
+          setIsAttractMode(false);
+          resetAttractTimer();
+        }}
+      />
     </div>
   );
 };

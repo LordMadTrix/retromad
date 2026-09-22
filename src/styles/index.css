@@ -38,6 +38,23 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+.kiosk-animated-background {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0, 242, 254, 0.22), transparent 26rem),
+    radial-gradient(circle at 80% 72%, rgba(255, 0, 127, 0.2), transparent 30rem),
+    linear-gradient(rgba(0, 242, 254, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(121, 40, 202, 0.1) 1px, transparent 1px);
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  background-size: auto, auto, 36px 36px, 36px 36px;
+  animation: kiosk-background-drift 12s linear infinite;
+}
+
+@keyframes kiosk-background-drift {
+  to {
+    background-position: 90px -50px, -70px 60px, 36px -36px, -36px 36px;
+  }
+}
+
 .arcade-card::after {
   content: "";
   position: absolute;
@@ -57,9 +74,88 @@ button {
   }
 }
 
+.company-content-enter {
+  animation: company-content-enter 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.company-console-card {
+  animation: company-console-card-enter 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.company-selector-active {
+  animation: company-selector-active 1.8s ease-in-out infinite;
+}
+
+.company-logo-reveal {
+  animation: company-logo-reveal 650ms 100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.console-identity {
+  transition: transform 200ms ease, filter 200ms ease;
+}
+
+.company-console-card:hover .console-identity {
+  transform: translateX(6px);
+  filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.55));
+}
+
+@keyframes company-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes company-console-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes company-selector-active {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 24px rgba(0, 242, 254, 0.75), 0 0 44px rgba(0, 242, 254, 0.35);
+  }
+}
+
+@keyframes company-logo-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .arcade-card,
-  .arcade-card::after {
+  .arcade-card::after,
+  .company-content-enter,
+  .company-console-card,
+  .company-selector-active,
+  .company-logo-reveal,
+  .kiosk-animated-background {
     animation: none !important;
     transition: none !important;
   }
