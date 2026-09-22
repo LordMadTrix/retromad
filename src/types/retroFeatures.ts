@@ -67,6 +67,10 @@ export interface ChiptuneTrack {
   bpm: number;
   pattern: ChiptuneNote[];
   year?: number;
+  audioUrl?: string;
+  fileFormat?: string;
+  isCustom?: boolean;
+  fileName?: string;
 }
 
 export interface TournamentMatch {

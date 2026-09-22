@@ -10,6 +10,7 @@ import {
   Sparkles,
   X,
   Disc3,
+  FolderSearch,
 } from 'lucide-react';
 import { ChiptuneTrack } from '../../types/retroFeatures';
 import { useRetroJukebox } from '../../hooks/useRetroJukebox';
@@ -17,6 +18,7 @@ import { useRetroJukebox } from '../../hooks/useRetroJukebox';
 interface RetroJukeboxModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenMusicManager?: () => void;
   jukebox?: ReturnType<typeof useRetroJukebox>;
   playlist?: ChiptuneTrack[];
   currentTrack?: ChiptuneTrack;
@@ -39,6 +41,7 @@ interface RetroJukeboxModalProps {
 export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
   isOpen,
   onClose,
+  onOpenMusicManager,
   jukebox,
   playlist: propPlaylist,
   currentTrack: propCurrentTrack,
@@ -243,6 +246,22 @@ export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
               🎺 Fanfare Victoire
             </button>
           </div>
+        </div>
+
+        {/* Playlist table header & scan button */}
+        <div className="flex items-center justify-between px-6 py-2.5 bg-slate-900/60 border-b border-slate-800/80 text-xs">
+          <span className="font-bold text-slate-400 uppercase tracking-wider">
+            Playlist Active ({playlist.length} pistes)
+          </span>
+          {onOpenMusicManager && (
+            <button
+              onClick={onOpenMusicManager}
+              className="px-3 py-1 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500 hover:text-slate-950 border border-fuchsia-500/40 text-fuchsia-300 font-bold flex items-center space-x-1.5 transition text-[11px]"
+            >
+              <FolderSearch className="w-3.5 h-3.5" />
+              <span>Gérer / Scanner un Dossier</span>
+            </button>
+          )}
         </div>
 
         {/* Playlist table */}
