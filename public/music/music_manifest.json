@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "basePath": "/music",
+  "description": "Bandes-son et thèmes rétro centralisés pour RetroMAD",
+  "tracks": [
+    {
+      "id": "bgm-sonic-greenhill",
+      "title": "Green Hill Zone (16-bit FM Synth)",
+      "gameTitle": "Sonic the Hedgehog",
+      "system": "SEGA Mega Drive",
+      "composer": "Masato Nakamura",
+      "duration": "2:40",
+      "bpm": 140,
+      "format": "mp3",
+      "path": "/music/green_hill_zone.mp3",
+      "category": "OST"
+    },
+    {
+      "id": "bgm-mario-overworld",
+      "title": "Overworld Theme (8-bit Pulse)",
+      "gameTitle": "Super Mario Bros.",
+      "system": "NES",
+      "composer": "Koji Kondo",
+      "duration": "3:02",
+      "bpm": 100,
+      "format": "mp3",
+      "path": "/music/mario_overworld.mp3",
+      "category": "OST"
+    },
+    {
+      "id": "bgm-pacman-arcade",
+      "title": "Pac-Man 1980 Fever (Arcade Chiptune)",
+      "gameTitle": "Pac-Man",
+      "system": "Arcade MAME",
+      "composer": "Toshio Kai",
+      "duration": "1:55",
+      "bpm": 132,
+      "format": "mp3",
+      "path": "/music/pacman_fever.mp3",
+      "category": "Arcade"
+    },
+    {
+      "id": "bgm-amiga-cyberpunk",
+      "title": "Cyberpunk Neon Drive 1999",
+      "gameTitle": "RetroMAD Original",
+      "system": "Commodore Amiga",
+      "composer": "RetroMAD Audio Team",
+      "duration": "3:45",
+      "bpm": 128,
+      "format": "mp3",
+      "path": "/music/cyberpunk_neon_drive.mp3",
+      "category": "Synthwave"
+    },
+    {
+      "id": "bgm-psx-startup",
+      "title": "PlayStation 1994 Boot Ambient",
+      "gameTitle": "Sony PlayStation BIOS",
+      "system": "Sony PlayStation",
+      "composer": "Takafumi Fujisawa",
+      "duration": "1:20",
+      "bpm": 80,
+      "format": "mp3",
+      "path": "/music/psx_boot_ambient.mp3",
+      "category": "Ambient"
+    }
+  ]
+}

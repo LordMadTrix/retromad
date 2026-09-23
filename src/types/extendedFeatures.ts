@@ -117,8 +117,10 @@ export interface NomadBackupPackage {
   achievements: any[];
   cheats: any[];
   saveStates: any[];
-  bezelConfig: any;
-  customMusicCount: number;
+  bezelConfig?: any;
+  customMusicCount?: number;
+  games?: any[];
+  systems?: any[];
 }
 
 // Module 7 : Overlays de Consoles Portables
@@ -179,3 +181,68 @@ export interface CustomAudioTrack {
   dateAdded: string;
   isFavorite?: boolean;
 }
+
+// Module Centralisé : Répertoire Public / Storage Hub
+export interface CentralizedRomItem {
+  id: string;
+  companyId: string;
+  companyName: string;
+  systemId: string;
+  systemName: string;
+  title: string;
+  filename: string;
+  path: string;
+  size: number;
+  sizeFormatted: string;
+  genre: string;
+  releaseYear: number;
+  status: 'playable' | 'missing' | 'installed';
+  description?: string;
+}
+
+export interface CentralizedBiosItem {
+  filename: string;
+  systemId: string;
+  systemName: string;
+  description: string;
+  expectedMd5: string;
+  size: number;
+  sizeFormatted: string;
+  required: boolean;
+  status: 'installed' | 'missing';
+}
+
+export interface CentralizedThemeItem {
+  id: string;
+  name: string;
+  author: string;
+  accentColor: string;
+  secondaryColor: string;
+  bgClass: string;
+  crtShader: string;
+  bezelStyle: string;
+  description: string;
+}
+
+export interface CentralizedEmulatorCore {
+  id: string;
+  name: string;
+  coreFileLinux: string;
+  coreFileWindows: string;
+  systems: string[];
+  features: string[];
+  status: 'ready' | 'missing';
+}
+
+export interface CentralizedSaveItem {
+  id: string;
+  gameTitle: string;
+  systemId: string;
+  type: string;
+  filename: string;
+  size: number;
+  modifiedAt: string;
+  progress: string;
+  slot: number;
+}
+

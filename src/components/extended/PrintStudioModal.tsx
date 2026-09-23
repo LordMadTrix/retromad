@@ -3,15 +3,9 @@ import {
   X,
   Printer,
   Download,
-  Sparkles,
-  Layers,
-  Gamepad2,
-  FileText,
   Sliders,
-  Check,
 } from 'lucide-react';
 import { Game } from '../../types';
-import { PrintTemplateConfig, PrintBoxType } from '../../types/extendedFeatures';
 import { PRINT_TEMPLATES } from '../../data/extendedFeaturesData';
 
 interface PrintStudioModalProps {
@@ -127,10 +121,10 @@ export const PrintStudioModal: React.FC<PrintStudioModalProps> = ({
       ctx.font = '13px sans-serif';
       ctx.fillStyle = '#cbd5e1';
       ctx.textAlign = 'left';
-      const words = (customBackText || selectedGame.description || '').split(' ');
+      const words = (customBackText || selectedGame.metadata?.synopsis || 'Jeu vidéo culte rétro.').split(' ');
       let line = '';
       let yOffset = startY + 110;
-      words.forEach((w) => {
+      words.forEach((w: string) => {
         if ((line + w).length > 32) {
           ctx.fillText(line, 55, yOffset);
           line = w + ' ';
@@ -329,6 +323,28 @@ export const PrintStudioModal: React.FC<PrintStudioModalProps> = ({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Titre et Résumé personnalisés */}
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">Titre Personnalisé</label>
+                <input
+                  type="text"
+                  placeholder={selectedGame.title}
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">Texte Résumé au Dos</label>
+                <textarea
+                  rows={2}
+                  value={customBackText}
+                  onChange={(e) => setCustomBackText(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-medium resize-none"
+                />
               </div>
 
               {/* Traits de coupe */}

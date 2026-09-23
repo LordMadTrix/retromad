@@ -51,6 +51,78 @@ import { ArcadeTournamentModal } from './components/retro/ArcadeTournamentModal'
 import { RetroManualsViewerModal } from './components/retro/RetroManualsViewerModal';
 import { BezelStudioModal } from './components/retro/BezelStudioModal';
 import { RetroRouletteDailyChallengeModal } from './components/retro/RetroRouletteDailyChallengeModal';
+import {
+  GamePlayStats,
+  PlaySession,
+  UserProfile,
+  ParentalControlConfig,
+  HandheldOverlayConfig,
+  NomadBackupPackage,
+} from './types/extendedFeatures';
+import {
+  INITIAL_PLAY_STATS,
+  INITIAL_PLAY_SESSIONS,
+  INITIAL_PROFILES,
+  INITIAL_PARENTAL_CONFIG,
+  INITIAL_HANDHELD_CONFIG,
+  HISTORICAL_MILESTONES,
+} from './data/extendedFeaturesData';
+import { RetroAnalyticsModal } from './components/extended/RetroAnalyticsModal';
+import { GamepadTesterModal } from './components/extended/GamepadTesterModal';
+import { MultiProfileModal } from './components/extended/MultiProfileModal';
+import { HistoryTimelineModal } from './components/extended/HistoryTimelineModal';
+import { PrintStudioModal } from './components/extended/PrintStudioModal';
+import { NomadBackupModal } from './components/extended/NomadBackupModal';
+import { HandheldOverlaysModal } from './components/extended/HandheldOverlaysModal';
+import { ArcadePartyModal } from './components/extended/ArcadePartyModal';
+import { MusicManagerModal } from './components/extended/MusicManagerModal';
+import { CentralizedStorageModal } from './components/extended/CentralizedStorageModal';
+import { CommunityThemeStudioModal } from './components/extended/CommunityThemeStudioModal';
+import { RetroAttractModeModal } from './components/retro/RetroAttractModeModal';
+import { RetroPasswordNotebookModal } from './components/retro/RetroPasswordNotebookModal';
+import { LanNetworkManagerModal } from './components/extended/LanNetworkManagerModal';
+import { ProjectorKioskManagerModal } from './components/retro/ProjectorKioskManagerModal';
+import { RetroManualPdfGuideModal } from './components/manual/RetroManualPdfGuideModal';
+import {
+  INITIAL_CENTRALIZED_ROMS,
+  INITIAL_CENTRALIZED_BIOS,
+  INITIAL_CENTRALIZED_THEMES,
+  INITIAL_CENTRALIZED_CORES,
+  INITIAL_CENTRALIZED_SAVES,
+} from './data/centralizedStorageData';
+import { CentralizedRomItem, CentralizedThemeItem } from './types/extendedFeatures';
+
+const convertCentralizedRomsToGames = (romList: CentralizedRomItem[]): Game[] => {
+  return romList.map((r) => {
+    const ext = r.filename.includes('.') ? `.${r.filename.split('.').pop()}` : '.bin';
+    return {
+      id: r.id,
+      title: r.title,
+      cleanTitle: r.title,
+      systemId: r.systemId,
+      path: r.path,
+      filename: r.filename,
+      extension: ext,
+      size: r.size,
+      favorite: false,
+      playCount: 0,
+      lastPlayed: undefined,
+      playTimeMinutes: 0,
+      metadata: {
+        publisher: 'Éditeur Culte',
+        developer: 'Studio Rétro',
+        releaseDate: `${r.releaseYear}-01-01`,
+        genres: [r.genre],
+        players: '1-2 Joueurs',
+        rating: 95,
+        synopsis: r.description || 'ROM centralisée dans /public prête pour émulation haute fidélité.',
+      },
+      media: {
+        boxart2d: `/roms/${r.systemId}/boxart.jpg`,
+      },
+    };
+  });
+};
 
 export const App: React.FC = () => {
   // Navigation & Vues (Par défaut sur 'companies' pour afficher immédiatement les firmes et vidéos)
@@ -65,12 +137,26 @@ export const App: React.FC = () => {
   const [systems, setSystems] = useState<System[]>(DEFAULT_SYSTEMS);
   const [companies, setCompanies] = useState<Company[]>(DEFAULT_COMPANIES);
   const [emulators, setEmulators] = useState<EmulatorProfile[]>(BUILTIN_EMULATORS);
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<Game[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_games');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return convertCentralizedRomsToGames(INITIAL_CENTRALIZED_ROMS);
+  });
   const [settings, setSettings] = useState<AppSettings>({
-    romsDir: '~/RetroMad/Roms',
-    biosDir: '~/RetroMad/Bios',
+    romsDir: 'public/roms',
+    biosDir: 'public/bios',
+    musicDir: 'public/music',
+    themesDir: 'public/themes',
+    emulatorsDir: 'public/emulators',
+    savesDir: 'public/saves',
+    publicCentralized: true,
     retroarchPath: '/usr/bin/retroarch',
-    retroarchCoresDir: '~/.config/retroarch/cores',
+    retroarchCoresDir: 'public/emulators/cores',
     scraperSource: 'both',
     language: 'fr',
     soundEnabled: true,
@@ -194,11 +280,182 @@ export const App: React.FC = () => {
   const [isCheatsModalOpen, setIsCheatsModalOpen] = useState(false);
   const [isSaveStatesModalOpen, setIsSaveStatesModalOpen] = useState(false);
   const [isJukeboxModalOpen, setIsJukeboxModalOpen] = useState(false);
+  const [isFloatingJukeboxVisible, setIsFloatingJukeboxVisible] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_jukebox_floating_visible');
+      return stored !== null ? JSON.parse(stored) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const handleToggleFloatingJukebox = () => {
+    setIsFloatingJukeboxVisible((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('retromad_jukebox_floating_visible', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleCloseFloatingJukebox = () => {
+    setIsFloatingJukeboxVisible(false);
+    try {
+      localStorage.setItem('retromad_jukebox_floating_visible', 'false');
+    } catch {}
+    jukebox.stop();
+    showNotification('Jukebox coupé et masqué de l\'écran. Réactivez-le via l\'icône 🎵 dans la barre de menu.', 'info');
+  };
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
   const [isManualsModalOpen, setIsManualsModalOpen] = useState(false);
   const [isBezelStudioModalOpen, setIsBezelStudioModalOpen] = useState(false);
   const [isRouletteModalOpen, setIsRouletteModalOpen] = useState(false);
   const [activeManualGameId, setActiveManualGameId] = useState<string | undefined>(undefined);
+
+  // Modales pour les 8 NOUVELLES fonctionnalités d'amélioration & Musique
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [isGamepadTesterOpen, setIsGamepadTesterOpen] = useState(false);
+  const [isProfilesOpen, setIsProfilesOpen] = useState(false);
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+  const [isPrintStudioOpen, setIsPrintStudioOpen] = useState(false);
+  const [isNomadBackupOpen, setIsNomadBackupOpen] = useState(false);
+  const [isHandheldOverlaysOpen, setIsHandheldOverlaysOpen] = useState(false);
+  const [isArcadePartyOpen, setIsArcadePartyOpen] = useState(false);
+  const [isMusicManagerOpen, setIsMusicManagerOpen] = useState(false);
+  const [isCentralizedStorageOpen, setIsCentralizedStorageOpen] = useState(false);
+  const [isCommunityThemeStudioOpen, setIsCommunityThemeStudioOpen] = useState(false);
+  const [isAttractModeOpen, setIsAttractModeOpen] = useState(false);
+  const [isPasswordNotebookOpen, setIsPasswordNotebookOpen] = useState(false);
+  const [isLanManagerOpen, setIsLanManagerOpen] = useState(false);
+  const [isProjectorModalOpen, setIsProjectorModalOpen] = useState(false);
+  const [isProjectorKioskRunning, setIsProjectorKioskRunning] = useState(false);
+  const [isUserManualPdfOpen, setIsUserManualPdfOpen] = useState(false);
+
+  // Données centralisées sous /public
+  const [centralizedRoms] = useState(INITIAL_CENTRALIZED_ROMS);
+  const [centralizedBios] = useState(INITIAL_CENTRALIZED_BIOS);
+  const [centralizedThemes, setCentralizedThemes] = useState<CentralizedThemeItem[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_community_themes');
+      return stored ? JSON.parse(stored) : INITIAL_CENTRALIZED_THEMES;
+    } catch {
+      return INITIAL_CENTRALIZED_THEMES;
+    }
+  });
+  const [centralizedCores] = useState(INITIAL_CENTRALIZED_CORES);
+  const [centralizedSaves] = useState(INITIAL_CENTRALIZED_SAVES);
+
+  const handleApplyCommunityTheme = (theme: CentralizedThemeItem) => {
+    setCentralizedThemes((prev) => {
+      const exists = prev.some((t) => t.id === theme.id);
+      const next = exists ? prev.map((t) => (t.id === theme.id ? theme : t)) : [theme, ...prev];
+      try {
+        localStorage.setItem('retromad_community_themes', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    setSettings((s) => ({ ...s, uiTheme: theme.id as any }));
+    showNotification(`Thème "${theme.name}" appliqué avec succès !`, 'success');
+  };
+
+  // Synchroniser games dans localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_games', JSON.stringify(games));
+    } catch {}
+  }, [games]);
+
+  // Données persistantes pour les nouveaux modules
+  const [playStats, setPlayStats] = useState<GamePlayStats[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_play_stats');
+      return stored ? JSON.parse(stored) : INITIAL_PLAY_STATS;
+    } catch {
+      return INITIAL_PLAY_STATS;
+    }
+  });
+
+  const [playSessions, setPlaySessions] = useState<PlaySession[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_play_sessions');
+      return stored ? JSON.parse(stored) : INITIAL_PLAY_SESSIONS;
+    } catch {
+      return INITIAL_PLAY_SESSIONS;
+    }
+  });
+
+  const [userProfiles, setUserProfiles] = useState<UserProfile[]>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_profiles');
+      return stored ? JSON.parse(stored) : INITIAL_PROFILES;
+    } catch {
+      return INITIAL_PROFILES;
+    }
+  });
+
+  const [activeProfileId, setActiveProfileId] = useState<string>(() => {
+    try {
+      return localStorage.getItem('retromad_active_profile_id') || 'profile-1';
+    } catch {
+      return 'profile-1';
+    }
+  });
+
+  const [parentalConfig, setParentalConfig] = useState<ParentalControlConfig>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_parental_config');
+      return stored ? JSON.parse(stored) : INITIAL_PARENTAL_CONFIG;
+    } catch {
+      return INITIAL_PARENTAL_CONFIG;
+    }
+  });
+
+  const [handheldConfig, setHandheldConfig] = useState<HandheldOverlayConfig>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_handheld_config');
+      return stored ? JSON.parse(stored) : INITIAL_HANDHELD_CONFIG;
+    } catch {
+      return INITIAL_HANDHELD_CONFIG;
+    }
+  });
+
+  // Sauvegarde automatique des nouveaux modules dans localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_play_stats', JSON.stringify(playStats));
+    } catch {}
+  }, [playStats]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_play_sessions', JSON.stringify(playSessions));
+    } catch {}
+  }, [playSessions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_profiles', JSON.stringify(userProfiles));
+    } catch {}
+  }, [userProfiles]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_active_profile_id', activeProfileId);
+    } catch {}
+  }, [activeProfileId]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_parental_config', JSON.stringify(parentalConfig));
+    } catch {}
+  }, [parentalConfig]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('retromad_handheld_config', JSON.stringify(handheldConfig));
+    } catch {}
+  }, [handheldConfig]);
 
   // Synchronisation avec localStorage
   useEffect(() => {
@@ -309,10 +566,14 @@ export const App: React.FC = () => {
     showNotification(newCrt ? 'Filtre CRT Scanlines & Phosphore activé 📺' : 'Filtre CRT désactivé 🖥️', 'info');
   }, [playSelect, settings.crtEffect, showNotification]);
 
-  // Raccourci clavier de déverrouillage (Ctrl+Shift+A ou F12) + Ctrl+K recherche
+  // Raccourci clavier de déverrouillage (Ctrl+Shift+A ou F12) + F1 pour le Guide PDF + Ctrl+K recherche
   useEffect(() => {
     const handleKeyShortcut = (e: KeyboardEvent) => {
-      if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') || e.key === 'F12') {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        playSelect();
+        setIsUserManualPdfOpen(true);
+      } else if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') || e.key === 'F12') {
         e.preventDefault();
         if (isKioskMode) {
           playSelect();
@@ -486,6 +747,45 @@ export const App: React.FC = () => {
 
   const handleLaunchGame = async (game: Game, emulatorId?: string) => {
     playLaunch();
+
+    // Enregistrement de session de jeu dans les Analytics
+    const sysName = systems.find((s) => s.id === game.systemId)?.name || game.systemId.toUpperCase();
+    const newSession: PlaySession = {
+      id: `session-${Date.now()}`,
+      gameId: game.id,
+      gameTitle: game.cleanTitle || game.title,
+      systemName: sysName,
+      startedAt: "À l'instant",
+      durationMinutes: Math.floor(Math.random() * 25) + 12,
+    };
+    setPlaySessions((prev) => [newSession, ...prev.slice(0, 49)]);
+    setPlayStats((prev) => {
+      const existingIdx = prev.findIndex((s) => s.gameId === game.id);
+      if (existingIdx >= 0) {
+        const updated = [...prev];
+        updated[existingIdx] = {
+          ...updated[existingIdx],
+          playTimeMinutes: updated[existingIdx].playTimeMinutes + 15,
+          sessionCount: updated[existingIdx].sessionCount + 1,
+          lastPlayedAt: "À l'instant",
+        };
+        return updated;
+      } else {
+        return [
+          {
+            gameId: game.id,
+            gameTitle: game.cleanTitle || game.title,
+            systemId: game.systemId,
+            systemName: sysName,
+            playTimeMinutes: 15,
+            sessionCount: 1,
+            lastPlayedAt: "À l'instant",
+          },
+          ...prev,
+        ];
+      }
+    });
+
     if (!window.api) {
       showNotification(`Simulation de lancement de "${game.cleanTitle}"`, 'info');
       return;
@@ -512,6 +812,37 @@ export const App: React.FC = () => {
     setGames((prev) =>
       prev.map((g) => (g.id === gameId ? { ...g, favorite: !g.favorite } : g))
     );
+  };
+
+  // Handlers pour le Répertoire Public Centralisé
+  const handleImportRomToLibrary = (rom: CentralizedRomItem) => {
+    const existing = games.find((g) => g.id === rom.id || g.filename === rom.filename);
+    if (!existing) {
+      const converted = convertCentralizedRomsToGames([rom])[0];
+      setGames((prev) => [converted, ...prev]);
+      showNotification(`ROM "${rom.title}" indexée dans votre ludothèque !`, 'success');
+    } else {
+      showNotification(`La ROM "${rom.title}" est déjà dans votre ludothèque.`, 'info');
+    }
+  };
+
+  const handleImportAllRomsToLibrary = () => {
+    const newGames = convertCentralizedRomsToGames(centralizedRoms);
+    setGames((prev) => {
+      const existingIds = new Set(prev.map((g) => g.id));
+      const added = newGames.filter((g) => !existingIds.has(g.id));
+      return [...added, ...prev];
+    });
+    showNotification(`Toutes les ROMs de /public/roms ont été indexées (${centralizedRoms.length} jeux) !`, 'success');
+  };
+
+  const handleLaunchCentralizedRom = (rom: CentralizedRomItem) => {
+    let target = games.find((g) => g.id === rom.id || g.filename === rom.filename);
+    if (!target) {
+      target = convertCentralizedRomsToGames([rom])[0];
+      setGames((prev) => [target!, ...prev]);
+    }
+    handleLaunchGame(target);
   };
 
   // Handlers pour les 8 fonctionnalités Rétro
@@ -845,6 +1176,14 @@ export const App: React.FC = () => {
             setSelectedGame(g);
           }}
           onUnlockAdmin={() => setIsPinModalOpen(true)}
+          onOpenProjectorModal={() => {
+            playSelect();
+            setIsProjectorModalOpen(true);
+          }}
+          onOpenUserManualPdf={() => {
+            playSelect();
+            setIsUserManualPdfOpen(true);
+          }}
           soundEnabled={settings.soundEnabled}
           soundVolume={settings.soundVolume ?? 0.8}
           crtEnabled={!!settings.crtEffect}
@@ -875,6 +1214,8 @@ export const App: React.FC = () => {
             crtEnabled={!!settings.crtEffect}
             onToggleCrt={handleToggleCrt}
             bgmActive={jukebox.isPlaying || isBgmActive}
+            isJukeboxMuted={jukebox.isMuted}
+            isJukeboxFloatingVisible={isFloatingJukeboxVisible}
             onToggleBgm={() => {
               jukebox.togglePlay();
               handleToggleBgm();
@@ -915,6 +1256,71 @@ export const App: React.FC = () => {
             onOpenSaveStates={() => {
               playSelect();
               setIsSaveStatesModalOpen(true);
+            }}
+            onOpenAnalytics={() => {
+              playSelect();
+              setIsAnalyticsOpen(true);
+            }}
+            onOpenGamepadTester={() => {
+              playSelect();
+              setIsGamepadTesterOpen(true);
+            }}
+            onOpenProfiles={() => {
+              playSelect();
+              setIsProfilesOpen(true);
+            }}
+            onOpenTimeline={() => {
+              playSelect();
+              setIsTimelineOpen(true);
+            }}
+            onOpenPrintStudio={() => {
+              playSelect();
+              setIsPrintStudioOpen(true);
+            }}
+            onOpenNomadBackup={() => {
+              playSelect();
+              setIsNomadBackupOpen(true);
+            }}
+            onOpenHandheldOverlays={() => {
+              playSelect();
+              setIsHandheldOverlaysOpen(true);
+            }}
+            onOpenArcadeParty={() => {
+              playSelect();
+              setIsArcadePartyOpen(true);
+            }}
+            onOpenMusicManager={() => {
+              playSelect();
+              setIsMusicManagerOpen(true);
+            }}
+            onOpenCentralizedStorage={() => {
+              playSelect();
+              setIsCentralizedStorageOpen(true);
+            }}
+            onOpenThemeStudio={() => {
+              playSelect();
+              setIsCommunityThemeStudioOpen(true);
+            }}
+            onOpenAttractMode={() => {
+              playSelect();
+              setIsAttractModeOpen(true);
+            }}
+            onOpenPasswordNotebook={() => {
+              playSelect();
+              setIsPasswordNotebookOpen(true);
+            }}
+            onOpenLanManager={() => {
+              playSelect();
+              setIsLanManagerOpen(true);
+            }}
+            onOpenProjectorModal={() => {
+              playSelect();
+              setIsProjectorModalOpen(true);
+            }}
+            isProjectorKioskRunning={isProjectorKioskRunning}
+            onOpenUserManualPdf={() => {
+              playSelect();
+              setIsUserManualPdfOpen(true);
             }}
           />
 
@@ -1081,6 +1487,66 @@ export const App: React.FC = () => {
                 playSelect();
                 setIsSaveStatesModalOpen(true);
               }}
+              onOpenAnalytics={() => {
+                playSelect();
+                setIsAnalyticsOpen(true);
+              }}
+              onOpenGamepadTester={() => {
+                playSelect();
+                setIsGamepadTesterOpen(true);
+              }}
+              onOpenProfiles={() => {
+                playSelect();
+                setIsProfilesOpen(true);
+              }}
+              onOpenTimeline={() => {
+                playSelect();
+                setIsTimelineOpen(true);
+              }}
+              onOpenPrintStudio={() => {
+                playSelect();
+                setIsPrintStudioOpen(true);
+              }}
+              onOpenNomadBackup={() => {
+                playSelect();
+                setIsNomadBackupOpen(true);
+              }}
+              onOpenHandheldOverlays={() => {
+                playSelect();
+                setIsHandheldOverlaysOpen(true);
+              }}
+              onOpenArcadeParty={() => {
+                playSelect();
+                setIsArcadePartyOpen(true);
+              }}
+              onOpenMusicManager={() => {
+                playSelect();
+                setIsMusicManagerOpen(true);
+              }}
+              onOpenThemeStudio={() => {
+                playSelect();
+                setIsCommunityThemeStudioOpen(true);
+              }}
+              onOpenAttractMode={() => {
+                playSelect();
+                setIsAttractModeOpen(true);
+              }}
+              onOpenPasswordNotebook={() => {
+                playSelect();
+                setIsPasswordNotebookOpen(true);
+              }}
+              onOpenLanManager={() => {
+                playSelect();
+                setIsLanManagerOpen(true);
+              }}
+              onOpenProjectorModal={() => {
+                playSelect();
+                setIsProjectorModalOpen(true);
+              }}
+              onOpenUserManualPdf={() => {
+                playSelect();
+                setIsUserManualPdfOpen(true);
+              }}
             />
           )}
         </>
@@ -1207,6 +1673,10 @@ export const App: React.FC = () => {
           onOpenSaveStates={() => {
             playSelect();
             setIsSaveStatesModalOpen(true);
+          }}
+          onOpenUserManualPdf={() => {
+            playSelect();
+            setIsUserManualPdfOpen(true);
           }}
         />
       )}
@@ -1425,14 +1895,20 @@ export const App: React.FC = () => {
       <RetroJukeboxModal
         isOpen={isJukeboxModalOpen}
         onClose={() => setIsJukeboxModalOpen(false)}
+        onOpenMusicManager={() => setIsMusicManagerOpen(true)}
         jukebox={jukebox}
+        isFloatingVisible={isFloatingJukeboxVisible}
+        onToggleFloatingVisible={handleToggleFloatingJukebox}
       />
 
-      {/* Mini-Lecteur Flottant Jukebox */}
-      <RetroJukeboxFloatingPlayer
-        jukebox={jukebox}
-        onOpenModal={() => setIsJukeboxModalOpen(true)}
-      />
+      {/* Mini-Lecteur Flottant Jukebox (Déplaçable & Coupable) */}
+      {isFloatingJukeboxVisible && (
+        <RetroJukeboxFloatingPlayer
+          jukebox={jukebox}
+          onOpenModal={() => setIsJukeboxModalOpen(true)}
+          onClose={handleCloseFloatingJukebox}
+        />
+      )}
 
       {/* 4. Tournois Arcade Multijoueur */}
       <ArcadeTournamentModal
@@ -1452,6 +1928,9 @@ export const App: React.FC = () => {
         manuals={INITIAL_MANUALS}
         games={games}
         initialGameId={activeManualGameId}
+        onOpenOfficialGuide={() => {
+          setIsUserManualPdfOpen(true);
+        }}
         onLaunchGame={(g: Game) => {
           setIsManualsModalOpen(false);
           handleLaunchGame(g);
@@ -1489,6 +1968,299 @@ export const App: React.FC = () => {
         onCreateState={handleCreateSaveState}
         onDeleteState={handleDeleteSaveState}
         onImportState={handleImportSaveState}
+      />
+
+      {/* ======================================================== */}
+      {/* LES 8 NOUVELLES EXTENSIONS DU PROJET + GESTION MUSIQUE */}
+      {/* ======================================================== */}
+
+      {/* 1. Rétro Analytics & Journal de Bord */}
+      <RetroAnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+        playStats={playStats}
+        sessions={playSessions}
+        games={games}
+        systems={systems}
+        onPlayGame={handleLaunchGame}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 2. Testeur de Manette & Input Calibrator */}
+      <GamepadTesterModal
+        isOpen={isGamepadTesterOpen}
+        onClose={() => setIsGamepadTesterOpen(false)}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 3. Multi-Profils & Contrôle Parental */}
+      <MultiProfileModal
+        isOpen={isProfilesOpen}
+        onClose={() => setIsProfilesOpen(false)}
+        profiles={userProfiles}
+        activeProfileId={activeProfileId}
+        parentalConfig={parentalConfig}
+        systems={systems}
+        onSelectProfile={(profileId) => {
+          setActiveProfileId(profileId);
+          const p = userProfiles.find((item) => item.id === profileId);
+          showNotification(`Profil activé : ${p?.name || 'Joueur'}`, 'success');
+        }}
+        onAddProfile={(newProfile) => {
+          setUserProfiles((prev) => [...prev, newProfile]);
+          showNotification(`Profil "${newProfile.name}" créé avec succès !`, 'success');
+        }}
+        onUpdateParentalConfig={(config) => {
+          setParentalConfig(config);
+          showNotification('Paramètres de contrôle parental enregistrés.', 'success');
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 4. Musée & Frise Chronologique de l'Histoire du Rétrogaming */}
+      <HistoryTimelineModal
+        isOpen={isTimelineOpen}
+        onClose={() => setIsTimelineOpen(false)}
+        milestones={HISTORICAL_MILESTONES}
+        games={games}
+        onPlayGame={(g) => {
+          setIsTimelineOpen(false);
+          handleLaunchGame(g);
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 5. Print Studio : Jaquettes & Boîtes 1:1 Prêtes à Imprimer */}
+      <PrintStudioModal
+        isOpen={isPrintStudioOpen}
+        onClose={() => setIsPrintStudioOpen(false)}
+        games={games}
+        initialGameId={selectedGame?.id}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 6. Nomad Backup : Export & Pack Clé USB */}
+      <NomadBackupModal
+        isOpen={isNomadBackupOpen}
+        onClose={() => setIsNomadBackupOpen(false)}
+        onExportBundle={() => ({
+          appVersion: '1.0',
+          exportedAt: new Date().toISOString(),
+          machineId: 'RETROMAD-STATION',
+          profiles: userProfiles,
+          playStats: playStats,
+          achievements,
+          cheats,
+          saveStates,
+          games,
+          systems,
+        })}
+        onImportBundle={(restored: NomadBackupPackage) => {
+          if (restored.achievements) setAchievements(restored.achievements);
+          if (restored.cheats) setCheats(restored.cheats);
+          if (restored.saveStates) setSaveStates(restored.saveStates);
+          if (restored.profiles) setUserProfiles(restored.profiles);
+          if (restored.games) setGames(restored.games);
+          showNotification('Sauvegarde Nomad restaurée avec succès !', 'success');
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 7. Overlays Consoles Portables LCD (Game Boy, GBA, Game Gear, etc.) */}
+      <HandheldOverlaysModal
+        isOpen={isHandheldOverlaysOpen}
+        onClose={() => setIsHandheldOverlaysOpen(false)}
+        currentConfig={handheldConfig}
+        onSaveConfig={(config) => {
+          setHandheldConfig(config);
+          showNotification('Configuration de l’overlay portable sauvegardée !', 'success');
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 8. Mode Soirée & Bar Arcade */}
+      <ArcadePartyModal
+        isOpen={isArcadePartyOpen}
+        onClose={() => setIsArcadePartyOpen(false)}
+        games={games}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* GESTIONNAIRE DE MUSIQUES & SCANNER AUTOMATIQUE DE DOSSIER */}
+      <MusicManagerModal
+        isOpen={isMusicManagerOpen}
+        onClose={() => setIsMusicManagerOpen(false)}
+        playlist={jukebox.playlist}
+        onAddTrack={(track) => {
+          jukebox.addTrack(track);
+          showNotification(`Piste "${track.title}" ajoutée au Jukebox !`, 'success');
+        }}
+        onRemoveTrack={(trackId) => {
+          jukebox.removeTrack(trackId);
+          showNotification('Piste retirée.', 'info');
+        }}
+        onImportTracks={(tracks) => {
+          jukebox.importTracks(tracks);
+          showNotification(`${tracks.length} morceau(x) importé(s) avec succès !`, 'success');
+        }}
+        onResetPlaylist={() => {
+          jukebox.resetPlaylist();
+          showNotification('Playlist originale restaurée.', 'info');
+        }}
+        onSelectTrack={(index) => {
+          jukebox.selectTrack(index);
+        }}
+        currentTrackId={jukebox.currentTrack?.id}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* MODULE CENTRALISÉ : RÉPERTOIRE PUBLIC (/public : ROMs, BIOS, Musiques, Thèmes, Émulateurs, Sauvegardes) */}
+      <CentralizedStorageModal
+        isOpen={isCentralizedStorageOpen}
+        onClose={() => setIsCentralizedStorageOpen(false)}
+        roms={centralizedRoms}
+        biosList={centralizedBios}
+        themes={centralizedThemes}
+        emulators={centralizedCores}
+        saves={centralizedSaves}
+        currentThemeId={settings.uiTheme || 'neon-dark'}
+        onSelectTheme={(themeId) => {
+          setSettings((s) => ({ ...s, uiTheme: themeId as any }));
+          showNotification(`Thème "${themeId}" activé depuis /public/themes/ !`, 'success');
+        }}
+        onLaunchRom={handleLaunchCentralizedRom}
+        onImportRomToLibrary={handleImportRomToLibrary}
+        onImportAllRomsToLibrary={handleImportAllRomsToLibrary}
+        onOpenThemeStudio={() => {
+          playSelect();
+          setIsCommunityThemeStudioOpen(true);
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* ATELIER & STUDIO DE THÈMES COMMUNAUTAIRES (DSL SIMPLIFIÉ, EXPORT/IMPORT, PRÉVISUALISATION LIVE) */}
+      <CommunityThemeStudioModal
+        isOpen={isCommunityThemeStudioOpen}
+        onClose={() => setIsCommunityThemeStudioOpen(false)}
+        onApplyTheme={handleApplyCommunityTheme}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* MODE ÉCRAN DE VEILLE / BORNE D'ARCADE "ATTRACT MODE" & BOÎTES 3D */}
+      <RetroAttractModeModal
+        isOpen={isAttractModeOpen}
+        onClose={() => setIsAttractModeOpen(false)}
+        games={games}
+        onLaunchGame={(g) => {
+          handleLaunchGame(g);
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* CARNET DE MOTS DE PASSE CULTES & FICHES RÉTRO (JOYPAD / VMU) */}
+      <RetroPasswordNotebookModal
+        isOpen={isPasswordNotebookOpen}
+        onClose={() => setIsPasswordNotebookOpen(false)}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* PASSERELLE RÉSEAU LOCAL (LAN) & SERVEUR WEB / FTP */}
+      <LanNetworkManagerModal
+        isOpen={isLanManagerOpen}
+        onClose={() => setIsLanManagerOpen(false)}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* KIOSQUE SUR 2ÈME ÉCRAN & RÉTROPROJECTEUR (DUAL-DISPLAY CINEMA) */}
+      <ProjectorKioskManagerModal
+        isOpen={isProjectorModalOpen}
+        onClose={() => setIsProjectorModalOpen(false)}
+        games={games}
+        systems={systems}
+        isKioskActive={isKioskMode}
+        onToggleKioskOnProjector={(enable) => {
+          setIsProjectorKioskRunning(enable);
+          if (enable) {
+            showNotification('Mode Projection Kiosque activé pour le Rétroprojecteur !', 'success');
+          } else {
+            showNotification('Mode Projection déconnecté.', 'info');
+          }
+        }}
+        onLaunchGame={(g) => {
+          handleLaunchGame(g);
+        }}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* MANUEL UTILISATEUR & GUIDE COMPLET DES FONCTIONNALITÉS (EXPORTABLE EN PDF / F1) */}
+      <RetroManualPdfGuideModal
+        isOpen={isUserManualPdfOpen}
+        onClose={() => setIsUserManualPdfOpen(false)}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'fanfare') playUnlock();
+          if (type === 'powerup') playSelect();
+        }}
       />
     </div>
   );

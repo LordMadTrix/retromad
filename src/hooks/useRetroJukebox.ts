@@ -18,9 +18,34 @@ export function useRetroJukebox(externalVolume = 0.5) {
 
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(externalVolume);
+  const [volume, setVolumeState] = useState(externalVolume);
+  const [previousVolume, setPreviousVolume] = useState(externalVolume > 0 ? externalVolume : 0.5);
+  const [isMuted, setIsMuted] = useState(externalVolume === 0);
   const [loopMode, setLoopMode] = useState<'all' | 'one' | 'none'>('all');
   const [eqLevels, setEqLevels] = useState<number[]>([10, 25, 45, 60, 40, 70, 30, 15]);
+
+  const setVolume = useCallback((val: number) => {
+    const clamped = Math.max(0, Math.min(1, val));
+    setVolumeState(clamped);
+    if (clamped === 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+      setPreviousVolume(clamped);
+    }
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    if (isMuted || volume === 0) {
+      const restored = previousVolume > 0 ? previousVolume : 0.5;
+      setVolumeState(restored);
+      setIsMuted(false);
+    } else {
+      setPreviousVolume(volume > 0 ? volume : 0.5);
+      setVolumeState(0);
+      setIsMuted(true);
+    }
+  }, [isMuted, volume, previousVolume]);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -215,6 +240,15 @@ export function useRetroJukebox(externalVolume = 0.5) {
     setIsPlaying(false);
   }, []);
 
+  const stop = useCallback(() => {
+    pause();
+    stepIndexRef.current = 0;
+    if (audioElementRef.current) {
+      audioElementRef.current.pause();
+      audioElementRef.current.currentTime = 0;
+    }
+  }, [pause]);
+
   const togglePlay = useCallback(() => {
     if (isPlaying) {
       pause();
@@ -334,13 +368,16 @@ export function useRetroJukebox(externalVolume = 0.5) {
     currentTrack,
     currentTrackIndex,
     isPlaying,
+    isMuted,
     volume,
     loopMode,
     eqLevels,
     setVolume,
+    toggleMute,
     setLoopMode,
     play,
     pause,
+    stop,
     togglePlay,
     nextTrack,
     prevTrack,

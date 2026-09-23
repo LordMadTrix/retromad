@@ -10,12 +10,10 @@ import {
   Sparkles,
   Disc,
   CheckCircle2,
-  Volume2,
   FolderOpen,
   FileAudio,
 } from 'lucide-react';
 import { ChiptuneTrack } from '../../types/retroFeatures';
-import { INITIAL_CHIPTUNE_TRACKS } from '../../data/retroFeaturesData';
 
 interface MusicManagerModalProps {
   isOpen: boolean;
@@ -57,7 +55,6 @@ export const MusicManagerModal: React.FC<MusicManagerModalProps> = ({
   const [scannedFiles, setScannedFiles] = useState<ChiptuneTrack[]>([]);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dirInputRef = useRef<HTMLInputElement | null>(null);
 
   if (!isOpen) return null;
@@ -386,10 +383,11 @@ export const MusicManagerModal: React.FC<MusicManagerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleDirectoryScanClick}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-pink-600 hover:from-fuchsia-400 hover:to-pink-500 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-fuchsia-500/25 flex items-center space-x-2 transition"
+                    disabled={isScanning}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-pink-600 hover:from-fuchsia-400 hover:to-pink-500 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-fuchsia-500/25 flex items-center space-x-2 transition disabled:opacity-50"
                   >
                     <FolderOpen className="w-4 h-4" />
-                    <span>Choisir un Dossier de Musiques</span>
+                    <span>{isScanning ? 'Scan en cours...' : 'Choisir un Dossier de Musiques'}</span>
                   </button>
 
                   {/* Input caché standard pour compatibilité dossier webkit */}

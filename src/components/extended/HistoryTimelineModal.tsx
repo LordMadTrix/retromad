@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import {
   X,
   History,
-  Calendar,
-  Sparkles,
   Gamepad2,
-  Tv,
-  ArrowRight,
-  Flame,
-  BookOpen,
 } from 'lucide-react';
 import { HistoricalMilestone } from '../../types/extendedFeatures';
 import { Game } from '../../types';
@@ -49,7 +43,8 @@ export const HistoryTimelineModal: React.FC<HistoryTimelineModalProps> = ({
     if (activeMilestone?.highlightGameTitles?.some((title) => g.title.toLowerCase().includes(title.toLowerCase()))) {
       return true;
     }
-    if (g.year && Math.abs(g.year - activeMilestone.year) <= 1) {
+    const gameYear = g.metadata?.releaseDate ? parseInt(g.metadata.releaseDate.slice(0, 4)) : undefined;
+    if (gameYear && Math.abs(gameYear - activeMilestone.year) <= 1) {
       return true;
     }
     return false;
@@ -205,7 +200,7 @@ export const HistoryTimelineModal: React.FC<HistoryTimelineModalProps> = ({
                         >
                           <div className="truncate">
                             <span className="text-xs font-bold text-white block truncate">{game.title}</span>
-                            <span className="text-[10px] text-slate-400">{game.year || activeMilestone.year}</span>
+                            <span className="text-[10px] text-slate-400">{game.metadata?.releaseDate?.slice(0, 4) || activeMilestone.year}</span>
                           </div>
 
                           {onPlayGame && (

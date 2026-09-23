@@ -9,7 +9,6 @@ import {
   Gamepad2,
   Tv,
   Award,
-  ChevronRight,
   TrendingUp,
 } from 'lucide-react';
 import { Game, System } from '../../types';

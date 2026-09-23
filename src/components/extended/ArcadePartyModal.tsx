@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   Beer,
-  Timer,
   Trophy,
   Users,
   Dices,
@@ -10,8 +9,6 @@ import {
   RotateCcw,
   Sparkles,
   Flame,
-  Award,
-  Gamepad2,
 } from 'lucide-react';
 import { Game } from '../../types';
 import { PartyPlayer, PartyDare } from '../../types/extendedFeatures';
@@ -30,7 +27,6 @@ export const ArcadePartyModal: React.FC<ArcadePartyModalProps> = ({
   games,
   onPlaySound,
 }) => {
-  const [sessionActive, setSessionActive] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState<string>(games[0]?.id || '');
   const [roundDuration, setRoundDuration] = useState<number>(90); // 90 secondes par tour
   const [timeLeft, setTimeLeft] = useState<number>(90);

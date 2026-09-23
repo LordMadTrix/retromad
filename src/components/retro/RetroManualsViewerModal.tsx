@@ -8,6 +8,7 @@ import {
   X,
   Lightbulb,
   Gamepad,
+  Printer,
 } from 'lucide-react';
 import { RetroManual } from '../../types/retroFeatures';
 import { INITIAL_MANUALS } from '../../data/retroFeaturesData';
@@ -22,6 +23,7 @@ interface RetroManualsViewerModalProps {
   initialGameId?: string;
   onLaunchGame?: (game: Game) => void;
   onPlaySound?: (type: 'coin' | 'powerup') => void;
+  onOpenOfficialGuide?: () => void;
 }
 
 export const RetroManualsViewerModal: React.FC<RetroManualsViewerModalProps> = ({
@@ -33,6 +35,7 @@ export const RetroManualsViewerModal: React.FC<RetroManualsViewerModalProps> = (
   games: _games,
   onLaunchGame: _onLaunchGame,
   onPlaySound,
+  onOpenOfficialGuide,
 }) => {
   const targetGameId = selectedGameId || initialGameId;
   const [activeManualIndex, setActiveManualIndex] = useState(() => {
@@ -113,6 +116,20 @@ export const RetroManualsViewerModal: React.FC<RetroManualsViewerModalProps> = (
             >
               {zoomLevel === 'normal' ? <ZoomIn className="w-4 h-4" /> : <ZoomOut className="w-4 h-4" />}
             </button>
+
+            {onOpenOfficialGuide && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenOfficialGuide();
+                }}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition shadow-sm"
+                title="Consulter le Guide Illustré Officiel de RetroMAD (10 Chapitres avec Captures & Export PDF)"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Guide RétroMAD (PDF)</span>
+              </button>
+            )}
 
             <button
               onClick={onClose}

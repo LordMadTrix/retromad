@@ -163,6 +163,11 @@ export interface BiosStatus {
 export interface AppSettings {
   romsDir: string;
   biosDir: string;
+  musicDir?: string;
+  themesDir?: string;
+  emulatorsDir?: string;
+  savesDir?: string;
+  publicCentralized?: boolean;
   retroarchPath: string;
   retroarchCoresDir: string;
   scraperSource: 'libretro' | 'screenscraper' | 'both';

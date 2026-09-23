@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   Gamepad2,
-  Sliders,
-  CheckCircle2,
-  RefreshCw,
   Zap,
   Activity,
   Layers,

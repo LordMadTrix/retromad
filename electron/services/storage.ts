@@ -48,15 +48,29 @@ export class StorageService {
 
   getDefaultSettings(): AppSettings {
     const isWindows = process.platform === 'win32';
-    const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+    const appRoot = process.cwd();
+    const publicDir = path.join(appRoot, 'public');
     
+    // Assurer l'existence des répertoires publics centralisés
+    ['roms', 'bios', 'music', 'themes', 'emulators', 'saves'].forEach((sub) => {
+      const dir = path.join(publicDir, sub);
+      if (!fs.existsSync(dir)) {
+        try { fs.mkdirSync(dir, { recursive: true }); } catch {}
+      }
+    });
+
     return {
-      romsDir: path.join(homeDir, 'RetroMad', 'Roms'),
-      biosDir: path.join(homeDir, 'RetroMad', 'Bios'),
+      publicCentralized: true,
+      romsDir: path.join(publicDir, 'roms'),
+      biosDir: path.join(publicDir, 'bios'),
+      musicDir: path.join(publicDir, 'music'),
+      themesDir: path.join(publicDir, 'themes'),
+      emulatorsDir: path.join(publicDir, 'emulators'),
+      savesDir: path.join(publicDir, 'saves'),
       retroarchPath: isWindows ? 'C:\\RetroArch-Win64\\retroarch.exe' : '/usr/bin/retroarch',
       retroarchCoresDir: isWindows 
         ? 'C:\\RetroArch-Win64\\cores' 
-        : path.join(homeDir, '.config/retroarch/cores'),
+        : path.join(publicDir, 'emulators', 'cores'),
       scraperSource: 'both',
       language: 'fr',
       soundEnabled: true,

@@ -1,0 +1,174 @@
+{
+  "version": "2.0",
+  "basePath": "/roms",
+  "hierarchy": "Roms -> Firmes -> Consoles",
+  "description": "Bibliothèque centrale de ROMs RetroMAD organisée selon l'arborescence Roms -> Firmes -> Consoles",
+  "systemsCount": 13,
+  "firmes": [
+    {
+      "id": "nintendo",
+      "name": "Nintendo",
+      "consoles": ["nes", "snes", "n64", "gb", "gbc", "gba"]
+    },
+    {
+      "id": "sega",
+      "name": "SEGA",
+      "consoles": ["mastersystem", "megadrive", "gamegear", "saturn", "dreamcast"]
+    },
+    {
+      "id": "sony",
+      "name": "Sony",
+      "consoles": ["psx", "ps2", "psp"]
+    },
+    {
+      "id": "snk",
+      "name": "SNK",
+      "consoles": ["neogeo"]
+    },
+    {
+      "id": "atari",
+      "name": "Atari",
+      "consoles": ["atari2600", "atari7800"]
+    },
+    {
+      "id": "arcade",
+      "name": "Arcade Classics",
+      "consoles": ["mame"]
+    },
+    {
+      "id": "nec",
+      "name": "NEC",
+      "consoles": ["pcengine"]
+    }
+  ],
+  "roms": [
+    {
+      "id": "rom-nes-mario",
+      "companyId": "nintendo",
+      "companyName": "Nintendo",
+      "systemId": "nes",
+      "systemName": "Nintendo Entertainment System",
+      "title": "Super Mario Bros. (Demake DX)",
+      "filename": "super_mario_demake.nes",
+      "path": "/roms/nintendo/nes/super_mario_demake.nes",
+      "size": 40960,
+      "sizeFormatted": "40 KB",
+      "genre": "Plateforme",
+      "releaseYear": 1985,
+      "status": "playable",
+      "description": "Version homebrew fidèle du premier monument du jeu de plateforme 8-bit par Shigeru Miyamoto."
+    },
+    {
+      "id": "rom-snes-world",
+      "companyId": "nintendo",
+      "companyName": "Nintendo",
+      "systemId": "snes",
+      "systemName": "Super Nintendo",
+      "title": "Super Mario World : Return to Dinosaur Land",
+      "filename": "super_demo_world.sfc",
+      "path": "/roms/nintendo/snes/super_demo_world.sfc",
+      "size": 2097152,
+      "sizeFormatted": "2.0 MB",
+      "genre": "Plateforme / Aventure",
+      "releaseYear": 1990,
+      "status": "playable",
+      "description": "Chef-d'œuvre du lancement 16-bit exploitant le scrolling parallaxe et les couleurs éclatantes de la SNES."
+    },
+    {
+      "id": "rom-md-sonic",
+      "companyId": "sega",
+      "companyName": "SEGA",
+      "systemId": "megadrive",
+      "systemName": "SEGA Mega Drive",
+      "title": "Sonic The Hedgehog (Remastered Edition)",
+      "filename": "sonic_retro_adventure.md",
+      "path": "/roms/sega/megadrive/sonic_retro_adventure.md",
+      "size": 1048576,
+      "sizeFormatted": "1.0 MB",
+      "genre": "Vitesse / Plateforme",
+      "releaseYear": 1991,
+      "status": "playable",
+      "description": "L'icône de Sega défiant Nintendo avec sa vitesse vertigineuse et sa synthèse sonore Yamaha YM2612."
+    },
+    {
+      "id": "rom-gba-poke",
+      "companyId": "nintendo",
+      "companyName": "Nintendo",
+      "systemId": "gba",
+      "systemName": "Game Boy Advance",
+      "title": "Pokémon Emeraude : Edition Rétro",
+      "filename": "pokemon_retro_emerald.gba",
+      "path": "/roms/nintendo/gba/pokemon_retro_emerald.gba",
+      "size": 16777216,
+      "sizeFormatted": "16.0 MB",
+      "genre": "RPG / Aventure",
+      "releaseYear": 2004,
+      "status": "playable",
+      "description": "Aventure culte de Hoenn avec combats stratégiques, météo dynamique et animations 32-bit détaillées."
+    },
+    {
+      "id": "rom-arcade-pacman",
+      "companyId": "arcade",
+      "companyName": "Arcade Classics",
+      "systemId": "arcade",
+      "systemName": "Arcade MAME",
+      "title": "PAC-MAN Championship Classic",
+      "filename": "pacman_table.zip",
+      "path": "/roms/arcade/mame/pacman_table.zip",
+      "size": 65536,
+      "sizeFormatted": "64 KB",
+      "genre": "Labyrinthe / Score-Attack",
+      "releaseYear": 1980,
+      "status": "playable",
+      "description": "Le légendaire jeu de Namco conçu par Toru Iwatani qui a popularisé la culture de l'arcade dans le monde."
+    },
+    {
+      "id": "rom-psx-ridge",
+      "companyId": "sony",
+      "companyName": "Sony",
+      "systemId": "psx",
+      "systemName": "Sony PlayStation",
+      "title": "Ridge Racer Revolution (Demo)",
+      "filename": "ridge_racer_demo.cue",
+      "path": "/roms/sony/psx/ridge_racer_demo.cue",
+      "size": 52428800,
+      "sizeFormatted": "50.0 MB",
+      "genre": "Course 3D",
+      "releaseYear": 1995,
+      "status": "playable",
+      "description": "L'entrée fracassante de Namco et Sony dans la course 3D texturée à 30 images par seconde."
+    },
+    {
+      "id": "rom-gb-tetris",
+      "companyId": "nintendo",
+      "companyName": "Nintendo",
+      "systemId": "gb",
+      "systemName": "Game Boy",
+      "title": "Tetris Master (Type-A)",
+      "filename": "tetris_master_gb.gb",
+      "path": "/roms/nintendo/gb/tetris_master_gb.gb",
+      "size": 32768,
+      "sizeFormatted": "32 KB",
+      "genre": "Puzzle / Réflexion",
+      "releaseYear": 1989,
+      "status": "playable",
+      "description": "Le phénomène puzzle de Pajitnov ayant vendu 35 millions d'exemplaires et propulsé la Game Boy mondiale."
+    },
+    {
+      "id": "rom-n64-mario64",
+      "companyId": "nintendo",
+      "companyName": "Nintendo",
+      "systemId": "n64",
+      "systemName": "Nintendo 64",
+      "title": "Super Mario 64 : Star Road",
+      "filename": "super_mario_star_road.z64",
+      "path": "/roms/nintendo/n64/super_mario_star_road.z64",
+      "size": 8388608,
+      "sizeFormatted": "8.0 MB",
+      "genre": "Plateforme 3D",
+      "releaseYear": 1996,
+      "status": "playable",
+      "description": "La grammaire révolutionnaire du jeu 3D analogique avec triple saut, plongeon et caméra orbitale."
+    }
+  ]
+}

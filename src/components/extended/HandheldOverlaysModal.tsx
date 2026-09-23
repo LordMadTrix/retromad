@@ -2,14 +2,9 @@ import React, { useState } from 'react';
 import {
   X,
   Smartphone,
-  Sliders,
-  Tv,
   Sparkles,
-  Sun,
-  Eye,
-  Check,
 } from 'lucide-react';
-import { HandheldOverlayConfig, HandheldConsoleModel } from '../../types/extendedFeatures';
+import { HandheldOverlayConfig } from '../../types/extendedFeatures';
 import { HANDHELD_PRESETS } from '../../data/extendedFeaturesData';
 
 interface HandheldOverlaysModalProps {

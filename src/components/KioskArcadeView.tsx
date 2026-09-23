@@ -22,6 +22,8 @@ import {
   Landmark,
   FolderOpen,
   Dices,
+  Projector,
+  BookOpen,
 } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
@@ -36,6 +38,8 @@ interface KioskArcadeViewProps {
   onToggleFavorite: (gameId: string) => void;
   onViewDetails: (game: Game) => void;
   onUnlockAdmin: () => void;
+  onOpenProjectorModal?: () => void;
+  onOpenUserManualPdf?: () => void;
   soundEnabled?: boolean;
   soundVolume?: number;
   crtEnabled?: boolean;
@@ -197,6 +201,8 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   onToggleFavorite,
   onViewDetails,
   onUnlockAdmin,
+  onOpenProjectorModal,
+  onOpenUserManualPdf,
   soundEnabled = true,
   soundVolume = 0.8,
   crtEnabled = false,
@@ -531,6 +537,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           playSelect();
           onViewDetails(currentGame);
         }
+      } else if (e.key === 'F1') {
+        e.preventDefault();
+        onOpenUserManualPdf?.();
       }
     };
 
@@ -547,6 +556,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     companySystems,
     consoleGames,
     currentGame,
+    onOpenUserManualPdf,
     selectedSystem,
     handleSelectCompany,
     handleSelectConsole,
@@ -697,6 +707,29 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Consoles</span>
+            </button>
+          )}
+
+          {onOpenProjectorModal && (
+            <button
+              onClick={onOpenProjectorModal}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 text-xs font-bold border border-cyan-500/40 transition shadow-sm"
+              title="Projeter le Kiosque sur un 2ème écran / Rétroprojecteur"
+            >
+              <Projector className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span className="hidden sm:inline">2ème Écran / Projecteur</span>
+            </button>
+          )}
+
+          {onOpenUserManualPdf && (
+            <button
+              onClick={onOpenUserManualPdf}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition shadow-sm"
+              title="Manuel Utilisateur Illustré & Guide Complet (Exportable en PDF / Touche F1)"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden md:inline">Aide PDF</span>
+              <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">F1</span>
             </button>
           )}
 

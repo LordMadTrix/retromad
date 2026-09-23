@@ -2,15 +2,19 @@ import React from 'react';
 import {
   Play,
   Pause,
+  Square,
   SkipForward,
   SkipBack,
   Volume2,
+  VolumeX,
   Repeat,
   Radio,
   Sparkles,
   X,
   Disc3,
   FolderSearch,
+  Tv,
+  Power,
 } from 'lucide-react';
 import { ChiptuneTrack } from '../../types/retroFeatures';
 import { useRetroJukebox } from '../../hooks/useRetroJukebox';
@@ -24,18 +28,23 @@ interface RetroJukeboxModalProps {
   currentTrack?: ChiptuneTrack;
   currentTrackIndex?: number;
   isPlaying?: boolean;
+  isMuted?: boolean;
   volume?: number;
   loopMode?: 'all' | 'one' | 'none';
   eqLevels?: number[];
   onPlay?: () => void;
   onPause?: () => void;
+  onStop?: () => void;
   onTogglePlay?: () => void;
+  onToggleMute?: () => void;
   onNext?: () => void;
   onPrev?: () => void;
   onSelectTrack?: (index: number) => void;
   onSetVolume?: (vol: number) => void;
   onSetLoopMode?: (mode: 'all' | 'one' | 'none') => void;
   onPlaySoundEffect?: (type: 'coin' | 'jump' | 'powerup' | 'fanfare' | 'gameover') => void;
+  isFloatingVisible?: boolean;
+  onToggleFloatingVisible?: () => void;
 }
 
 export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
@@ -47,27 +56,35 @@ export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
   currentTrack: propCurrentTrack,
   currentTrackIndex: propCurrentTrackIndex,
   isPlaying: propIsPlaying,
+  isMuted: propIsMuted,
   volume: propVolume,
   loopMode: propLoopMode,
   eqLevels: propEqLevels,
   onPlay: _propOnPlay,
   onPause: _propOnPause,
+  onStop: propOnStop,
   onTogglePlay: propOnTogglePlay,
+  onToggleMute: propOnToggleMute,
   onNext: propOnNext,
   onPrev: propOnPrev,
   onSelectTrack: propOnSelectTrack,
   onSetVolume: propOnSetVolume,
   onSetLoopMode: propOnSetLoopMode,
   onPlaySoundEffect: propOnPlaySoundEffect,
+  isFloatingVisible,
+  onToggleFloatingVisible,
 }) => {
   const playlist = jukebox?.playlist || propPlaylist || [];
   const currentTrack = jukebox?.currentTrack || propCurrentTrack || playlist[0];
   const currentTrackIndex = jukebox?.currentTrackIndex ?? propCurrentTrackIndex ?? 0;
   const isPlaying = jukebox?.isPlaying ?? propIsPlaying ?? false;
+  const isMuted = jukebox?.isMuted ?? propIsMuted ?? false;
   const volume = jukebox?.volume ?? propVolume ?? 0.7;
   const loopMode = jukebox?.loopMode || propLoopMode || 'all';
   const eqLevels = jukebox?.eqLevels || propEqLevels || [30, 50, 70, 40, 60];
   const onTogglePlay = jukebox?.togglePlay || propOnTogglePlay || (() => {});
+  const onToggleMute = jukebox?.toggleMute || propOnToggleMute || (() => {});
+  const onStop = jukebox?.stop || propOnStop || (() => {});
   const onNext = jukebox?.nextTrack || propOnNext || (() => {});
   const onPrev = jukebox?.prevTrack || propOnPrev || (() => {});
   const onSelectTrack = jukebox?.selectTrack || propOnSelectTrack || (() => {});
@@ -100,12 +117,49 @@ export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            {/* Toggle Lecteur Flottant */}
+            {onToggleFloatingVisible && (
+              <button
+                type="button"
+                onClick={onToggleFloatingVisible}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition ${
+                  isFloatingVisible
+                    ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                }`}
+                title="Afficher ou masquer le mini-lecteur flottant sur l'écran"
+              >
+                <Tv className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Lecteur Flottant</span>
+                <span className="text-[10px] px-1 rounded bg-black/40 font-mono">
+                  {isFloatingVisible ? 'Actif' : 'Masqué'}
+                </span>
+              </button>
+            )}
+
+            {/* Bouton Couper le Jukebox */}
+            <button
+              type="button"
+              onClick={() => {
+                onStop();
+                onClose();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold flex items-center space-x-1.5 transition"
+              title="Couper le son, arrêter la musique et fermer le Jukebox"
+            >
+              <Power className="w-3.5 h-3.5" />
+              <span>Couper le Jukebox</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              title="Fermer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Console / Écran Platine Vintage */}
@@ -180,6 +234,16 @@ export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
                   )}
                 </button>
 
+                {/* Bouton Couper / Arrêter la musique */}
+                <button
+                  type="button"
+                  onClick={onStop}
+                  className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-400 transition"
+                  title="Couper / Arrêter la lecture"
+                >
+                  <Square className="w-4 h-4" />
+                </button>
+
                 <button
                   type="button"
                   onClick={onNext}
@@ -203,17 +267,27 @@ export const RetroJukeboxModal: React.FC<RetroJukeboxModalProps> = ({
                 </button>
               </div>
 
-              {/* Slider volume */}
-              <div className="flex items-center space-x-2 flex-1 max-w-[130px]">
-                <Volume2 className="w-4 h-4 text-slate-500 shrink-0" />
+              {/* Slider volume + Bouton Mute */}
+              <div className="flex items-center space-x-2 flex-1 max-w-[150px]">
+                <button
+                  type="button"
+                  onClick={onToggleMute}
+                  className={`p-1 rounded transition ${
+                    isMuted ? 'text-red-400 hover:text-red-300' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title={isMuted ? 'Rétablir le son' : 'Couper le son (Mute)'}
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
                 <input
                   type="range"
                   min="0"
                   max="1"
                   step="0.05"
-                  value={volume}
+                  value={isMuted ? 0 : volume}
                   onChange={(e) => onSetVolume(parseFloat(e.target.value))}
                   className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                  title={`Volume : ${isMuted ? 'Coupé (Muet)' : `${Math.round(volume * 100)}%`}`}
                 />
               </div>
             </div>

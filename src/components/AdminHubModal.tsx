@@ -23,6 +23,7 @@ import {
   Trash2,
   Search,
   Save,
+  HardDrive,
   Check,
   RefreshCw,
   DownloadCloud,
@@ -115,6 +116,22 @@ interface AdminHubModalProps {
   onOpenBezelStudio?: () => void;
   onOpenCheats?: () => void;
   onOpenSaveStates?: () => void;
+  // 8 Nouveaux modules d'amélioration & Musique
+  onOpenAnalytics?: () => void;
+  onOpenGamepadTester?: () => void;
+  onOpenProfiles?: () => void;
+  onOpenTimeline?: () => void;
+  onOpenPrintStudio?: () => void;
+  onOpenNomadBackup?: () => void;
+  onOpenHandheldOverlays?: () => void;
+  onOpenArcadeParty?: () => void;
+  onOpenMusicManager?: () => void;
+  onOpenThemeStudio?: () => void;
+  onOpenAttractMode?: () => void;
+  onOpenPasswordNotebook?: () => void;
+  onOpenLanManager?: () => void;
+  onOpenProjectorModal?: () => void;
+  onOpenUserManualPdf?: () => void;
 }
 
 export const AdminHubModal: React.FC<AdminHubModalProps> = ({
@@ -156,6 +173,21 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   onOpenBezelStudio,
   onOpenCheats,
   onOpenSaveStates,
+  onOpenAnalytics,
+  onOpenGamepadTester,
+  onOpenProfiles,
+  onOpenTimeline,
+  onOpenPrintStudio,
+  onOpenNomadBackup,
+  onOpenHandheldOverlays,
+  onOpenArcadeParty,
+  onOpenMusicManager,
+  onOpenThemeStudio,
+  onOpenAttractMode,
+  onOpenPasswordNotebook,
+  onOpenLanManager,
+  onOpenProjectorModal,
+  onOpenUserManualPdf,
 }) => {
   if (!isOpen) return null;
 
@@ -1724,6 +1756,30 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       </button>
                     </div>
                   </div>
+
+                  <div className="pt-2 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400">Standard RetroMAD centralisé :</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormSettings((prev) => ({
+                          ...prev,
+                          romsDir: 'public/roms',
+                          biosDir: 'public/bios',
+                          musicDir: 'public/music',
+                          themesDir: 'public/themes',
+                          emulatorsDir: 'public/emulators',
+                          savesDir: 'public/saves',
+                          publicCentralized: true,
+                        }));
+                        notify('Chemins centralisés sur le répertoire ./public');
+                      }}
+                      className="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold transition flex items-center space-x-1"
+                    >
+                      <HardDrive className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Basculer vers /public (Centralisé)</span>
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -1905,6 +1961,29 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
                     />
                   </div>
+
+                  {/* Atelier & Thèmes Communautaires */}
+                  <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-bold text-pink-300 block flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+                        <span>Moteur de Thèmes & Atelier Communautaire</span>
+                      </span>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">
+                        Créez vos thèmes avec le langage déclaratif RetroTheme DSL et exportez vos packs pour la communauté.
+                      </span>
+                    </div>
+                    {onOpenThemeStudio && (
+                      <button
+                        type="button"
+                        onClick={onOpenThemeStudio}
+                        className="px-3.5 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-bold transition flex items-center space-x-1.5 shrink-0"
+                      >
+                        <Palette className="w-3.5 h-3.5 text-pink-400" />
+                        <span>Ouvrir l'Atelier Studio</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <button
@@ -1949,6 +2028,20 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 onOpenBezelStudio={onOpenBezelStudio}
                 onOpenCheats={onOpenCheats}
                 onOpenSaveStates={onOpenSaveStates}
+                onOpenAnalytics={onOpenAnalytics}
+                onOpenGamepadTester={onOpenGamepadTester}
+                onOpenProfiles={onOpenProfiles}
+                onOpenTimeline={onOpenTimeline}
+                onOpenPrintStudio={onOpenPrintStudio}
+                onOpenNomadBackup={onOpenNomadBackup}
+                onOpenHandheldOverlays={onOpenHandheldOverlays}
+                onOpenArcadeParty={onOpenArcadeParty}
+                onOpenMusicManager={onOpenMusicManager}
+                onOpenAttractMode={onOpenAttractMode}
+                onOpenPasswordNotebook={onOpenPasswordNotebook}
+                onOpenLanManager={onOpenLanManager}
+                onOpenProjectorModal={onOpenProjectorModal}
+                onOpenUserManualPdf={onOpenUserManualPdf}
                 totalGames={games.length}
               />
             )}

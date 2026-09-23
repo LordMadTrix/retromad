@@ -9,7 +9,6 @@ import {
   Clock,
   Award,
   Sparkles,
-  Sliders,
 } from 'lucide-react';
 import { UserProfile, ParentalControlConfig } from '../../types/extendedFeatures';
 import { System } from '../../types';
@@ -23,7 +22,7 @@ interface MultiProfileModalProps {
   onAddProfile: (profile: UserProfile) => void;
   onUpdateParentalConfig: (config: ParentalControlConfig) => void;
   parentalConfig: ParentalControlConfig;
-  systems: System[];
+  systems?: System[];
   onPlaySound?: (type: 'coin' | 'powerup' | 'fanfare') => void;
 }
 
@@ -36,7 +35,7 @@ export const MultiProfileModal: React.FC<MultiProfileModalProps> = ({
   onAddProfile,
   onUpdateParentalConfig,
   parentalConfig,
-  systems,
+  systems: _systems,
   onPlaySound,
 }) => {
   const [activeTab, setActiveTab] = useState<'profiles' | 'parental' | 'new'>('profiles');

@@ -3,7 +3,9 @@ import {
   Gamepad2, Landmark, Cpu, Settings, RefreshCw, Sparkles,
   Volume2, VolumeX, Lock, Unlock, ShieldCheck, DownloadCloud,
   Tv, Search, ChevronDown, Dices, Trophy,
-  BookOpen, Swords, HardDrive, Code2, Disc3
+  BookOpen, Swords, HardDrive, Code2, Disc3,
+  BarChart3, Users, History, Printer, PackageCheck, Smartphone, Beer, FolderSearch, Palette,
+  Key, Wifi, Projector
 } from 'lucide-react';
 
 export type NavTab = 'games' | 'companies' | 'bios' | 'settings';
@@ -35,6 +37,27 @@ interface NavigationProps {
   onOpenBezelStudio?: () => void;
   onOpenCheats?: () => void;
   onOpenSaveStates?: () => void;
+  // 8 Nouvelles Innovations & Musique
+  onOpenAnalytics?: () => void;
+  onOpenGamepadTester?: () => void;
+  onOpenProfiles?: () => void;
+  onOpenTimeline?: () => void;
+  onOpenPrintStudio?: () => void;
+  onOpenNomadBackup?: () => void;
+  onOpenHandheldOverlays?: () => void;
+  onOpenArcadeParty?: () => void;
+  onOpenMusicManager?: () => void;
+  onOpenCentralizedStorage?: () => void;
+  onOpenThemeStudio?: () => void;
+  // Nouvelles Innovations Demandées
+  onOpenAttractMode?: () => void;
+  onOpenPasswordNotebook?: () => void;
+  onOpenLanManager?: () => void;
+  onOpenProjectorModal?: () => void;
+  isProjectorKioskRunning?: boolean;
+  isJukeboxFloatingVisible?: boolean;
+  isJukeboxMuted?: boolean;
+  onOpenUserManualPdf?: () => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
@@ -63,6 +86,25 @@ export const Navigation: React.FC<NavigationProps> = ({
   onOpenBezelStudio,
   onOpenCheats,
   onOpenSaveStates,
+  onOpenAnalytics,
+  onOpenGamepadTester,
+  onOpenProfiles,
+  onOpenTimeline,
+  onOpenPrintStudio,
+  onOpenNomadBackup,
+  onOpenHandheldOverlays,
+  onOpenArcadeParty,
+  onOpenMusicManager,
+  onOpenCentralizedStorage,
+  onOpenThemeStudio,
+  onOpenAttractMode,
+  onOpenPasswordNotebook,
+  onOpenLanManager,
+  onOpenProjectorModal,
+  isProjectorKioskRunning,
+  isJukeboxFloatingVisible,
+  isJukeboxMuted,
+  onOpenUserManualPdf,
 }) => {
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [retroLabOpen, setRetroLabOpen] = useState(false);
@@ -106,6 +148,19 @@ export const Navigation: React.FC<NavigationProps> = ({
             ) : (
               <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-bold flex items-center gap-0.5">
                 <ShieldCheck className="w-2.5 h-2.5" />ADMIN
+              </span>
+            )}
+            {isProjectorKioskRunning && (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenProjectorModal?.();
+                }}
+                className="px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-300 border border-sky-500/50 text-[9px] font-bold flex items-center gap-1 cursor-pointer animate-pulse hover:bg-sky-500/40"
+                title="Rétroprojecteur Kiosque actif sur Écran 2 (Cliquer pour calibrer)"
+              >
+                <Projector className="w-2.5 h-2.5" />
+                <span>PROJECTEUR 2</span>
               </span>
             )}
           </div>
@@ -169,10 +224,112 @@ export const Navigation: React.FC<NavigationProps> = ({
         </button>
 
         {retroLabOpen && (
-          <div className="absolute left-0 top-full mt-1.5 w-64 bg-[#0a122a]/98 border border-cyan-500/30 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] backdrop-blur-2xl z-50 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-3.5 py-1 text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
-              <span>EXPÉRIENCES & MODULES</span>
-              <span className="font-mono text-slate-500">8 NOUVEAUTÉS</span>
+          <div className="absolute left-0 top-full mt-1.5 w-72 max-h-[85vh] overflow-y-auto bg-[#0a122a]/98 border border-cyan-500/30 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] backdrop-blur-2xl z-50 py-2 animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-3.5 py-1 text-[10px] font-black text-amber-400 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
+              <span>NOUVEAUTÉS MAJEURES</span>
+              <span className="font-mono text-amber-400/80">★ EXCLUSIF</span>
+            </div>
+
+            <MenuAction
+              icon={<Sparkles className="w-4 h-4 text-pink-400 animate-pulse" />}
+              label="Borne d'Arcade (Attract Mode & 3D)"
+              onClick={() => { onOpenAttractMode?.(); setRetroLabOpen(false); }}
+              className="text-pink-200 hover:bg-pink-500/15 font-bold"
+            />
+            <MenuAction
+              icon={<Key className="w-4 h-4 text-amber-400" />}
+              label="Carnet de Passwords & Fiches Rétro"
+              onClick={() => { onOpenPasswordNotebook?.(); setRetroLabOpen(false); }}
+              className="text-amber-200 hover:bg-amber-500/15 font-bold"
+            />
+            <MenuAction
+              icon={<Wifi className="w-4 h-4 text-cyan-400" />}
+              label="Passerelle Réseau LAN (Serveur Web/FTP)"
+              onClick={() => { onOpenLanManager?.(); setRetroLabOpen(false); }}
+              className="text-cyan-200 hover:bg-cyan-500/15 font-bold"
+            />
+            <MenuAction
+              icon={<Projector className="w-4 h-4 text-sky-400" />}
+              label="Kiosque sur 2ème Écran & Rétroprojecteur"
+              onClick={() => { onOpenProjectorModal?.(); setRetroLabOpen(false); }}
+              className="text-sky-200 hover:bg-sky-500/15 font-bold"
+            />
+
+            <div className="px-3.5 py-1 text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
+              <span>8 NOUVELLES INNOVATIONS</span>
+              <span className="font-mono text-cyan-400/80">★ TOP</span>
+            </div>
+
+            <MenuAction
+              icon={<BarChart3 className="w-4 h-4 text-cyan-400" />}
+              label="Rétro Analytics & Journal de Bord"
+              onClick={() => { onOpenAnalytics?.(); setRetroLabOpen(false); }}
+              className="text-cyan-200 hover:bg-cyan-500/15"
+            />
+            <MenuAction
+              icon={<Gamepad2 className="w-4 h-4 text-purple-400" />}
+              label="Testeur de Manette & Sticks Arcade"
+              onClick={() => { onOpenGamepadTester?.(); setRetroLabOpen(false); }}
+              className="text-purple-200 hover:bg-purple-500/15"
+            />
+            <MenuAction
+              icon={<Users className="w-4 h-4 text-pink-400" />}
+              label="Multi-Profils & Contrôle Parental"
+              onClick={() => { onOpenProfiles?.(); setRetroLabOpen(false); }}
+              className="text-pink-200 hover:bg-pink-500/15"
+            />
+            <MenuAction
+              icon={<History className="w-4 h-4 text-amber-400" />}
+              label="Musée & Frise Chronologique"
+              onClick={() => { onOpenTimeline?.(); setRetroLabOpen(false); }}
+              className="text-amber-200 hover:bg-amber-500/15"
+            />
+            <MenuAction
+              icon={<Printer className="w-4 h-4 text-emerald-400" />}
+              label="Print Studio (Jaquettes 1:1)"
+              onClick={() => { onOpenPrintStudio?.(); setRetroLabOpen(false); }}
+              className="text-emerald-200 hover:bg-emerald-500/15"
+            />
+            <MenuAction
+              icon={<PackageCheck className="w-4 h-4 text-blue-400" />}
+              label="Pack Nomade & Clé USB"
+              onClick={() => { onOpenNomadBackup?.(); setRetroLabOpen(false); }}
+              className="text-blue-200 hover:bg-blue-500/15"
+            />
+            <MenuAction
+              icon={<Smartphone className="w-4 h-4 text-green-400" />}
+              label="Overlays Portables LCD"
+              onClick={() => { onOpenHandheldOverlays?.(); setRetroLabOpen(false); }}
+              className="text-green-200 hover:bg-green-500/15"
+            />
+            <MenuAction
+              icon={<Beer className="w-4 h-4 text-yellow-400" />}
+              label="Mode Soirée & Bar Arcade"
+              onClick={() => { onOpenArcadeParty?.(); setRetroLabOpen(false); }}
+              className="text-yellow-200 hover:bg-yellow-500/15"
+            />
+            <MenuAction
+              icon={<FolderSearch className="w-4 h-4 text-fuchsia-400" />}
+              label="Musiques & Scan Dossier Auto"
+              onClick={() => { onOpenMusicManager?.(); setRetroLabOpen(false); }}
+              className="text-fuchsia-200 hover:bg-fuchsia-500/15"
+            />
+            <MenuAction
+              icon={<HardDrive className="w-4 h-4 text-cyan-400" />}
+              label="Répertoire Public Centralisé (/public)"
+              onClick={() => { onOpenCentralizedStorage?.(); setRetroLabOpen(false); }}
+              className="text-cyan-200 hover:bg-cyan-500/15 font-bold"
+            />
+            <MenuAction
+              icon={<Palette className="w-4 h-4 text-pink-400" />}
+              label="Atelier de Thèmes Communautaires (DSL)"
+              onClick={() => { onOpenThemeStudio?.(); setRetroLabOpen(false); }}
+              className="text-pink-200 hover:bg-pink-500/15 font-bold"
+            />
+
+            <div className="px-3.5 py-1 text-[10px] font-black text-purple-400 uppercase tracking-widest border-b border-t border-slate-800/80 my-1.5 flex items-center justify-between">
+              <span>LABO RÉTRO HISTORIQUE</span>
+              <span className="font-mono text-purple-400/80">VINTAGE</span>
             </div>
 
             <MenuAction
@@ -189,7 +346,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             />
             <MenuAction
               icon={<Disc3 className="w-4 h-4 text-pink-400" />}
-              label="Jukebox Chiptune 8/16-Bit"
+              label={`Jukebox Chiptune 8/16-Bit ${isJukeboxFloatingVisible ? '(Lecteur Actif)' : '(Masqué)'}`}
               onClick={() => { onOpenJukebox?.(); setRetroLabOpen(false); }}
               className="text-pink-200 hover:bg-pink-500/15"
             />
@@ -245,14 +402,22 @@ export const Navigation: React.FC<NavigationProps> = ({
         {/* Jukebox BGM Chiptune */}
         <button
           onClick={onOpenJukebox || onToggleBgm}
-          title="Ouvrir le Jukebox Chiptune 🎵"
+          title={
+            bgmActive
+              ? isJukeboxMuted
+                ? 'Jukebox : En lecture mais son coupé (Muet 🔇) - Cliquer pour ouvrir'
+                : 'Jukebox : En lecture 🎵 (Cliquer pour ouvrir)'
+              : 'Ouvrir le Jukebox Chiptune 🎵'
+          }
           className={`p-2 rounded-lg border transition ${
             bgmActive
-              ? 'bg-pink-500/20 border-pink-500/50 text-pink-300 shadow-[0_0_10px_rgba(236,72,153,0.3)]'
+              ? isJukeboxMuted
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+                : 'bg-pink-500/20 border-pink-500/50 text-pink-300 shadow-[0_0_10px_rgba(236,72,153,0.3)]'
               : 'bg-slate-800/70 border-slate-700/40 text-slate-500 hover:text-white hover:bg-slate-700/70'
           }`}
         >
-          <Disc3 className={`w-3.5 h-3.5 ${bgmActive ? 'animate-spin' : ''}`} />
+          <Disc3 className={`w-3.5 h-3.5 ${bgmActive && !isJukeboxMuted ? 'animate-spin' : ''}`} />
         </button>
 
         {/* Sons FX */}
@@ -280,6 +445,39 @@ export const Navigation: React.FC<NavigationProps> = ({
         >
           <Tv className="w-3.5 h-3.5" />
         </button>
+
+        {/* Borne d'Arcade (Attract Mode & 3D) */}
+        {onOpenAttractMode && (
+          <button
+            onClick={onOpenAttractMode}
+            title="Lancer le Mode Borne d'Arcade (Attract Mode, Démos & 3D)"
+            className="p-2 rounded-lg border bg-slate-800/70 border-slate-700/40 text-pink-400 hover:text-white hover:bg-pink-500/20 hover:border-pink-500/50 transition"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+          </button>
+        )}
+
+        {/* Passerelle Réseau LAN / Web / FTP */}
+        {onOpenLanManager && (
+          <button
+            onClick={onOpenLanManager}
+            title="Passerelle Réseau Local (LAN) : Dépose sans fil smartphone, Web & FTP"
+            className="p-2 rounded-lg border bg-slate-800/70 border-slate-700/40 text-cyan-400 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-500/50 transition"
+          >
+            <Wifi className="w-3.5 h-3.5" />
+          </button>
+        )}
+
+        {/* Mode Kiosque sur 2ème Écran & Rétroprojecteur */}
+        {onOpenProjectorModal && (
+          <button
+            onClick={onOpenProjectorModal}
+            title="Mode Kiosque sur 2ème Écran & Rétroprojecteur (Dual-Display Cinema)"
+            className="p-2 rounded-lg border bg-slate-800/70 border-slate-700/40 text-sky-400 hover:text-white hover:bg-sky-500/20 hover:border-sky-500/50 transition"
+          >
+            <Projector className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* ── Séparateur ── */}
@@ -288,6 +486,28 @@ export const Navigation: React.FC<NavigationProps> = ({
       {/* ── Actions Admin (Scanner visible + menu pour reste) ── */}
       {!isKioskMode ? (
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Répertoire Public Centralisé */}
+          <button
+            onClick={onOpenCentralizedStorage}
+            title="Répertoire Public Centralisé (/public : ROMs, BIOS, Musiques, Thèmes, Émulateurs, Sauvegardes)"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-bold transition shadow-sm shadow-cyan-500/10"
+          >
+            <HardDrive className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span className="hidden md:inline">/public</span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-mono">Hub</span>
+          </button>
+
+          {/* Atelier de Thèmes Communautaires */}
+          <button
+            onClick={onOpenThemeStudio}
+            title="Atelier & Studio de Thèmes Communautaires (Créez facilement vos thèmes en direct)"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/40 text-pink-300 hover:text-white text-xs font-bold transition shadow-sm shadow-pink-500/10"
+          >
+            <Palette className="w-3.5 h-3.5 text-pink-400" />
+            <span className="hidden lg:inline">Thèmes</span>
+            <span className="px-1.5 py-0.2 rounded bg-pink-500/20 text-pink-300 text-[10px] font-mono">Studio</span>
+          </button>
+
           {/* Scanner ROMs (toujours visible) */}
           <button
             onClick={onScan}
@@ -302,6 +522,19 @@ export const Navigation: React.FC<NavigationProps> = ({
             <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
             <span>{isScanning ? 'Scan...' : 'Scanner'}</span>
           </button>
+
+          {/* Guide & Manuel Utilisateur Illustré (Export PDF / F1) */}
+          {onOpenUserManualPdf && (
+            <button
+              onClick={onOpenUserManualPdf}
+              title="Manuel Utilisateur Illustré & Guide Complet (Exportable en PDF / Touche F1)"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-bold transition shadow-sm shadow-emerald-500/10"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden md:inline">Aide PDF</span>
+              <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">F1</span>
+            </button>
+          )}
 
           {/* Bouton Mode Kiosk (visible directement) */}
           <button
@@ -343,6 +576,20 @@ export const Navigation: React.FC<NavigationProps> = ({
                   onClick={() => { onOpenExtensions(); setAdminMenuOpen(false); }}
                   className="text-cyan-300 hover:bg-cyan-500/10"
                 />
+                <MenuAction
+                  icon={<HardDrive className="w-3.5 h-3.5 text-cyan-400" />}
+                  label="Dossier /public Centralisé"
+                  onClick={() => { onOpenCentralizedStorage?.(); setAdminMenuOpen(false); }}
+                  className="text-cyan-300 hover:bg-cyan-500/10 font-bold"
+                />
+                {onOpenUserManualPdf && (
+                  <MenuAction
+                    icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
+                    label="Manuel Illustré (PDF / F1)"
+                    onClick={() => { onOpenUserManualPdf(); setAdminMenuOpen(false); }}
+                    className="text-emerald-300 hover:bg-emerald-500/10 font-bold"
+                  />
+                )}
               </div>
             )}
           </div>

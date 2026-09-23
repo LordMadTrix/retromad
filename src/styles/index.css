@@ -199,3 +199,57 @@ button {
   transform: scale(1.04);
   z-index: 10;
 }
+
+/* ═════════════════════════════════════════════════════════════════
+   RÈGLES D'EXPORT PDF ET D'IMPRESSION PRO DU GUIDE RETROMAD
+   ═════════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 15mm 10mm;
+  }
+
+  body {
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Masquer tout sauf le guide */
+  #root > *:not(.retromad-printable-guide-container) {
+    display: none !important;
+  }
+
+  .retromad-printable-guide-container {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break-before-page {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+

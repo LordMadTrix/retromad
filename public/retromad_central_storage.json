@@ -1,0 +1,22 @@
+{
+  "name": "RetroMAD Centralized Public Storage",
+  "root": "/public",
+  "directories": {
+    "roms": "/public/roms",
+    "bios": "/public/bios",
+    "music": "/public/music",
+    "themes": "/public/themes",
+    "emulators": "/public/emulators",
+    "saves": "/public/saves",
+    "media": "/public/media"
+  },
+  "status": "active",
+  "features": [
+    "ROMs centralisées par console avec sous-répertoires nes, snes, megadrive, gba, psx, arcade, etc.",
+    "BIOS officiels et universels vérifiés avec sommes MD5",
+    "Bandes-son Chiptune & OST intégrées directement au Jukebox de la borne",
+    "Thèmes et filtres shaders rétro commutables",
+    "Cœurs Libretro & profils d'émulateurs prêts à l'emploi",
+    "Cartouches de sauvegarde SRAM et instantanés d'états d'émulation"
+  ]
+}

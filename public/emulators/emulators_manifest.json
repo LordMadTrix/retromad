@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "basePath": "/emulators",
+  "description": "Gestionnaire des cœurs d'émulateurs Libretro et runners centralisés",
+  "emulators": [
+    {
+      "id": "core-fceumm",
+      "name": "FCEUmm (NES / FDS)",
+      "coreFileLinux": "fceumm_libretro.so",
+      "coreFileWindows": "fceumm_libretro.dll",
+      "systems": ["nes"],
+      "features": ["Support FDS", "Overclock Dendy", "Sauvegarde d'état ultra-rapide"],
+      "status": "ready"
+    },
+    {
+      "id": "core-snes9x",
+      "name": "Snes9x (Super Nintendo)",
+      "coreFileLinux": "snes9x_libretro.so",
+      "coreFileWindows": "snes9x_libretro.dll",
+      "systems": ["snes"],
+      "features": ["Mode 7 HD", "Emulation puces spéciales (Super FX, SA-1)", "Multi-tap 4 joueurs"],
+      "status": "ready"
+    },
+    {
+      "id": "core-genesis-plus-gx",
+      "name": "Genesis Plus GX (Mega Drive / Mega-CD / Master System)",
+      "coreFileLinux": "genesis_plus_gx_libretro.so",
+      "coreFileWindows": "genesis_plus_gx_libretro.dll",
+      "systems": ["megadrive", "mastersystem", "gamegear"],
+      "features": ["Synthèse audio YM2612 cycle-accurate", "Support Mega-CD bios", "6 boutons arcade"],
+      "status": "ready"
+    },
+    {
+      "id": "core-mgba",
+      "name": "mGBA (Game Boy Advance / Color / Classic)",
+      "coreFileLinux": "mgba_libretro.so",
+      "coreFileWindows": "mgba_libretro.dll",
+      "systems": ["gba", "gb", "gbc"],
+      "features": ["Capteur solaire Boktai simulé", "Liaison câble Game Link virtuelle", "Overclock CPU 32-bit"],
+      "status": "ready"
+    },
+    {
+      "id": "core-pcsx-rearmed",
+      "name": "PCSX ReARMed (Sony PlayStation 1)",
+      "coreFileLinux": "pcsx_rearmed_libretro.so",
+      "coreFileWindows": "pcsx_rearmed_libretro.dll",
+      "systems": ["psx"],
+      "features": ["Rendu polygonal amélioré", "Dithering 24-bit", "Correction de perspective PGXP"],
+      "status": "ready"
+    },
+    {
+      "id": "core-mame2003-plus",
+      "name": "MAME 2003-Plus (Bornes d'Arcade)",
+      "coreFileLinux": "mame2003_plus_libretro.so",
+      "coreFileWindows": "mame2003_plus_libretro.dll",
+      "systems": ["arcade"],
+      "features": ["Over 5000 jeux d'arcade", "Support Neo-Geo UniBIOS", "Gestion des crédits Coin-in"],
+      "status": "ready"
+    },
+    {
+      "id": "core-mupen64plus",
+      "name": "Mupen64Plus-Next (Nintendo 64)",
+      "coreFileLinux": "mupen64plus_next_libretro.so",
+      "coreFileWindows": "mupen64plus_next_libretro.dll",
+      "systems": ["n64"],
+      "features": ["Plugin vidéo GLideN64", "Widescreen 16:9 hack", "Expansion Pak 8 MB émulé"],
+      "status": "ready"
+    }
+  ]
+}

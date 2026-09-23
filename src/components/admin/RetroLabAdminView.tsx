@@ -19,6 +19,9 @@ import {
   Smartphone,
   Beer,
   FolderSearch,
+  Key,
+  Wifi,
+  Projector,
 } from 'lucide-react';
 
 interface RetroLabAdminViewProps {
@@ -40,6 +43,12 @@ interface RetroLabAdminViewProps {
   onOpenHandheldOverlays?: () => void;
   onOpenArcadeParty?: () => void;
   onOpenMusicManager?: () => void;
+  // Nouvelles fonctionnalités majeures demandées
+  onOpenAttractMode?: () => void;
+  onOpenPasswordNotebook?: () => void;
+  onOpenLanManager?: () => void;
+  onOpenProjectorModal?: () => void;
+  onOpenUserManualPdf?: () => void;
   totalGames: number;
 }
 
@@ -61,8 +70,72 @@ export const RetroLabAdminView: React.FC<RetroLabAdminViewProps> = ({
   onOpenHandheldOverlays,
   onOpenArcadeParty,
   onOpenMusicManager,
+  onOpenAttractMode,
+  onOpenPasswordNotebook,
+  onOpenLanManager,
+  onOpenProjectorModal,
+  onOpenUserManualPdf,
   totalGames,
 }) => {
+  // 5 NOUVELLES INNOVATIONS MAJEURES
+  const majorInnovations = [
+    {
+      id: 'manual-pdf',
+      title: 'Manuel Illustré & Export PDF',
+      badge: 'Documentation & F1 ★',
+      desc: 'Guide exhaustif en 10 chapitres avec captures d\'écran annotées ②, procédures pas-à-pas, raccourcis et export 1-clic en PDF ou HTML.',
+      icon: <BookOpen className="w-5 h-5 text-emerald-400 animate-pulse" />,
+      color: 'from-emerald-950/40 to-slate-900 border-emerald-500/40 text-emerald-300',
+      btnColor: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950',
+      action: onOpenUserManualPdf,
+      stats: '10 Chapitres & A4 PDF',
+    },
+    {
+      id: 'projector-kiosk',
+      title: 'Kiosque sur 2ème Écran & Rétroprojecteur',
+      badge: 'Home Cinéma ★',
+      desc: 'Projetez le mode Kiosque ou l\'Attract Mode en plein écran sur votre rétroprojecteur ou TV de salon pendant que vous pilotez la régie depuis votre PC.',
+      icon: <Projector className="w-5 h-5 text-sky-400 animate-pulse" />,
+      color: 'from-sky-950/40 to-slate-900 border-sky-500/40 text-sky-300',
+      btnColor: 'bg-sky-500 hover:bg-sky-400 text-slate-950',
+      action: onOpenProjectorModal,
+      stats: 'Dual-Display & Calibration',
+    },
+    {
+      id: 'attract-mode',
+      title: 'Borne d\'Arcade & Attract Mode 3D',
+      badge: 'Exclusif ★',
+      desc: 'Écran de veille interactif avec défilement de jeux en continu, bruitages et pièces de monnaie d\'arcade, et vue 3D rotative de la cartouche / boîte vintage.',
+      icon: <Sparkles className="w-5 h-5 text-pink-400 animate-pulse" />,
+      color: 'from-pink-950/40 to-slate-900 border-pink-500/40 text-pink-300',
+      btnColor: 'bg-pink-500 hover:bg-pink-400 text-slate-950',
+      action: onOpenAttractMode,
+      stats: 'Écran de Veille & Boîte 3D',
+    },
+    {
+      id: 'password-notebook',
+      title: 'Carnet de Passwords & Fiches Rétro',
+      badge: 'Nostalgie 80/90s',
+      desc: 'Codes secrets cultes (Mega Man, Metroid, Castlevania...), décodeur de grilles interactif, fiches magazines Consoles+/Joypad et blocs carte mémoire PS1/VMU.',
+      icon: <Key className="w-5 h-5 text-amber-400" />,
+      color: 'from-amber-950/40 to-slate-900 border-amber-500/40 text-amber-300',
+      btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950',
+      action: onOpenPasswordNotebook,
+      stats: 'Décodeur & Joypad',
+    },
+    {
+      id: 'lan-manager',
+      title: 'Passerelle Réseau Local (LAN) & Web / FTP',
+      badge: 'Sans Fil / Mobile',
+      desc: 'Serveur Web HTTP intégré pour dépose de ROMs sans fil par smartphone (QR Code instantané), serveur FTP pour FileZilla et partage réseau WebDAV/SMB.',
+      icon: <Wifi className="w-5 h-5 text-cyan-400" />,
+      color: 'from-cyan-950/40 to-slate-900 border-cyan-500/40 text-cyan-300',
+      btnColor: 'bg-cyan-500 hover:bg-cyan-400 text-slate-950',
+      action: onOpenLanManager,
+      stats: 'QR Code & Serveur Web',
+    },
+  ];
+
   // Modules originaux
   const labModules = [
     {
@@ -277,6 +350,50 @@ export const RetroLabAdminView: React.FC<RetroLabAdminViewProps> = ({
               Accédez et pilotez l'intégralité des outils avancés, de l'analytics aux jaquettes imprimables et au scanner de musiques.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* SECTION 0 : LES 3 NOUVELLES INNOVATIONS MAJEURES (ATTRACT MODE, PASSWORDS, LAN) */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <h4 className="text-sm font-black text-amber-300 uppercase tracking-wider">
+            Nouveautés Phares : Attract Mode 3D, Passwords & Passerelle LAN
+          </h4>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {majorInnovations.map((m) => (
+            <div
+              key={m.id}
+              className={`p-4 rounded-2xl border bg-gradient-to-b ${m.color} flex flex-col justify-between space-y-4 hover:border-slate-500 transition shadow-sm`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+                    {m.icon}
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/50 border border-white/10 text-slate-300">
+                    {m.badge}
+                  </span>
+                </div>
+
+                <h4 className="text-xs font-black text-white mb-1">{m.title}</h4>
+                <p className="text-[11px] text-slate-300 leading-relaxed mb-3">{m.desc}</p>
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[10px] text-slate-400 font-mono">{m.stats}</span>
+                <button
+                  onClick={m.action}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95 ${m.btnColor}`}
+                >
+                  <span>Ouvrir</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

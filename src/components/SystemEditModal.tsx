@@ -771,10 +771,37 @@ export const SystemEditModal: React.FC<SystemEditModalProps> = ({
                 </div>
               </div>
 
+              {/* Arborescence Centralisée Roms -> Firmes -> Console */}
+              <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    Arborescence ROMs Générée à la Création
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono font-bold">
+                    Roms ➔ Firmes ➔ Consoles
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 font-mono text-xs flex flex-wrap items-center gap-1.5 text-slate-300">
+                  <span className="text-slate-500">public/roms/</span>
+                  <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold">
+                    {formData.companyId || 'firme'}
+                  </span>
+                  <span className="text-slate-500">/</span>
+                  <span className="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold">
+                    {formData.subfolder || formData.id || 'console'}
+                  </span>
+                  <span className="text-slate-500">/</span>
+                  <span className="text-[11px] text-emerald-400 ml-auto font-sans font-medium flex items-center gap-1">
+                    ✓ Dossier auto-généré à l'enregistrement
+                  </span>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    Sous-dossier ROMs
+                    Sous-dossier ROMs (Console)
                   </label>
                   <input
                     type="text"

@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "basePath": "/bios",
+  "description": "Répertoire centralisé des BIOS officielles pour RetroMAD",
+  "biosList": [
+    {
+      "filename": "scph1001.bin",
+      "systemId": "psx",
+      "systemName": "Sony PlayStation 1",
+      "description": "BIOS PlayStation 1 Originale (NTSC-U / Amérique du Nord)",
+      "expectedMd5": "924e392ed05558d122f27644b68a864a",
+      "size": 524288,
+      "sizeFormatted": "512 KB",
+      "required": true,
+      "status": "installed"
+    },
+    {
+      "filename": "scph5502.bin",
+      "systemId": "psx",
+      "systemName": "Sony PlayStation 1",
+      "description": "BIOS PlayStation 1 Révision C (PAL / Europe)",
+      "expectedMd5": "32736f17079d0b2b7024407c39bd3050",
+      "size": 524288,
+      "sizeFormatted": "512 KB",
+      "required": true,
+      "status": "installed"
+    },
+    {
+      "filename": "neogeo.zip",
+      "systemId": "neogeo",
+      "systemName": "SNK Neo-Geo MVS / AES",
+      "description": "BIOS Universel Multi-Région UniBIOS SNK Neo-Geo",
+      "expectedMd5": "df03ff1a2b725048d2f1d5e3cbe8bfb8",
+      "size": 131072,
+      "sizeFormatted": "128 KB",
+      "required": true,
+      "status": "installed"
+    },
+    {
+      "filename": "gba_bios.bin",
+      "systemId": "gba",
+      "systemName": "Nintendo Game Boy Advance",
+      "description": "BIOS Démarrage Officiel Nintendo Game Boy Advance",
+      "expectedMd5": "a860e8c0b67573d40bc81233aa8924e2",
+      "size": 16384,
+      "sizeFormatted": "16 KB",
+      "required": false,
+      "status": "installed"
+    },
+    {
+      "filename": "disksys.rom",
+      "systemId": "nes",
+      "systemName": "Nintendo Famicom Disk System",
+      "description": "BIOS du lecteur de disquettes Nintendo FDS",
+      "expectedMd5": "ca30b50f880eb660a32069da365b69ad",
+      "size": 8192,
+      "sizeFormatted": "8 KB",
+      "required": false,
+      "status": "installed"
+    },
+    {
+      "filename": "bios_CD_U.bin",
+      "systemId": "megadrive",
+      "systemName": "SEGA Mega-CD / Sega CD",
+      "description": "BIOS Sega CD Model 1 US NTSC",
+      "expectedMd5": "2efd74e3232ff260e392999f83e5a4f0",
+      "size": 131072,
+      "sizeFormatted": "128 KB",
+      "required": true,
+      "status": "installed"
+    },
+    {
+      "filename": "bios_CD_E.bin",
+      "systemId": "megadrive",
+      "systemName": "SEGA Mega-CD PAL",
+      "description": "BIOS Sega Mega-CD Model 1 Europe PAL",
+      "expectedMd5": "e66fa1dc5820d254611f74bbab6b538b",
+      "size": 131072,
+      "sizeFormatted": "128 KB",
+      "required": true,
+      "status": "installed"
+    },
+    {
+      "filename": "syscard3.pce",
+      "systemId": "pcengine",
+      "systemName": "NEC PC Engine Super CD-ROM²",
+      "description": "System Card v3.0 pour Super CD-ROM PC Engine",
+      "expectedMd5": "38179f2dcbeae9c2d54e32435fa337e4",
+      "size": 262144,
+      "sizeFormatted": "256 KB",
+      "required": true,
+      "status": "installed"
+    }
+  ]
+}

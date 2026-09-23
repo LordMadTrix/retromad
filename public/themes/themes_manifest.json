@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "basePath": "/themes",
+  "description": "Thèmes visuels et ambiances rétros centralisés pour RetroMAD",
+  "activeTheme": "neon-dark",
+  "themes": [
+    {
+      "id": "neon-dark",
+      "name": "Neon Dark Synthwave (Défaut)",
+      "author": "RetroMAD Studio",
+      "accentColor": "#ec4899",
+      "secondaryColor": "#8b5cf6",
+      "bgClass": "from-slate-950 via-purple-950/20 to-slate-950",
+      "crtShader": "subtle-scanlines",
+      "bezelStyle": "modern-neon",
+      "description": "Ambiance futuriste aux néons roses et violets avec reflets d'arcade rétro."
+    },
+    {
+      "id": "arcade-cab",
+      "name": "Borne d'Arcade 1980 Vintage CRT",
+      "author": "Coin-Op Legends",
+      "accentColor": "#f59e0b",
+      "secondaryColor": "#ef4444",
+      "bgClass": "from-black via-zinc-950 to-black",
+      "crtShader": "heavy-scanlines-curvature",
+      "bezelStyle": "wooden-cabinet",
+      "description": "Sensations authentiques des salles de jeu d'époque avec courbure d'écran bombée et phosphore."
+    },
+    {
+      "id": "cyberpunk-99",
+      "name": "Cyberpunk Neo Tokyo 2099",
+      "author": "Kowloon Shinjuku",
+      "accentColor": "#06b6d4",
+      "secondaryColor": "#10b981",
+      "bgClass": "from-slate-950 via-cyan-950/30 to-slate-950",
+      "crtShader": "rgb-mask-high-tech",
+      "bezelStyle": "metal-cyber",
+      "description": "Esthétique Matrix / Ghost in the Shell aux teintes cyan et vert terminal."
+    },
+    {
+      "id": "gameboy-dmg",
+      "name": "Nintendo Game Boy DMG-01 (1989)",
+      "author": "Gunpei Heritage",
+      "accentColor": "#84cc16",
+      "secondaryColor": "#4d7c0f",
+      "bgClass": "from-stone-950 via-lime-950/20 to-stone-950",
+      "crtShader": "lcd-grid-green",
+      "bezelStyle": "gameboy-dmg-gray",
+      "description": "Palette quatre nuances de vert olive emblématique de la première console portable Nintendo."
+    },
+    {
+      "id": "famicom-red",
+      "name": "Famicom & Super Famicom 16-Bit",
+      "author": "Kyoto Crafts",
+      "accentColor": "#dc2626",
+      "secondaryColor": "#eab308",
+      "bgClass": "from-slate-950 via-red-950/20 to-slate-950",
+      "crtShader": "trinitron-aperture",
+      "bezelStyle": "famicom-red-gold",
+      "description": "Hommage vibrant aux plastiques rouge bordeaux et doré de la Family Computer japonaise."
+    },
+    {
+      "id": "playstation-gray",
+      "name": "Sony PlayStation 1994 Industrial Gray",
+      "author": "Tokyo Design Lab",
+      "accentColor": "#64748b",
+      "secondaryColor": "#38bdf8",
+      "bgClass": "from-slate-950 via-slate-900 to-slate-950",
+      "crtShader": "sony-bvm-sharp",
+      "bezelStyle": "playstation-gray-box",
+      "description": "Design industriel minimaliste gris CD-ROM inspiré de la première PlayStation de Sony."
+    }
+  ]
+}

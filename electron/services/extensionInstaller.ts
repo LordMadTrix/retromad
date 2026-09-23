@@ -265,7 +265,9 @@ export class ExtensionInstallerService {
     let created = 0;
 
     for (const sys of SYSTEMS) {
-      const folderPath = path.join(romsDir, sys.subfolder);
+      const companyFolder = sys.companyId || 'autres';
+      // Structure hiérarchique : Roms -> Firmes (constructeurs) -> Consoles
+      const folderPath = path.join(romsDir, companyFolder, sys.subfolder);
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
         created++;
@@ -277,6 +279,7 @@ export class ExtensionInstallerService {
         const content = [
           `============================================================`,
           `  DOSSIER DE ROMS : ${sys.name.toUpperCase()} (${sys.shortName})`,
+          `  Hiérarchie      : Roms / ${companyFolder.toUpperCase()} / ${sys.subfolder}`,
           `  Constructeur    : ${sys.manufacturer} (${sys.releaseYear})`,
           `============================================================`,
           ``,

@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "basePath": "/saves",
+  "description": "Sauvegardes centralisées SRAM et Save-States pour RetroMAD",
+  "saves": [
+    {
+      "id": "save-snes-world-1",
+      "gameTitle": "Super Mario World",
+      "systemId": "snes",
+      "type": "sram",
+      "filename": "super_demo_world.srm",
+      "size": 2048,
+      "modifiedAt": "2026-09-23T10:00:00Z",
+      "progress": "96 Sorties Débloquées (Monde Spécial terminé)",
+      "slot": 1
+    },
+    {
+      "id": "save-gba-poke-1",
+      "gameTitle": "Pokémon Emeraude",
+      "systemId": "gba",
+      "type": "battery",
+      "filename": "pokemon_retro_emerald.sav",
+      "size": 131072,
+      "modifiedAt": "2026-09-22T19:30:00Z",
+      "progress": "8 Badges Arène - Rayquaza capturé",
+      "slot": 1
+    }
+  ]
+}

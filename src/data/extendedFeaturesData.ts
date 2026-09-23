@@ -7,6 +7,7 @@ import {
   PartyDare,
   CustomAudioTrack,
   UserProfile,
+  ParentalControlConfig,
 } from '../types/extendedFeatures';
 
 export const INITIAL_USER_PROFILES: UserProfile[] = [
@@ -48,6 +49,26 @@ export const INITIAL_USER_PROFILES: UserProfile[] = [
     unlockedAchievementsCount: 2,
   },
 ];
+
+export const INITIAL_PROFILES = INITIAL_USER_PROFILES;
+
+export const INITIAL_PARENTAL_CONFIG: ParentalControlConfig = {
+  enabled: false,
+  masterPin: '1234',
+  maxDailyPlayTimeMinutes: 120,
+  curfewHour: 21,
+  blockGoreGames: true,
+};
+
+export const INITIAL_HANDHELD_CONFIG: HandheldOverlayConfig = {
+  model: 'gameboy_dmg',
+  shellColor: '#d1d5db',
+  backlightEnabled: false,
+  backlightBrightness: 0.85,
+  magnifierLens: false,
+  pixelGridStrength: 0.4,
+  motionBlur: true,
+};
 
 export const INITIAL_PLAY_STATS: GamePlayStats[] = [
   {
@@ -210,6 +231,8 @@ export const TIMELINE_MILESTONES: HistoricalMilestone[] = [
     highlightGameTitles: ['Super Mario 64'],
   },
 ];
+
+export const HISTORICAL_MILESTONES = TIMELINE_MILESTONES;
 
 export const PRINT_TEMPLATES: PrintTemplateConfig[] = [
   {

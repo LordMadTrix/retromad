@@ -5,11 +5,8 @@ import {
   Download,
   Upload,
   HardDrive,
-  Trash2,
   CheckCircle2,
-  AlertTriangle,
   RefreshCw,
-  Sparkles,
 } from 'lucide-react';
 import { NomadBackupPackage } from '../../types/extendedFeatures';
 
