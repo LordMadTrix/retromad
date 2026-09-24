@@ -16,7 +16,9 @@ export interface ManualSection {
     | 'centralized_storage'
     | 'theme_jukebox'
     | 'cheats_tournaments'
-    | 'shortcuts_cheatsheet';
+    | 'shortcuts_cheatsheet'
+    | 'speedrun_shaders'
+    | 'cartridge_sync';
   keyFeatures: string[];
   stepByStep: { step: number; title: string; instruction: string }[];
   annotatedCallouts: { id: number; label: string; description: string }[];
@@ -486,6 +488,100 @@ export const RETROMAD_MANUAL_SECTIONS: ManualSection[] = [
       { key: 'F11', action: 'Basculer en Plein Écran' },
       { key: 'Select + Start', action: 'Quitter le jeu en cours sur manette' },
       { key: 'Select + X', action: 'Ouvrir le menu de configuration de l\'émulateur' }
+    ]
+  },
+  {
+    id: 'speedrun-shaders',
+    number: '11',
+    title: 'Speedrun Arcade Pro & Shaders Cathodiques CRT',
+    subtitle: 'Chronomètre split au millième de seconde, records PB et profils Trinitron PVM / 15kHz',
+    category: 'arcade',
+    iconName: 'Tv',
+    summary:
+      'Poussez le réalisme rétro avec les profils d\'écrans d\'époque (Sony Trinitron, Arcade 15kHz, Game Boy DMG) et défiez vos temps avec le chronomètre speedrun intégré.',
+    screenshotType: 'speedrun_shaders',
+    keyFeatures: [
+      'Chronomètre de Speedrun au millième avec gestion de segments (Splits) et Personal Best (PB)',
+      'Profils Shaders CRT instantanés : Trinitron PVM, Arcade 15kHz, Game Boy DMG, GBA Micro-TFT',
+      'Affichage du Delta de temps en direct (vert si en avance, rouge si en retard)',
+      'Touches rapides Clavier/Manette : Espace pour splitter, R pour reset',
+      'Compatibilité avec tous les jeux rétro et persistance automatique des records'
+    ],
+    stepByStep: [
+      {
+        step: 1,
+        title: 'Choisir son profil d\'écran CRT',
+        instruction: 'Ouvrez "Profils Shaders Rétro" dans le menu Admin ou la barre Kiosque pour tester le rendu Trinitron ou Arcade 15kHz.'
+      },
+      {
+        step: 2,
+        title: 'Lancer le chronomètre de speedrun',
+        instruction: 'Cliquez sur "Chronomètre Speedrun Pro", sélectionnez votre jeu et appuyez sur Démarrer (ou Espace).'
+      },
+      {
+        step: 3,
+        title: 'Enregistrer vos splits et battre votre PB',
+        instruction: 'À chaque niveau ou boss complété, validez le split. Si vous battez votre record, RetroMAD enregistre votre nouvelle référence or !'
+      }
+    ],
+    annotatedCallouts: [
+      { id: 1, label: 'Chrono Central HD', description: 'Affichage haute précision minutes:secondes:millisecondes.' },
+      { id: 2, label: 'Tableau des Splits & Delta', description: 'Comparaison en direct avec votre meilleur temps historique.' },
+      { id: 3, label: 'Sélecteur de Profil CRT', description: 'Basculez entre Sony PVM, balayage 15kHz ou matrice Game Boy.' },
+      { id: 4, label: 'Bouton Split / Pause', description: 'Commande rapide utilisable aussi bien à la manette qu\'au clavier.' }
+    ],
+    proTip: 'Associez un bouton de votre stick arcade à la touche Espace pour fractionner vos temps sans jamais lâcher vos contrôles !',
+    shortcuts: [
+      { key: 'Espace', action: 'Démarrer / Valider le Split de Speedrun' },
+      { key: 'P', action: 'Mettre en pause le chronomètre' },
+      { key: 'R', action: 'Réinitialiser le chronomètre' },
+      { key: 'C', action: 'Activer / Désactiver le filtre d\'écran CRT' }
+    ]
+  },
+  {
+    id: 'cartridges-sync',
+    number: '12',
+    title: 'Étagère 3D de Cartouches & Synchro Sauvegardes P2P',
+    subtitle: 'Inspection physique des boîtes, connecteurs dorés et partage de sauvegardes sans fil',
+    category: 'retro',
+    iconName: 'Layers',
+    summary:
+      'Retrouvez le plaisir tactile d\'insérer une cartouche dans la console et synchronisez facilement votre progression entre votre PC de salon, votre borne et votre smartphone.',
+    screenshotType: 'cartridge_sync',
+    keyFeatures: [
+      'Visualiseur 3D interactif de cartouches (Famicom, Game Boy grise, HuCard, Genesis)',
+      'Zoom et inspection des étiquettes et des connecteurs dorés avec bruits d\'insertion rétro',
+      'Hub de synchronisation de sauvegardes SRAM et Save States inter-appareils',
+      'Génération de code d\'appairage instantané P2P (Wi-Fi Direct / Local)',
+      'Exportation et importation d\'archives de sauvegarde JSON en un clic'
+    ],
+    stepByStep: [
+      {
+        step: 1,
+        title: 'Explorer l\'étagère 3D',
+        instruction: 'Dans le Labo Rétro, cliquez sur "Étagère 3D de Cartouches" pour faire défiler vos jeux sous forme de cassettes physiques.'
+      },
+      {
+        step: 2,
+        title: 'Inspecter et insérer',
+        instruction: 'Cliquez sur une cartouche pour l\'examiner en gros plan, puis cliquez sur "Insérer & Jouer" pour lancer la partie.'
+      },
+      {
+        step: 3,
+        title: 'Synchroniser avec un autre appareil',
+        instruction: 'Ouvrez "Synchro Sauvegardes P2P", notez le code d\'appairage ou exportez votre pack JSON pour reprendre votre partie sur une autre machine.'
+      }
+    ],
+    annotatedCallouts: [
+      { id: 1, label: 'Cartouche 3D Réaliste', description: 'Texture rétro avec étiquette du jeu, connecteurs dorés et biseau.' },
+      { id: 2, label: 'Slot d\'Insertion Virtuel', description: 'Animation d\'enclenchement de la cassette dans la fente console.' },
+      { id: 3, label: 'Code d\'Appairage P2P', description: 'Clé de liaison rapide pour transférer vos sauvegardes sans serveur externe.' },
+      { id: 4, label: 'Bouton Export Pack JSON', description: 'Sauvegarde portable de l\'ensemble de vos fiches et temps de jeu.' }
+    ],
+    proTip: 'Exportez régulièrement votre pack de sauvegardes JSON sur une clé USB : vos heures de jeu dans vos RPG favoris seront toujours protégées !',
+    shortcuts: [
+      { key: 'Flèches ← / →', action: 'Faire défiler les cartouches de l\'étagère' },
+      { key: 'Entrée', action: 'Inspecter et insérer la cartouche sélectionnée' }
     ]
   }
 ];

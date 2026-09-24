@@ -24,6 +24,10 @@ import {
   Dices,
   Projector,
   BookOpen,
+  Timer,
+  Layers,
+  Sliders,
+  Maximize2,
 } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
@@ -40,6 +44,9 @@ interface KioskArcadeViewProps {
   onUnlockAdmin: () => void;
   onOpenProjectorModal?: () => void;
   onOpenUserManualPdf?: () => void;
+  onOpenShaderProfiles?: () => void;
+  onOpenSpeedrun?: () => void;
+  onOpenCartridgeShelf?: () => void;
   soundEnabled?: boolean;
   soundVolume?: number;
   crtEnabled?: boolean;
@@ -203,6 +210,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   onUnlockAdmin,
   onOpenProjectorModal,
   onOpenUserManualPdf,
+  onOpenShaderProfiles,
+  onOpenSpeedrun,
+  onOpenCartridgeShelf,
   soundEnabled = true,
   soundVolume = 0.8,
   crtEnabled = false,
@@ -222,6 +232,8 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   const [consoleIndex, setConsoleIndex] = useState<number>(0);
   const [gameIndex, setGameIndex] = useState<number>(0);
   const [kioskFavoritesOnly, setKioskFavoritesOnly] = useState<boolean>(false);
+  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const [isCompactFit, setIsCompactFit] = useState<boolean>(false);
 
   const { playMove, playSelect, playLaunch, playBack, playCoin, playFavorite, playDice } = useAudio(soundEnabled, soundVolume);
 
@@ -576,30 +588,30 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   ]);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#06080d] text-slate-100 select-none overflow-hidden relative">
+    <div className="flex-1 min-h-0 w-full h-full flex flex-col bg-[#06080d] text-slate-100 select-none overflow-hidden relative">
       <div className="kiosk-animated-background absolute inset-0 z-0 pointer-events-none" />
       {/* Texture CRT & Scanlines Arcade */}
       <div className="absolute inset-0 scanlines opacity-35 z-20 pointer-events-none" />
       <div className="absolute inset-0 crt-vignette z-20 pointer-events-none" />
 
       {/* MARQUEE HEADER ARCADE AVEC FIL D'ARIANE (BREADCRUMB) */}
-      <header className="h-16 bg-gradient-to-b from-retro-900 via-retro-900/90 to-transparent px-8 py-3 flex items-center justify-between border-b border-slate-800/80 z-30 shrink-0">
+      <header className="h-14 sm:h-16 bg-gradient-to-b from-retro-900 via-retro-900/90 to-transparent px-3 sm:px-6 py-2 flex items-center justify-between border-b border-slate-800/80 z-30 shrink-0 gap-2 overflow-x-auto no-scrollbar">
         {/* Logo & Fil d'Ariane cliquable */}
-        <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-retro-pink via-retro-purple to-retro-accent flex items-center justify-center shadow-neon animate-pulse">
-            <Flame className="w-6 h-6 text-white" />
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 min-w-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-retro-pink via-retro-purple to-retro-accent flex items-center justify-center shadow-neon animate-pulse shrink-0">
+            <Flame className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
           </div>
 
-          <div className="flex items-center space-x-2 text-xs sm:text-sm font-black">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm font-black truncate max-w-[130px] xs:max-w-[200px] sm:max-w-none">
             <span
               onClick={handleBackToCompanies}
-              className={`flex items-center space-x-1.5 transition ${
+              className={`flex items-center space-x-1 transition ${
                 step === 'companies'
                   ? 'text-retro-accent drop-shadow-[0_0_8px_#00f2fe]'
                   : 'text-slate-400 hover:text-white cursor-pointer'
               }`}
             >
-              <Landmark className="w-4 h-4" />
+              <Landmark className="w-3.5 h-3.5 shrink-0" />
               <span>FIRMES</span>
             </span>
 
@@ -608,14 +620,14 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 <span className="text-slate-600 font-bold">❯</span>
                 <span
                   onClick={step === 'games' ? handleBackToConsoles : undefined}
-                  className={`flex items-center space-x-1.5 transition ${
+                  className={`flex items-center space-x-1 transition truncate ${
                     step === 'consoles'
                       ? 'text-retro-accent drop-shadow-[0_0_8px_#00f2fe]'
                       : 'text-slate-400 hover:text-white cursor-pointer'
                   }`}
                 >
-                  <Gamepad2 className="w-4 h-4" />
-                  <span>{selectedCompany.name.toUpperCase()}</span>
+                  <Gamepad2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{selectedCompany.name.toUpperCase()}</span>
                 </span>
               </>
             )}
@@ -623,9 +635,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             {selectedSystem && (
               <>
                 <span className="text-slate-600 font-bold">❯</span>
-                <span className="text-retro-pink font-black drop-shadow-[0_0_8px_#ff007f] flex items-center space-x-1.5">
-                  <Tv className="w-4 h-4" />
-                  <span>{selectedSystem.name.toUpperCase()}</span>
+                <span className="text-retro-pink font-black drop-shadow-[0_0_8px_#ff007f] flex items-center space-x-1 truncate">
+                  <Tv className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{selectedSystem.name.toUpperCase()}</span>
                 </span>
               </>
             )}
@@ -633,11 +645,11 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         </div>
 
         {/* Boutons d'Action & Déverrouillage Admin */}
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           {/* Monnayeur Arcade Interactif */}
           <button
             onClick={() => playCoin()}
-            className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition shadow-sm"
+            className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition shadow-sm"
             title="Insérer une pièce / Insert Coin"
           >
             <span>🪙</span>
@@ -647,11 +659,11 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           {/* Bouton Jeu au Hasard */}
           <button
             onClick={handleRandomPickInKiosk}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition shadow-sm hover:text-white"
+            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition shadow-sm hover:text-white"
             title="Choisir un jeu au hasard (Touche R ou Select manette)"
           >
             <Dices className="w-3.5 h-3.5 text-purple-400" />
-            <span className="hidden md:inline">Hasard</span>
+            <span className="hidden xl:inline">Hasard</span>
           </button>
 
           {/* Filtre Favoris uniquement en mode jeux */}
@@ -661,7 +673,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 playSelect();
                 setKioskFavoritesOnly((prev) => !prev);
               }}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition ${
                 kioskFavoritesOnly
                   ? 'bg-rose-500 text-white border-rose-400 shadow-neon-pink'
                   : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:text-white'
@@ -669,7 +681,40 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
               title="Afficher uniquement les favoris (Touche F)"
             >
               <Heart className={`w-3.5 h-3.5 ${kioskFavoritesOnly ? 'fill-current' : ''}`} />
-              <span className="hidden md:inline">Favoris</span>
+              <span className="hidden xl:inline">Favoris</span>
+            </button>
+          )}
+
+          {/* Profils Shaders Rétro */}
+          {onOpenShaderProfiles && (
+            <button
+              onClick={onOpenShaderProfiles}
+              className="p-1.5 rounded-xl border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60 transition shadow-sm"
+              title="Changer de profil Shader (Trinitron, DMG, 15kHz...)"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Étagère 3D Cartouches */}
+          {onOpenCartridgeShelf && (
+            <button
+              onClick={onOpenCartridgeShelf}
+              className="p-1.5 rounded-xl border border-purple-500/40 bg-purple-950/40 text-purple-300 hover:bg-purple-900/60 transition shadow-sm"
+              title="Ouvrir l'étagère de cartouches physiques 3D"
+            >
+              <Layers className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Chronomètre Speedrun */}
+          {onOpenSpeedrun && (
+            <button
+              onClick={onOpenSpeedrun}
+              className="p-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 transition shadow-sm"
+              title="Chronomètre Speedrun Arcade"
+            >
+              <Timer className="w-3.5 h-3.5" />
             </button>
           )}
 
@@ -688,58 +733,75 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </button>
           )}
 
+          {/* Bouton Adapter / Plein Écran Kiosk */}
+          <button
+            onClick={() => {
+              playSelect();
+              setIsCompactFit((prev) => !prev);
+            }}
+            className={`p-1.5 rounded-xl border transition ${
+              isCompactFit
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
+            }`}
+            title={isCompactFit ? "Mode d'affichage standard défilable" : "Mode ajusté à l'écran (anti-coupure sans défilement)"}
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+
           {step === 'consoles' && (
             <button
               onClick={handleBackToCompanies}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition"
               title="Retourner à la liste des firmes (Touche B / Échap)"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Firmes</span>
+              <span className="hidden xs:inline">Firmes</span>
             </button>
           )}
 
           {step === 'games' && (
             <button
               onClick={handleBackToConsoles}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition"
               title="Retourner aux consoles de cette firme (Touche B / Échap)"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Consoles</span>
+              <span className="hidden xs:inline">Consoles</span>
             </button>
           )}
 
           {onOpenProjectorModal && (
             <button
               onClick={onOpenProjectorModal}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 text-xs font-bold border border-cyan-500/40 transition shadow-sm"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 text-xs font-bold border border-cyan-500/40 transition shadow-sm"
               title="Projeter le Kiosque sur un 2ème écran / Rétroprojecteur"
             >
               <Projector className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span className="hidden sm:inline">2ème Écran / Projecteur</span>
+              <span className="hidden xl:inline">Projecteur</span>
             </button>
           )}
 
           {onOpenUserManualPdf && (
             <button
               onClick={onOpenUserManualPdf}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition shadow-sm"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition shadow-sm"
               title="Manuel Utilisateur Illustré & Guide Complet (Exportable en PDF / Touche F1)"
             >
               <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden md:inline">Aide PDF</span>
-              <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">F1</span>
+              <span className="hidden xl:inline">Aide PDF</span>
+              <span className="hidden sm:inline px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">F1</span>
             </button>
           )}
 
           <button
             onClick={onUnlockAdmin}
-            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-retro-accent hover:text-retro-900 text-slate-300 text-xs font-bold border border-slate-700 hover:border-retro-accent transition shadow-lg"
+            className="flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-retro-accent hover:text-retro-900 text-slate-300 text-xs font-bold border border-slate-700 hover:border-retro-accent transition shadow-lg shrink-0 cursor-pointer active:scale-95"
             title="Saisir le code PIN pour passer en mode administration"
           >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Admin (PIN)</span>
+            <Lock className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">Admin (PIN)</span>
+            <span className="sm:hidden">PIN</span>
           </button>
         </div>
       </header>
@@ -748,23 +810,23 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       {/* NIVEAU 1 : LES FIRMES EN GRAND AU CENTRE                                   */}
       {/* ========================================================================= */}
       {step === 'companies' && (
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-start p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className={`flex-1 min-h-0 flex flex-col items-center justify-start ${isCompactFit ? 'p-2 sm:p-3' : 'p-3 sm:p-5 md:p-6'} z-20 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200`}>
           {/* Titre & Guide central */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">
+          <div className={`text-center ${isCompactFit ? 'mb-2' : 'mb-3 sm:mb-5'}`}>
+            <div className="inline-flex items-center space-x-2 px-3 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Étape 1 sur 3 • Choisissez votre constructeur</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]">
+            <h1 className={`${isCompactFit ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'} font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]`}>
               LES GRANDES FIRMES DU JEU VIDÉO
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto mt-2">
+            <p className="text-[11px] sm:text-xs text-slate-400 max-w-xl mx-auto mt-0.5 sm:mt-1">
               Cliquez ou appuyez sur A pour découvrir toutes les consoles et machines de la marque.
             </p>
           </div>
 
           {/* Grille des Firmes en Grand au Centre */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-6xl w-full justify-center">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${isCompactFit ? 'gap-2.5 sm:gap-3' : 'gap-3 sm:gap-5'} max-w-6xl w-full justify-center`}>
             {companies.map((company, idx) => {
               const isFocused = idx === companyIndex;
               const consoleCount = systems.filter((s) => s.companyId === company.id).length;
@@ -786,9 +848,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     borderColor: isFocused ? company.accentColor : 'rgba(51, 65, 85, 0.6)',
                     boxShadow: isFocused ? `0 0 25px ${company.accentColor}55` : undefined,
                   }}
-                  className={`group relative rounded-3xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden min-h-[340px] ${
+                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px] sm:min-h-[180px]' : 'p-3.5 sm:p-5 min-h-[200px] sm:min-h-[250px]'} flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
                     isFocused
-                      ? 'bg-slate-900/95 scale-105 border-2 z-10'
+                      ? 'bg-slate-900/95 scale-102 sm:scale-105 border-2 z-10'
                       : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100'
                   }`}
                 >
@@ -804,18 +866,18 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   {/* Contenu de la carte positionné au-dessus de la vidéo */}
                   <div className="relative z-10 w-full flex flex-col items-center justify-between flex-1">
                     {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND */}
-                    <div className="w-full h-24 flex items-center justify-center my-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                    <div className="w-full h-16 sm:h-20 flex items-center justify-center my-1 sm:my-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
                       <CompanyLogo companyId={company.id} size="xl" />
                     </div>
 
                     {/* Nom de la firme */}
-                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2 drop-shadow">
+                    <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-wider mb-1 drop-shadow">
                       {company.name}
                     </h3>
 
                     {/* Badges de statistiques */}
-                    <div className="flex items-center space-x-2 my-2">
-                      <span className="px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-[11px] font-bold text-slate-200 shadow">
+                    <div className="flex items-center space-x-2 my-1 sm:my-2">
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-[10px] sm:text-[11px] font-bold text-slate-200 shadow">
                         {consoleCount} Console{consoleCount > 1 ? 's' : ''}
                       </span>
                       <span
@@ -824,7 +886,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                           borderColor: romCount > 0 ? `${company.accentColor}70` : undefined,
                           color: romCount > 0 ? company.accentColor : '#94a3b8',
                         }}
-                        className="px-2.5 py-1 rounded-xl border text-[11px] font-black backdrop-blur-md shadow"
+                        className="px-2.5 py-0.5 sm:py-1 rounded-xl border text-[10px] sm:text-[11px] font-black backdrop-blur-md shadow"
                       >
                         {romCount} ROM{romCount > 1 ? 's' : ''}
                       </span>
@@ -832,21 +894,21 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
                     {/* Citation / Mascotte */}
                     {heroes.length > 0 && (
-                      <div className="mt-2 text-[10px] text-slate-300 italic line-clamp-1 drop-shadow">
+                      <div className="mt-1 text-[10px] text-slate-300 italic line-clamp-1 drop-shadow">
                         "{heroes[0].quote}"
                       </div>
                     )}
                   </div>
 
                   {/* Boutons d'action */}
-                  <div className="relative z-10 w-full mt-4 pt-3 border-t border-slate-800/80 space-y-2">
+                  <div className="relative z-10 w-full mt-3 pt-2.5 border-t border-slate-800/80 space-y-1.5 sm:space-y-2">
                     <button
                       type="button"
                       style={{
                         backgroundColor: isFocused ? company.accentColor : undefined,
                         color: isFocused ? '#000000' : '#ffffff',
                       }}
-                      className={`w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
+                      className={`w-full py-2 sm:py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
                         isFocused
                           ? 'shadow-neon font-black'
                           : 'bg-slate-900/80 backdrop-blur-md group-hover:bg-slate-800 text-slate-200 border border-slate-700'
@@ -868,7 +930,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         backgroundColor: isFocused ? `${company.accentColor}25` : 'rgba(15, 23, 42, 0.7)',
                         color: isFocused ? '#ffffff' : '#cbd5e1',
                       }}
-                      className="w-full py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border shadow backdrop-blur-md hover:scale-102 hover:text-white group/mus"
+                      className="w-full py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border shadow backdrop-blur-md hover:scale-102 hover:text-white group/mus"
                       title={`Découvrir l'histoire complète, les fondateurs et archives de ${company.name} (Touche Y ou M)`}
                     >
                       <Landmark className="w-3.5 h-3.5 text-amber-400 group-hover/mus:rotate-6 transition-transform" />
@@ -883,7 +945,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
           {/* Raccourci vers le Grand Musée Virtuel de la firme sélectionnée */}
           {companies[companyIndex] && (
-            <div className="mt-8 flex items-center justify-center">
+            <div className="mt-4 sm:mt-6 flex items-center justify-center">
               <button
                 onClick={() => {
                   playSelect();
@@ -895,7 +957,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   color: '#ffffff',
                   boxShadow: `0 0 25px ${companies[companyIndex].accentColor}44`,
                 }}
-                className="px-6 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md group"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md group"
               >
                 <Landmark className="w-4 h-4 text-amber-400 group-hover:rotate-6 transition-transform" />
                 <span>Visiter le Grand Musée Virtuel de {companies[companyIndex].name}</span>
@@ -910,21 +972,21 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       {/* NIVEAU 2 : LES CONSOLES DE LA FIRME EN GRAND AU CENTRE                     */}
       {/* ========================================================================= */}
       {step === 'consoles' && selectedCompany && (
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-start p-6 sm:p-10 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className={`flex-1 min-h-0 flex flex-col items-center justify-start ${isCompactFit ? 'p-2 sm:p-3' : 'p-3 sm:p-5 md:p-6'} z-20 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200`}>
           {/* En-tête centré avec logo firme */}
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center space-x-3 mb-2">
+          <div className={`text-center ${isCompactFit ? 'mb-2' : 'mb-3 sm:mb-5'}`}>
+            <div className="flex items-center justify-center space-x-3 mb-1">
               <CompanyLogo companyId={selectedCompany.id} size="md" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]">
+            <h1 className={`${isCompactFit ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'} font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]`}>
               CONSOLES {selectedCompany.name.toUpperCase()}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
               {companySystems.length} consoles disponibles • Cliquez sur une console pour explorer sa ludothèque
             </p>
 
             {/* Bouton d'accès direct au Grand Musée de la firme */}
-            <div className="mt-3 flex items-center justify-center">
+            <div className="mt-2.5 flex items-center justify-center">
               <button
                 onClick={() => {
                   playSelect();
@@ -935,7 +997,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   borderColor: `${selectedCompany.accentColor}70`,
                   boxShadow: `0 0 15px ${selectedCompany.accentColor}33`,
                 }}
-                className="px-4 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 backdrop-blur-md hover:scale-105 active:scale-95 shadow"
+                className="px-3.5 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 backdrop-blur-md hover:scale-105 active:scale-95 shadow"
                 title={`Explorer le Musée historique complet de ${selectedCompany.name}`}
               >
                 <Landmark className="w-3.5 h-3.5 text-amber-400" />
@@ -946,7 +1008,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           </div>
 
           {/* Grille des Consoles en Grand au Centre */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-6xl w-full justify-center">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${isCompactFit ? 'gap-2.5 sm:gap-3' : 'gap-3 sm:gap-5'} max-w-6xl w-full justify-center`}>
             {companySystems.map((sys, idx) => {
               const isFocused = idx === consoleIndex;
               const romCount = gamesCountBySystem.get(sys.id) || 0;
@@ -966,9 +1028,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     borderColor: isFocused ? sys.themeColor : 'rgba(51, 65, 85, 0.6)',
                     boxShadow: isFocused ? `0 0 25px ${sys.themeColor}55` : undefined,
                   }}
-                  className={`group relative rounded-3xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
+                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px]' : 'p-3.5 sm:p-5 min-h-[220px]'} flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
                     isFocused
-                      ? 'bg-slate-900/95 scale-105 border-2 z-10'
+                      ? 'bg-slate-900/95 scale-102 sm:scale-105 border-2 z-10'
                       : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100'
                   }`}
                 >
@@ -979,29 +1041,29 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   />
 
                   {/* Vrai Logo Haute Définition de la Console EN GRAND */}
-                  <div className="w-full h-24 flex items-center justify-center my-2 p-2 transition-transform duration-300 group-hover:scale-110">
-                    <ConsoleLogo system={sys} size="xl" />
+                  <div className={`w-full ${isCompactFit ? 'h-12 sm:h-14' : 'h-14 sm:h-18'} flex items-center justify-center my-1 p-1 transition-transform duration-300 group-hover:scale-110`}>
+                    <ConsoleLogo system={sys} size={isCompactFit ? 'lg' : 'xl'} />
                   </div>
 
                   {/* Titre & Année */}
                   <div>
-                    <h3 className="text-base font-black text-white uppercase tracking-wider">
+                    <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
                       {sys.name}
                     </h3>
-                    <span className="text-[11px] text-slate-400 font-mono mt-0.5 block">
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono mt-0.5 block">
                       {sys.releaseYear} • {sys.generation}
                     </span>
                   </div>
 
                   {/* Badge ROMs installées */}
-                  <div className="my-3">
+                  <div className="my-2 sm:my-3">
                     <span
                       style={{
                         backgroundColor: romCount > 0 ? `${sys.themeColor}25` : undefined,
                         borderColor: romCount > 0 ? `${sys.themeColor}50` : undefined,
                         color: romCount > 0 ? sys.themeColor : '#94a3b8',
                       }}
-                      className="px-3 py-1 rounded-xl border text-xs font-black flex items-center space-x-1.5"
+                      className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs font-black flex items-center space-x-1.5"
                     >
                       <Gamepad2 className="w-3.5 h-3.5" />
                       <span>{romCount} JEU{romCount > 1 ? 'X' : ''} DISPONIBLE{romCount > 1 ? 'S' : ''}</span>
@@ -1014,14 +1076,14 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   </div>
 
                   {/* Boutons d'action */}
-                  <div className="w-full mt-4 pt-3 border-t border-slate-800/80 space-y-2">
+                  <div className="w-full mt-3 pt-2.5 border-t border-slate-800/80 space-y-1.5 sm:space-y-2">
                     <button
                       type="button"
                       style={{
                         backgroundColor: isFocused ? sys.themeColor : undefined,
                         color: isFocused ? '#000000' : '#ffffff',
                       }}
-                      className={`w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
+                      className={`w-full py-2 sm:py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
                         isFocused
                           ? 'shadow-neon font-black'
                           : 'bg-slate-800 group-hover:bg-slate-700 text-slate-300'
@@ -1038,7 +1100,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         playSelect();
                         setExhibitionSystem(sys);
                       }}
-                      className="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-cyan-950 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-400 text-xs font-bold transition flex items-center justify-center space-x-2 shadow"
+                      className="w-full py-1.5 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-cyan-950 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-400 text-xs font-bold transition flex items-center justify-center space-x-2 shadow"
                       title="Découvrir l'histoire complète, l'architecture hardware et les secrets de cette console"
                     >
                       <Landmark className="w-3.5 h-3.5 text-cyan-400" />
@@ -1051,10 +1113,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           </div>
 
           {/* Boutons de retour et accès direct musée en bas */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <button
               onClick={handleBackToCompanies}
-              className="px-6 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center space-x-2 border border-slate-700 shadow"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center space-x-2 border border-slate-700 shadow"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Retourner aux Firmes (B / Échap)</span>
@@ -1070,7 +1132,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 backgroundColor: `${selectedCompany.accentColor}25`,
                 borderColor: `${selectedCompany.accentColor}70`,
               }}
-              className="px-6 py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md hover:scale-105 active:scale-95 cursor-pointer"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md hover:scale-105 active:scale-95 cursor-pointer"
               title={`Consulter le Grand Musée de la firme ${selectedCompany.name}`}
             >
               <Landmark className="w-4 h-4 text-amber-400" />
@@ -1084,7 +1146,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   playSelect();
                   setExhibitionSystem(companySystems[consoleIndex]);
                 }}
-                className="px-6 py-2.5 rounded-2xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 hover:text-white border border-cyan-500/50 text-xs font-bold transition flex items-center space-x-2 shadow-neon cursor-pointer"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 hover:text-white border border-cyan-500/50 text-xs font-bold transition flex items-center space-x-2 shadow-neon cursor-pointer"
                 title="Consulter l'exposition complète de la console sélectionnée (Touche M ou Y)"
               >
                 <Landmark className="w-4 h-4 text-cyan-400" />
@@ -1100,144 +1162,170 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       {/* NIVEAU 3 : LES ROMS / JEUX DE LA CONSOLE EN GRAND AU CENTRE                */}
       {/* ========================================================================= */}
       {step === 'games' && selectedSystem && (
-        <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 z-20 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className={`flex-1 min-h-0 flex flex-col justify-between ${isCompactFit ? 'p-2 sm:p-3' : 'p-2 sm:p-4 md:p-5'} z-20 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200`}>
           {/* Espace Central Showcase du Jeu Sélectionné (Centré à l'écran) */}
-          <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-5xl mx-auto w-full">
+          <div className="flex-1 min-h-0 flex flex-col md:flex-row items-center justify-center gap-3 sm:gap-6 md:gap-8 max-w-5xl mx-auto w-full my-auto">
             {currentGame ? (
               <>
                 {/* Colonne Gauche : Grande Jaquette 3D & Reflet au sol */}
-                <div className="flex flex-col items-center justify-center w-full md:w-1/2 max-w-sm relative group">
+                <div className="flex flex-col items-center justify-center w-full md:w-1/2 max-w-sm relative group shrink-0">
                   {/* Effet halo lumineux néon aux couleurs de la console */}
                   <div
-                    className="absolute inset-0 rounded-3xl opacity-40 blur-3xl transition-colors duration-500"
+                    className="absolute inset-0 rounded-3xl opacity-40 blur-3xl transition-colors duration-500 pointer-events-none"
                     style={{ backgroundColor: selectedSystem.themeColor }}
                   />
 
-                  <div className="relative aspect-[3/4] w-72 sm:w-80 rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl p-4 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                    {currentGame.media?.boxart2d ? (
+                  <div className={`relative aspect-[3/4] ${isCompactFit ? 'w-32 sm:w-44 max-h-[20vh] sm:max-h-[24vh] p-1.5' : 'w-36 sm:w-48 md:w-56 lg:w-64 max-h-[24vh] sm:max-h-[30vh] md:max-h-[36vh] p-2 sm:p-3'} rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105`}>
+                    {currentGame.media?.boxart2d && !failedImageIds.has(currentGame.id) ? (
                       <img
                         src={resolveMediaUrl(currentGame.media.boxart2d)}
                         alt={currentGame.title}
                         className="w-full h-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
+                        onError={() => setFailedImageIds((prev) => new Set(prev).add(currentGame.id))}
                       />
                     ) : (
                       /* Cartouche géante stylized */
-                      <div className="w-full h-full rounded-2xl bg-slate-800/80 border-2 border-slate-700 flex flex-col items-center justify-center p-6 text-center shadow-inner">
-                        <div className="w-16 h-16 rounded-full bg-retro-accent/20 border border-retro-accent text-retro-accent flex items-center justify-center mb-4">
-                          <Gamepad2 className="w-8 h-8" />
+                      <div className="w-full h-full rounded-2xl bg-slate-800/80 border-2 border-slate-700 flex flex-col items-center justify-center p-3 text-center shadow-inner">
+                        <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-retro-accent/20 border border-retro-accent text-retro-accent flex items-center justify-center mb-2">
+                          <Gamepad2 className="w-5 sm:w-6 h-5 sm:h-6" />
                         </div>
-                        <span className="text-base font-black text-white">{currentGame.cleanTitle}</span>
-                        <span className="text-xs text-slate-400 font-mono mt-2 uppercase">
+                        <span className="text-xs sm:text-sm font-black text-white line-clamp-2">{currentGame.cleanTitle}</span>
+                        <span className="text-[9px] sm:text-[10px] text-slate-400 font-mono mt-1 uppercase">
                           {selectedSystem.name}
                         </span>
                       </div>
                     )}
 
                     {/* Badge officiel de la console */}
-                    <div className="absolute top-4 left-4 z-10">
+                    <div className="absolute top-2 left-2 z-10">
                       <div
                         style={{
                           backgroundColor: 'rgba(11, 13, 20, 0.85)',
                           borderColor: `${selectedSystem.themeColor}77`,
                         }}
-                        className="px-3 py-1.5 rounded-xl border backdrop-blur-md shadow-2xl flex items-center justify-center max-w-[140px]"
+                        className="px-2 py-0.5 sm:py-1 rounded-xl border backdrop-blur-md shadow-2xl flex items-center justify-center max-w-[130px]"
                       >
                         <ConsoleLogo system={selectedSystem} size="md" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Reflet au sol façon miroir arcade */}
-                  <div className="w-72 sm:w-80 h-10 bg-gradient-to-b from-retro-accent/10 to-transparent blur-md mt-1 rounded-full opacity-60" />
+                  {/* Vrai Reflet Miroir Arcade & Ombre de Contact */}
+                  <div className="w-full flex flex-col items-center pointer-events-none select-none -mt-1 overflow-hidden">
+                    {/* Ombre de contact au sol */}
+                    <div className="w-3/4 max-w-[240px] h-1.5 bg-black/90 blur-[2px] rounded-full" />
+
+                    {/* Reflet miroir inversé dégressif */}
+                    <div
+                      className={`relative aspect-[3/4] ${
+                        isCompactFit
+                          ? 'w-32 sm:w-44 max-h-[8vh] sm:max-h-[10vh]'
+                          : 'w-36 sm:w-48 md:w-56 lg:w-64 max-h-[9vh] sm:max-h-[12vh]'
+                      } rounded-2xl sm:rounded-3xl bg-slate-900/30 border border-slate-800/30 flex items-center justify-center overflow-hidden scale-y-[-1] opacity-35 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.75)_0%,transparent_75%)] [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.75)_0%,transparent_75%)] filter blur-[0.3px]`}
+                    >
+                      {currentGame.media?.boxart2d && !failedImageIds.has(currentGame.id) ? (
+                        <img
+                          src={resolveMediaUrl(currentGame.media.boxart2d)}
+                          alt=""
+                          aria-hidden="true"
+                          className="w-full h-full object-contain p-2"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-2xl bg-slate-800/60 flex flex-col items-center justify-center p-2 text-center">
+                          <Gamepad2 className="w-6 h-6 text-retro-accent/40" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Colonne Droite : Fiche Graphique Rétro & Bouton JOUER */}
-                <div className="flex-1 flex flex-col justify-center space-y-5 max-w-lg">
+                <div className="flex-1 flex flex-col justify-center space-y-3 sm:space-y-4 max-w-lg min-w-0">
                   <div>
-                    <div className="flex items-center space-x-3 mb-2">
+                    <div className="flex items-center space-x-2 sm:space-x-3 mb-1.5 flex-wrap gap-y-1">
                       <CompanyLogo companyId={selectedCompany?.id ?? selectedSystem.companyId} size="sm" />
                       <span className="text-slate-600 font-bold">•</span>
                       <ConsoleLogo system={selectedSystem} size="md" />
                       <span className="text-slate-600 font-bold">•</span>
-                      <span className="text-xs font-mono text-slate-400">
-                        Jeu {gameIndex + 1} sur {consoleGames.length}
+                      <span className="text-[11px] sm:text-xs font-mono text-slate-400">
+                        {gameIndex + 1} / {consoleGames.length}
                       </span>
                       <button
                         onClick={() => {
                           playSelect();
                           setExhibitionSystem(selectedSystem);
                         }}
-                        className="ml-auto px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold flex items-center space-x-1.5 transition shadow"
+                        className="ml-auto px-2 py-0.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[10px] sm:text-[11px] font-bold flex items-center space-x-1.5 transition shadow"
                         title="Consulter l'exposition Musée & Histoire de cette console (Touche M)"
                       >
-                        <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+                        <Landmark className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-400" />
                         <span>Musée {selectedSystem.shortName}</span>
                       </button>
                     </div>
 
-                    <h1 className="text-3xl sm:text-4xl font-black text-white tracking-wide uppercase drop-shadow-md">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wide uppercase drop-shadow-md truncate">
                       {currentGame.cleanTitle}
                     </h1>
 
                     {currentGame.metadata?.developer && (
-                      <p className="text-sm font-semibold text-retro-accent mt-1">
+                      <p className="text-xs sm:text-sm font-semibold text-retro-accent mt-0.5">
                         Par {currentGame.metadata.developer}
                       </p>
                     )}
                   </div>
 
                   {/* Badges Caractéristiques */}
-                  <div className="flex flex-wrap gap-2 text-xs">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[11px] sm:text-xs">
                     {currentGame.metadata?.releaseDate && (
-                      <span className="px-3 py-1 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-mono flex items-center space-x-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-retro-pink" />
-                        <span>Année {currentGame.metadata.releaseDate.substring(0, 4)}</span>
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-mono flex items-center space-x-1">
+                        <Calendar className="w-3 h-3 text-retro-pink" />
+                        <span>{currentGame.metadata.releaseDate.substring(0, 4)}</span>
                       </span>
                     )}
                     {currentGame.region && (
-                      <span className="px-3 py-1 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold">
-                        Région : {currentGame.region}
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold">
+                        {currentGame.region}
                       </span>
                     )}
                     {currentGame.metadata?.rating && (
-                      <span className="px-3 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black flex items-center space-x-1">
-                        <Award className="w-3.5 h-3.5" />
-                        <span>Note {currentGame.metadata.rating}%</span>
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black flex items-center space-x-1">
+                        <Award className="w-3 h-3" />
+                        <span>{currentGame.metadata.rating}%</span>
                       </span>
                     )}
                     {currentGame.playCount && currentGame.playCount > 0 ? (
-                      <span className="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold flex items-center space-x-1.5">
-                        <Flame className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Joué {currentGame.playCount} fois</span>
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold flex items-center space-x-1">
+                        <Flame className="w-3 h-3 text-emerald-400" />
+                        <span>{currentGame.playCount}x</span>
                       </span>
                     ) : null}
                   </div>
 
                   {/* Résumé synopsis */}
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed line-clamp-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                  <p className={`text-xs ${isCompactFit ? 'line-clamp-2 p-2' : 'sm:text-sm line-clamp-2 sm:line-clamp-3 p-2.5 sm:p-3'} text-slate-300 leading-relaxed bg-slate-900/60 rounded-xl border border-slate-800`}>
                     {currentGame.metadata?.synopsis ||
                       "Préparez-vous à une aventure rétro inoubliable ! Installez-vous aux commandes et lancez la partie."}
                   </p>
 
                   {/* GRAND BOUTON ARCADE JOUER */}
-                  <div className="flex items-center space-x-3 pt-2">
+                  <div className="flex items-center space-x-2 sm:space-x-3 pt-1">
                     <button
                       onClick={() => {
                         playLaunch();
                         onLaunchGame(currentGame);
                       }}
-                      className="flex-1 flex items-center justify-center space-x-3 py-4 rounded-2xl bg-gradient-to-r from-retro-accent via-emerald-400 to-retro-green text-retro-900 font-black text-lg tracking-wider shadow-neon hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                      className={`flex-1 flex items-center justify-center space-x-2 ${isCompactFit ? 'py-2 sm:py-2.5 text-xs sm:text-sm' : 'py-2.5 sm:py-3 text-sm sm:text-base'} rounded-xl sm:rounded-2xl bg-gradient-to-r from-retro-accent via-emerald-400 to-retro-green text-retro-900 font-black tracking-wider shadow-neon hover:scale-105 active:scale-95 transition-all cursor-pointer`}
                     >
-                      <Play className="w-6 h-6 fill-current" />
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                       <span>▶ APPUYEZ SUR A POUR JOUER</span>
                     </button>
 
                     <button
                       onClick={handleRandomPickInKiosk}
-                      className="p-4 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 hover:text-white transition shadow-sm"
+                      className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 hover:text-white transition shadow-sm"
                       title="Choisir un jeu au hasard sur cette console (Touche R / Select manette)"
                     >
-                      <Dices className="w-6 h-6 text-amber-400" />
+                      <Dices className="w-5 h-5 text-amber-400" />
                     </button>
 
                     <button
@@ -1245,14 +1333,14 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         playFavorite();
                         onToggleFavorite(currentGame.id);
                       }}
-                      className={`p-4 rounded-2xl border transition ${
+                      className={`p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border transition ${
                         currentGame.favorite
                           ? 'bg-rose-500 text-white border-rose-400 shadow-neon-pink'
                           : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:text-white'
                       }`}
                       title="Ajouter aux favoris (Touche Y / F)"
                     >
-                      <Heart className={`w-6 h-6 ${currentGame.favorite ? 'fill-current' : ''}`} />
+                      <Heart className={`w-5 h-5 ${currentGame.favorite ? 'fill-current' : ''}`} />
                     </button>
 
                     <button
@@ -1260,10 +1348,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         playSelect();
                         onViewDetails(currentGame);
                       }}
-                      className="p-4 rounded-2xl bg-slate-800/80 text-slate-300 border border-slate-700 hover:text-white hover:bg-slate-700 transition"
+                      className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-800/80 text-slate-300 border border-slate-700 hover:text-white hover:bg-slate-700 transition"
                       title="Fiche détaillée (Touche X / D)"
                     >
-                      <Eye className="w-6 h-6" />
+                      <Eye className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -1330,20 +1418,20 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
           {/* Carrousel Inférieur de Défilement des Jeux de la Console */}
           {consoleGames.length > 1 && (
-            <div className="h-24 bg-retro-900/90 border border-slate-800/80 rounded-2xl px-6 flex items-center justify-between z-30 shrink-0 mt-4 max-w-4xl mx-auto w-full">
+            <div className={`${isCompactFit ? 'h-13 sm:h-16 mt-1' : 'h-16 sm:h-20 mt-1.5 sm:mt-3'} bg-retro-900/90 border border-slate-800/80 rounded-xl sm:rounded-2xl px-2.5 sm:px-5 flex items-center justify-between z-30 shrink-0 max-w-4xl mx-auto w-full`}>
               <button
                 onClick={() => {
                   playMove();
                   setGameIndex((prev) => (prev > 0 ? prev - 1 : consoleGames.length - 1));
                 }}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-retro-accent hover:text-retro-900 text-slate-300 transition shadow shrink-0"
+                className="p-1 sm:p-1.5 rounded-xl bg-slate-800 hover:bg-retro-accent hover:text-retro-900 text-slate-300 transition shadow shrink-0"
                 title="Jeu précédent (Flèche Gauche / LB)"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               {/* Miniatures des jeux avec zoom sur le jeu sélectionné */}
-              <div className="flex-1 flex items-center justify-center space-x-3 overflow-hidden px-4">
+              <div className="flex-1 flex items-center justify-center space-x-2 sm:space-x-3 overflow-hidden px-2 sm:px-4">
                 {consoleGames.slice(Math.max(0, gameIndex - 3), gameIndex + 4).map((game) => {
                   const isCurrent = game.id === currentGame?.id;
                   return (
@@ -1354,17 +1442,18 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         const idx = consoleGames.findIndex((g) => g.id === game.id);
                         if (idx >= 0) setGameIndex(idx);
                       }}
-                      className={`relative aspect-[3/4] h-16 rounded-xl bg-slate-800 border-2 overflow-hidden cursor-pointer transition-all duration-200 shrink-0 ${
+                      className={`relative aspect-[3/4] ${isCompactFit ? 'h-10 sm:h-12' : 'h-12 sm:h-14 md:h-15'} rounded-lg sm:rounded-xl bg-slate-800 border-2 overflow-hidden cursor-pointer transition-all duration-200 shrink-0 ${
                         isCurrent
-                          ? 'border-retro-accent shadow-neon scale-110 z-10'
+                          ? 'border-retro-accent shadow-neon scale-105 sm:scale-110 z-10'
                           : 'border-slate-700 opacity-60 hover:opacity-100 hover:scale-102'
                       }`}
                     >
-                      {game.media?.boxart2d ? (
+                      {game.media?.boxart2d && !failedImageIds.has(game.id) ? (
                         <img
                           src={resolveMediaUrl(game.media.boxart2d)}
                           alt={game.title}
                           className="w-full h-full object-contain p-0.5"
+                          onError={() => setFailedImageIds((prev) => new Set(prev).add(game.id))}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center p-1 text-[8px] font-bold text-center text-slate-300">
@@ -1381,10 +1470,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   playMove();
                   setGameIndex((prev) => (prev < consoleGames.length - 1 ? prev + 1 : 0));
                 }}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-retro-accent hover:text-retro-900 text-slate-300 transition shadow shrink-0"
+                className="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-retro-accent hover:text-retro-900 text-slate-300 transition shadow shrink-0"
                 title="Jeu suivant (Flèche Droite / RB)"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           )}
@@ -1392,16 +1481,16 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       )}
 
       {/* PIED DE PAGE : INDICATEURS MANETTE & COMMANDES SELON LE NIVEAU ACTIF */}
-      <footer className="h-10 bg-slate-950/90 border-t border-slate-800/80 px-8 flex items-center justify-between z-30 shrink-0 text-[11px] text-slate-400 font-mono">
-        <div className="flex items-center space-x-4">
-          <span className="flex items-center space-x-1.5">
+      <footer className="h-9 sm:h-10 bg-slate-950/90 border-t border-slate-800/80 px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 text-[10px] sm:text-[11px] text-slate-400 font-mono overflow-x-auto no-scrollbar gap-2">
+        <div className="flex items-center space-x-2.5 sm:space-x-4 shrink-0">
+          <span className="flex items-center space-x-1 sm:space-x-1.5">
             <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 font-bold border border-slate-700">
               ◀ ▶ / Stick
             </span>
             <span>Naviguer</span>
           </span>
 
-          <span className="flex items-center space-x-1.5">
+          <span className="flex items-center space-x-1 sm:space-x-1.5">
             <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/40">
               A / Entrée
             </span>
@@ -1409,7 +1498,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           </span>
 
           {step === 'companies' && (
-            <span className="flex items-center space-x-1.5">
+            <span className="flex items-center space-x-1 sm:space-x-1.5">
               <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
                 Y / M
               </span>
@@ -1418,7 +1507,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           )}
 
           {step !== 'companies' && (
-            <span className="flex items-center space-x-1.5">
+            <span className="flex items-center space-x-1 sm:space-x-1.5">
               <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold border border-rose-500/40">
                 B / Échap
               </span>
@@ -1427,7 +1516,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           )}
 
           {step === 'consoles' && (
-            <span className="flex items-center space-x-1.5">
+            <span className="flex items-center space-x-1 sm:space-x-1.5">
               <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/40">
                 Y / M
               </span>
@@ -1459,11 +1548,12 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           )}
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-bold border border-slate-700">
             START / Échap
           </span>
-          <span>Déverrouiller Admin</span>
+          <span className="hidden sm:inline">Déverrouiller Admin</span>
+          <span className="sm:hidden">Admin</span>
         </div>
       </footer>
 

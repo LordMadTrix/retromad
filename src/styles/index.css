@@ -4,16 +4,16 @@
 
 @layer base {
   body {
-    @apply bg-[#101a38] text-slate-100 font-display antialiased overflow-hidden select-none;
+    @apply bg-[#090d1a] text-slate-100 font-display antialiased overflow-hidden select-none;
   }
 
   #root {
-    background-color: #101a38;
+    background-color: #090d1a;
     background-image:
-      radial-gradient(circle at 15% 5%, rgba(0, 242, 254, 0.2), transparent 32rem),
-      radial-gradient(circle at 90% 10%, rgba(255, 0, 127, 0.18), transparent 28rem),
-      linear-gradient(rgba(96, 165, 250, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(96, 165, 250, 0.06) 1px, transparent 1px);
+      radial-gradient(circle at 15% 5%, rgba(0, 242, 254, 0.16), transparent 34rem),
+      radial-gradient(circle at 90% 10%, rgba(255, 0, 127, 0.14), transparent 30rem),
+      linear-gradient(rgba(96, 165, 250, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(96, 165, 250, 0.04) 1px, transparent 1px);
     background-size: auto, auto, 28px 28px, 28px 28px;
   }
 
@@ -168,6 +168,52 @@ button {
     rgba(0, 0, 0, 0.32) 50%
   );
   background-size: 100% 3px;
+  pointer-events: none;
+}
+
+/* Profils de Shaders d'Écran Rétro Authentiques */
+.shader-arcade-15khz {
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.42) 50%);
+  background-size: 100% 3.5px;
+  box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.88), inset 0 0 40px rgba(0, 242, 254, 0.05);
+  pointer-events: none;
+}
+
+.shader-trinitron-pvm {
+  background: linear-gradient(rgba(12, 10, 10, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+  background-size: 100% 2px;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+.shader-trinitron-pvm::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,0,0,0.035), rgba(0,255,0,0.03), rgba(0,0,255,0.035));
+  background-size: 3px 100%;
+  pointer-events: none;
+  z-index: 52;
+}
+
+.shader-dmg-matrix {
+  background-color: rgba(139, 172, 15, 0.16);
+  background-image: 
+    linear-gradient(rgba(15, 56, 15, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 56, 15, 0.25) 1px, transparent 1px);
+  background-size: 4px 4px;
+  box-shadow: inset 0 0 60px rgba(15, 56, 15, 0.6);
+  pointer-events: none;
+}
+
+.shader-gba-tft {
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.12) 1px, transparent 1px);
+  background-size: 3px 100%;
+  pointer-events: none;
+}
+
+.shader-vectrex {
+  background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+  box-shadow: inset 0 0 100px rgba(0, 242, 254, 0.12);
   pointer-events: none;
 }
 

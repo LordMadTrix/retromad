@@ -179,6 +179,7 @@ export interface AppSettings {
   bgmEnabled?: boolean; // Musique chiptune d'ambiance
   bgmVolume?: number; // 0 to 1
   crtEffect?: boolean;
+  crtShaderProfile?: 'arcade-15khz' | 'trinitron-pvm' | 'dmg-matrix' | 'gba-tft' | 'vectrex' | 'pure';
   attractMode?: boolean; // Mode démonstration écran de veille Kiosk
   attractDelaySeconds?: number; // Délai d'inactivité avant Attract Mode (défaut: 60s)
   uiTheme: 'neon-dark' | 'arcade' | 'cyberpunk';

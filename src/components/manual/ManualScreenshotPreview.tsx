@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Play,
   Sliders,
+  Timer,
 } from 'lucide-react';
 import { ManualSection } from '../../data/userManualData';
 
@@ -662,6 +663,117 @@ export const ManualScreenshotPreview: React.FC<ManualScreenshotPreviewProps> = (
                 </div>
                 <CalloutBadge id={2} className="absolute -top-3 right-4" />
                 <CalloutBadge id={3} className="absolute -bottom-3 right-1/4" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 11. SPEEDRUN ARCADE & SHADERS CRT */}
+        {section.screenshotType === 'speedrun_shaders' && (
+          <div className="p-4 sm:p-6 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Chronomètre Speedrun */}
+              <div className="p-4 rounded-xl bg-slate-900 border border-amber-500/40 font-mono relative">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                  <span className="text-xs font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                    <Timer className="w-4 h-4" />
+                    <span>Speedrun Split Timer</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                    PB: 04:12.450
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white text-center py-2 tracking-wider">
+                  03:48.<span className="text-amber-400">820</span>
+                </div>
+                <div className="space-y-1 text-xs border-t border-slate-800 pt-2">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Monde 1-1</span>
+                    <span className="text-emerald-400 font-bold">-02.4s</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Château Bowser</span>
+                    <span className="text-emerald-400 font-bold">-01.8s</span>
+                  </div>
+                </div>
+                <CalloutBadge id={1} className="absolute -top-3 left-6" />
+                <CalloutBadge id={2} className="absolute bottom-3 right-4" />
+                <CalloutBadge id={4} className="absolute -bottom-3 left-1/3" />
+              </div>
+
+              {/* Shaders CRT & Trinitron */}
+              <div className="p-4 rounded-xl bg-slate-900 border border-cyan-500/40 relative">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                  <span className="text-xs font-bold text-cyan-400 uppercase flex items-center gap-1.5">
+                    <Tv className="w-4 h-4" />
+                    <span>Profils CRT & Rendu</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
+                    Trinitron PVM
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-bold">
+                  <div className="p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
+                    Trinitron PVM (Scanlines fines)
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+                    Arcade 15kHz (Lignes épaisses)
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+                    Game Boy DMG (Matrice verte)
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+                    Pixel Art Pur (Raw)
+                  </div>
+                </div>
+                <CalloutBadge id={3} className="absolute -top-3 right-6" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 12. ÉTAGÈRE 3D DE CARTOUCHES & SYNCHRO P2P */}
+        {section.screenshotType === 'cartridge_sync' && (
+          <div className="p-4 sm:p-6 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Étagère Cartouches */}
+              <div className="p-4 rounded-xl bg-slate-900 border border-purple-500/40 relative flex flex-col items-center justify-center min-h-[160px]">
+                <div className="w-32 h-40 bg-gradient-to-b from-slate-700 to-slate-800 rounded-t-xl border-2 border-slate-600 shadow-2xl flex flex-col items-center p-2 relative">
+                  <div className="w-24 h-24 bg-purple-900/60 rounded border border-purple-500/30 flex items-center justify-center text-[10px] font-bold text-center text-purple-200">
+                    SUPER MARIO WORLD
+                  </div>
+                  <div className="absolute bottom-0 w-24 h-3 bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-400 rounded-sm" />
+                </div>
+                <div className="w-48 h-3 bg-slate-950 border-t-2 border-slate-700 mt-1 shadow-inner" />
+                <CalloutBadge id={1} className="absolute top-4 left-6" />
+                <CalloutBadge id={2} className="absolute bottom-4 right-6" />
+              </div>
+
+              {/* Hub Synchro P2P */}
+              <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/40 relative space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="text-xs font-bold text-emerald-400 uppercase flex items-center gap-1.5">
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Synchronisation P2P / Cloud</span>
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                    Connecté
+                  </span>
+                </div>
+                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Code Appairage :</span>
+                  <span className="font-mono font-black text-amber-300 text-sm">MAD-8421</span>
+                </div>
+                <div className="flex gap-2">
+                  <button className="flex-1 py-1.5 rounded-lg bg-emerald-600/30 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+                    Exporter JSON
+                  </button>
+                  <button className="flex-1 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold">
+                    Importer Saves
+                  </button>
+                </div>
+                <CalloutBadge id={3} className="absolute -top-3 right-6" />
+                <CalloutBadge id={4} className="absolute -bottom-3 left-1/3" />
               </div>
             </div>
           </div>

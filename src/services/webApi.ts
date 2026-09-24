@@ -3,9 +3,14 @@ import { COMPANIES } from '../../electron/data/companies';
 import { BUILTIN_EMULATORS } from '../../electron/data/emulators';
 import { ALL_BIOS_DEFINITIONS } from '../../electron/data/biosData';
 import { AppSettings, BiosStatus, EmulatorProfile, ExtensionInfo, ExtensionProgress, Game } from '../types';
+import {
+  getStoredGames,
+  saveStoredGames,
+  filterOutDeletedGames,
+} from './romStorage';
+import { scanPublicRomsManifest } from './romScanner';
 
 const STORAGE_KEY_SETTINGS = 'retromad_web_settings';
-const STORAGE_KEY_GAMES = 'retromad_web_games';
 
 const DEFAULT_SETTINGS: AppSettings = {
   romsDir: '~/RetroMad/Roms',
@@ -332,33 +337,19 @@ export function createWebApi() {
   }
 
   function loadGames(): Game[] {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_GAMES);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {
-      // Fallback
+    const stored = getStoredGames();
+    if (stored !== null) {
+      return stored;
     }
-    // Seed initial demo games
-    try {
-      localStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(INITIAL_DEMO_GAMES));
-    } catch {
-      // Fallback
-    }
-    return [...INITIAL_DEMO_GAMES];
+    // Premier lancement : semer les jeux initiaux filtrés
+    const initial = filterOutDeletedGames(INITIAL_DEMO_GAMES);
+    saveStoredGames(initial);
+    return initial;
   }
 
   function saveGames(games: Game[]): boolean {
-    try {
-      localStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
-      return true;
-    } catch {
-      return false;
-    }
+    saveStoredGames(games);
+    return true;
   }
 
   return {
@@ -371,7 +362,15 @@ export function createWebApi() {
     },
 
     selectDirectory: async (): Promise<string | null> => {
-      return '~/RetroMad/Roms';
+      if (typeof window !== 'undefined' && 'showDirectoryPicker' in window) {
+        try {
+          const handle = await (window as any).showDirectoryPicker({ mode: 'read' });
+          return handle.name || 'Dossier Sélectionné';
+        } catch (e: any) {
+          if (e.name === 'AbortError') return null;
+        }
+      }
+      return 'public/roms';
     },
 
     getSystems: async () => {
@@ -398,22 +397,24 @@ export function createWebApi() {
     },
 
     scanRoms: async (): Promise<Game[]> => {
-      const existing = loadGames();
-      const simulatedPaths = [
-        '~/RetroMad/Roms/snes/Super Mario World (USA).sfc',
-        '~/RetroMad/Roms/snes/The Legend of Zelda - A Link to the Past (USA).sfc',
-        '~/RetroMad/Roms/megadrive/Sonic The Hedgehog 2 (Europe).md',
-        '~/RetroMad/Roms/psx/Castlevania - Symphony of the Night (USA).chd',
-        '~/RetroMad/Roms/n64/Super Mario 64 (USA).z64',
-        '~/RetroMad/Roms/gba/Pokemon - Emerald Version (USA, Europe).gba',
-      ];
+      const current = loadGames();
+      const existingIds = new Set(current.map((g) => g.id));
+      const existingNames = new Set(current.map((g) => g.filename.toLowerCase()));
 
-      for (let i = 0; i < simulatedPaths.length; i++) {
-        await new Promise((r) => setTimeout(r, 120));
-        scanListeners.forEach((fn) => fn({ count: i + 1, file: simulatedPaths[i] }));
-      }
+      const { added } = await scanPublicRomsManifest();
+      const newGames = added.filter(
+        (g) => !existingIds.has(g.id) && !existingNames.has(g.filename.toLowerCase())
+      );
 
-      return existing.length > 0 ? existing : INITIAL_DEMO_GAMES;
+      const merged = filterOutDeletedGames([...newGames, ...current]);
+      saveGames(merged);
+
+      // Notification de progression
+      merged.slice(0, 10).forEach((g, idx) => {
+        scanListeners.forEach((fn) => fn({ count: idx + 1, file: g.filename }));
+      });
+
+      return merged;
     },
 
     onScanProgress: (callback: (data: { count: number; file: string }) => void) => {

@@ -502,6 +502,37 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="w-4 h-4 accent-purple-500 rounded cursor-pointer"
                   />
                 </div>
+
+                {formData.crtEffect && (
+                  <div className="pt-3 border-t border-slate-700/60 space-y-2">
+                    <span className="text-[11px] font-bold text-slate-300 block">
+                      Profil de Rendu & Shader Actif :
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[
+                        { id: 'arcade-15khz', label: 'Arcade 15kHz (Scanlines)' },
+                        { id: 'trinitron-pvm', label: 'Sony Trinitron PVM' },
+                        { id: 'dmg-matrix', label: 'Game Boy DMG Vert' },
+                        { id: 'gba-tft', label: 'Game Boy Advance TFT' },
+                        { id: 'vectrex', label: 'Vectrex Phosphore' },
+                        { id: 'pure', label: 'Pixel Art Pur (Brut)' },
+                      ].map((prof) => (
+                        <button
+                          key={prof.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, crtShaderProfile: prof.id as any })}
+                          className={`p-2 rounded-xl text-[11px] font-bold border text-left transition ${
+                            (formData.crtShaderProfile || 'arcade-15khz') === prof.id
+                              ? 'bg-purple-600/30 border-purple-400 text-purple-200'
+                              : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          {prof.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Section Audio & Volume */}

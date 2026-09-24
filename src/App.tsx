@@ -83,6 +83,11 @@ import { RetroPasswordNotebookModal } from './components/retro/RetroPasswordNote
 import { LanNetworkManagerModal } from './components/extended/LanNetworkManagerModal';
 import { ProjectorKioskManagerModal } from './components/retro/ProjectorKioskManagerModal';
 import { RetroManualPdfGuideModal } from './components/manual/RetroManualPdfGuideModal';
+import { RetroShaderProfilesModal, CrtShaderProfileId } from './components/retro/RetroShaderProfilesModal';
+import { ArcadeSpeedrunModal } from './components/retro/ArcadeSpeedrunModal';
+import { VirtualCartridgeShelfModal } from './components/retro/VirtualCartridgeShelfModal';
+import { SaveStateSyncModal } from './components/extended/SaveStateSyncModal';
+import { QuickStartOnboardingModal } from './components/QuickStartOnboardingModal';
 import {
   INITIAL_CENTRALIZED_ROMS,
   INITIAL_CENTRALIZED_BIOS,
@@ -91,6 +96,13 @@ import {
   INITIAL_CENTRALIZED_SAVES,
 } from './data/centralizedStorageData';
 import { CentralizedRomItem, CentralizedThemeItem } from './types/extendedFeatures';
+import { RomScannerModal } from './components/RomScannerModal';
+import {
+  getStoredGames,
+  saveStoredGames,
+  filterOutDeletedGames,
+  markGameDeleted,
+} from './services/romStorage';
 
 const convertCentralizedRomsToGames = (romList: CentralizedRomItem[]): Game[] => {
   return romList.map((r) => {
@@ -128,6 +140,7 @@ export const App: React.FC = () => {
   // Navigation & Vues (Par défaut sur 'companies' pour afficher immédiatement les firmes et vidéos)
   const [currentTab, setCurrentTab] = useState<NavTab>('companies');
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<string>('all');
 
   // Profil Kiosk vs Admin
   const [isKioskMode, setIsKioskMode] = useState(false);
@@ -138,14 +151,13 @@ export const App: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>(DEFAULT_COMPANIES);
   const [emulators, setEmulators] = useState<EmulatorProfile[]>(BUILTIN_EMULATORS);
   const [games, setGames] = useState<Game[]>(() => {
-    try {
-      const stored = localStorage.getItem('retromad_games');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return convertCentralizedRomsToGames(INITIAL_CENTRALIZED_ROMS);
+    const stored = getStoredGames();
+    if (stored !== null) {
+      return stored;
+    }
+    const initial = filterOutDeletedGames(convertCentralizedRomsToGames(INITIAL_CENTRALIZED_ROMS));
+    saveStoredGames(initial);
+    return initial;
   });
   const [settings, setSettings] = useState<AppSettings>({
     romsDir: 'public/roms',
@@ -331,6 +343,19 @@ export const App: React.FC = () => {
   const [isProjectorModalOpen, setIsProjectorModalOpen] = useState(false);
   const [isProjectorKioskRunning, setIsProjectorKioskRunning] = useState(false);
   const [isUserManualPdfOpen, setIsUserManualPdfOpen] = useState(false);
+  const [isRomScannerOpen, setIsRomScannerOpen] = useState(false);
+  const [isShaderProfilesModalOpen, setIsShaderProfilesModalOpen] = useState(false);
+  const [isSpeedrunModalOpen, setIsSpeedrunModalOpen] = useState(false);
+  const [isCartridgeShelfModalOpen, setIsCartridgeShelfModalOpen] = useState(false);
+  const [isSaveStateSyncModalOpen, setIsSaveStateSyncModalOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
+    try {
+      const completed = localStorage.getItem('retromad_onboarding_completed');
+      return !completed;
+    } catch {
+      return false;
+    }
+  });
 
   // Données centralisées sous /public
   const [centralizedRoms] = useState(INITIAL_CENTRALIZED_ROMS);
@@ -361,9 +386,7 @@ export const App: React.FC = () => {
 
   // Synchroniser games dans localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem('retromad_games', JSON.stringify(games));
-    } catch {}
+    saveStoredGames(games);
   }, [games]);
 
   // Données persistantes pour les nouveaux modules
@@ -516,7 +539,11 @@ export const App: React.FC = () => {
 
           if (loadedSystems?.length) setSystems(loadedSystems);
           if (loadedCompanies?.length) setCompanies(loadedCompanies);
-          if (loadedGames) setGames(loadedGames);
+          if (loadedGames) {
+            const filtered = filterOutDeletedGames(loadedGames);
+            setGames(filtered);
+            saveStoredGames(filtered);
+          }
           if (loadedSettings) {
             setSettings(loadedSettings);
             if (loadedSettings.kioskMode) {
@@ -670,27 +697,82 @@ export const App: React.FC = () => {
     return list.filter((g) => g.systemId === selectedSystemId);
   }, [games, selectedSystemId, isKioskMode, settings.kioskOnlyFavorites]);
 
+  // Extraction dynamique des genres disponibles et de leur décompte
+  const availableGenres = useMemo(() => {
+    const genreCountMap = new Map<string, number>();
+
+    games.forEach((game) => {
+      if (selectedSystemId && game.systemId !== selectedSystemId) return;
+
+      const rawGenres = game.metadata?.genres;
+      if (rawGenres && Array.isArray(rawGenres) && rawGenres.length > 0) {
+        rawGenres.forEach((g) => {
+          if (!g) return;
+          const parts = g.split(/[/,]/).map((p) => p.trim()).filter(Boolean);
+          parts.forEach((part) => {
+            const normalized = part.charAt(0).toUpperCase() + part.slice(1);
+            genreCountMap.set(normalized, (genreCountMap.get(normalized) || 0) + 1);
+          });
+        });
+      }
+    });
+
+    return Array.from(genreCountMap.entries())
+      .map(([genre, count]) => ({ genre, count }))
+      .sort((a, b) => a.genre.localeCompare(b.genre, 'fr'));
+  }, [games, selectedSystemId]);
+
+  // Si le genre sélectionné n'est pas présent dans la console courante, réinitialiser
+  useEffect(() => {
+    if (selectedGenre !== 'all') {
+      const exists = availableGenres.some(
+        (g) => g.genre.toLowerCase() === selectedGenre.toLowerCase()
+      );
+      if (!exists) {
+        setSelectedGenre('all');
+      }
+    }
+  }, [selectedSystemId, availableGenres, selectedGenre]);
+
   // Actions utilisateur
-  const handleScanRoms = async () => {
+  const handleScanRoms = async (): Promise<void> => {
     if (isKioskMode) return;
     playSelect();
-    if (!window.api) {
-      showNotification("Mode démo : Lancez l'application Electron pour scanner les ROMs", 'info');
+    setIsScanning(false);
+    setIsRomScannerOpen(true);
+  };
+
+  const handleAddGames = (newGames: Game[]) => {
+    const existingIds = new Set(games.map((g) => g.id));
+    const existingNames = new Set(games.map((g) => g.filename.toLowerCase()));
+    const trulyNew = filterOutDeletedGames(newGames).filter(
+      (g) => !existingIds.has(g.id) && !existingNames.has(g.filename.toLowerCase())
+    );
+
+    if (trulyNew.length === 0) {
+      showNotification('Aucune nouvelle ROM à ajouter (fichiers déjà présents ou supprimés).', 'info');
       return;
     }
 
-    setIsScanning(true);
-    showNotification('Scan des répertoires de ROMs en cours...', 'info');
+    const merged = [...trulyNew, ...games];
+    setGames(merged);
+    saveStoredGames(merged);
+    playUnlock();
+    showNotification(`${trulyNew.length} jeu(x) ajouté(s) avec succès à la bibliothèque !`, 'success');
 
-    try {
-      const scanned = await window.api.scanRoms();
-      setGames(scanned);
-      showNotification(`Scan terminé ! ${scanned.length} jeu(x) répertorié(s).`, 'success');
-    } catch (err: any) {
-      showNotification(`Erreur lors du scan : ${err.message}`, 'error');
-    } finally {
-      setIsScanning(false);
+    if (trulyNew[0]?.systemId) {
+      setSelectedSystemId(trulyNew[0].systemId);
+      setCurrentTab('games');
     }
+  };
+
+  const handleDeleteGame = (game: Game) => {
+    markGameDeleted(game.id, game.filename);
+    const updated = games.filter((g) => g.id !== game.id);
+    setGames(updated);
+    saveStoredGames(updated);
+    playBack();
+    showNotification(`Jeu "${game.cleanTitle}" supprimé définitivement de la ludothèque.`, 'info');
   };
 
   const handleStartScrapeBatch = async () => {
@@ -1158,9 +1240,23 @@ export const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-transparent text-slate-100 select-none overflow-hidden relative font-display">
-      {/* Filtre d'écran CRT Rétro Global si activé */}
+      {/* Filtre d'écran CRT Rétro Global si activé avec profil personnalisé */}
       {settings.crtEffect && (
-        <div className="fixed inset-0 scanlines crt-vignette crt-phosphor pointer-events-none z-50 animate-in fade-in duration-200" />
+        <div
+          className={`fixed inset-0 pointer-events-none z-50 animate-in fade-in duration-200 ${
+            settings.crtShaderProfile === 'trinitron-pvm'
+              ? 'shader-trinitron-pvm scanlines crt-phosphor'
+              : settings.crtShaderProfile === 'dmg-matrix'
+              ? 'shader-dmg-matrix'
+              : settings.crtShaderProfile === 'gba-tft'
+              ? 'shader-gba-tft'
+              : settings.crtShaderProfile === 'vectrex'
+              ? 'shader-vectrex'
+              : settings.crtShaderProfile === 'pure'
+              ? ''
+              : 'shader-arcade-15khz scanlines crt-vignette'
+          }`}
+        />
       )}
 
       {isKioskMode ? (
@@ -1183,6 +1279,18 @@ export const App: React.FC = () => {
           onOpenUserManualPdf={() => {
             playSelect();
             setIsUserManualPdfOpen(true);
+          }}
+          onOpenShaderProfiles={() => {
+            playSelect();
+            setIsShaderProfilesModalOpen(true);
+          }}
+          onOpenSpeedrun={() => {
+            playSelect();
+            setIsSpeedrunModalOpen(true);
+          }}
+          onOpenCartridgeShelf={() => {
+            playSelect();
+            setIsCartridgeShelfModalOpen(true);
           }}
           soundEnabled={settings.soundEnabled}
           soundVolume={settings.soundVolume ?? 0.8}
@@ -1224,6 +1332,13 @@ export const App: React.FC = () => {
             isKioskMode={isKioskMode}
             onEnterKiosk={handleEnterKiosk}
             onUnlockKiosk={() => setIsPinModalOpen(true)}
+            selectedGenre={selectedGenre}
+            onSelectGenre={(genre) => {
+              playSelect();
+              setSelectedGenre(genre);
+              setCurrentTab('games');
+            }}
+            availableGenres={availableGenres}
             onOpenRoulette={() => {
               playDice();
               setIsRouletteModalOpen(true);
@@ -1322,6 +1437,26 @@ export const App: React.FC = () => {
               playSelect();
               setIsUserManualPdfOpen(true);
             }}
+            onOpenShaderProfiles={() => {
+              playSelect();
+              setIsShaderProfilesModalOpen(true);
+            }}
+            onOpenSpeedrun={() => {
+              playSelect();
+              setIsSpeedrunModalOpen(true);
+            }}
+            onOpenCartridgeShelf={() => {
+              playSelect();
+              setIsCartridgeShelfModalOpen(true);
+            }}
+            onOpenSaveStateSync={() => {
+              playSelect();
+              setIsSaveStateSyncModalOpen(true);
+            }}
+            onOpenQuickStart={() => {
+              playSelect();
+              setIsOnboardingOpen(true);
+            }}
           />
 
           {/* Vues principales */}
@@ -1360,9 +1495,15 @@ export const App: React.FC = () => {
                   setSelectedGame(g);
                 }}
                 onScanPrompt={() => {
-                  setIsSettingsOpen(true);
+                  playSelect();
+                  setIsRomScannerOpen(true);
                 }}
+                onAddGames={handleAddGames}
                 onPlayDice={playDice}
+                selectedGenre={selectedGenre}
+                onSelectGenre={(genre) => {
+                  setSelectedGenre(genre);
+                }}
                 onOpenRoulette={() => {
                   playDice();
                   setIsRouletteModalOpen(true);
@@ -1569,6 +1710,7 @@ export const App: React.FC = () => {
             setDirectEditingGame(game);
           }
         }}
+        onDeleteGame={handleDeleteGame}
         isKioskMode={isKioskMode}
         isScraping={isScrapingBatch}
         onOpenAchievements={(_g) => {
@@ -1587,6 +1729,11 @@ export const App: React.FC = () => {
           playSelect();
           setActiveManualGameId(g.id);
           setIsManualsModalOpen(true);
+        }}
+        onFilterByGenre={(genre) => {
+          playSelect();
+          setSelectedGenre(genre);
+          setCurrentTab('games');
         }}
       />
 
@@ -2220,10 +2367,26 @@ export const App: React.FC = () => {
       <LanNetworkManagerModal
         isOpen={isLanManagerOpen}
         onClose={() => setIsLanManagerOpen(false)}
+        onAddGames={handleAddGames}
         onPlaySound={(type) => {
           if (type === 'coin') playCoin();
           if (type === 'fanfare') playUnlock();
           if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* SCANNER DE RÉPERTOIRE & AJOUT DE ROMS INTERACTIF */}
+      <RomScannerModal
+        isOpen={isRomScannerOpen}
+        onClose={() => setIsRomScannerOpen(false)}
+        games={games}
+        systems={systems}
+        selectedSystemId={selectedSystemId}
+        onGamesAdded={handleAddGames}
+        onPlaySound={(type) => {
+          if (type === 'coin') playCoin();
+          if (type === 'powerup') playUnlock();
+          if (type === 'select') playSelect();
         }}
       />
 
@@ -2260,6 +2423,91 @@ export const App: React.FC = () => {
           if (type === 'coin') playCoin();
           if (type === 'fanfare') playUnlock();
           if (type === 'powerup') playSelect();
+        }}
+      />
+
+      {/* 1. PROFILS DE SHADERS CRT & APERÇU IMMERSIF */}
+      <RetroShaderProfilesModal
+        isOpen={isShaderProfilesModalOpen}
+        onClose={() => setIsShaderProfilesModalOpen(false)}
+        currentProfile={(settings.crtShaderProfile as CrtShaderProfileId) || 'arcade-15khz'}
+        onSelectProfile={(profileId) => {
+          setSettings((prev) => ({
+            ...prev,
+            crtShaderProfile: profileId,
+            crtEffect: profileId !== 'pure',
+          }));
+          showNotification(`Shader appliqué : ${profileId}`, 'success');
+        }}
+        crtEnabled={!!settings.crtEffect}
+        onToggleCrt={handleToggleCrt}
+        onPlaySound={() => playSelect()}
+      />
+
+      {/* 2. CHRONOMÈTRE SPEEDRUN ARCADE PRO (SPLITS & RECORDS) */}
+      <ArcadeSpeedrunModal
+        isOpen={isSpeedrunModalOpen}
+        onClose={() => setIsSpeedrunModalOpen(false)}
+        games={visibleGames}
+        activeGame={visibleGames[focusedGameIndex] || null}
+        onLaunchGame={(g) => handleLaunchGame(g)}
+        onPlaySound={(type) => {
+          if (type === 'split') playSelect();
+          if (type === 'pb') playUnlock();
+          if (type === 'click') playMove();
+          if (type === 'reset') playBack();
+        }}
+      />
+
+      {/* 3. ÉTAGÈRE 3D DE CARTOUCHES PHYSIQUES & INSPECTION */}
+      <VirtualCartridgeShelfModal
+        isOpen={isCartridgeShelfModalOpen}
+        onClose={() => setIsCartridgeShelfModalOpen(false)}
+        games={visibleGames}
+        systems={systems}
+        onLaunchGame={(g) => handleLaunchGame(g)}
+        onPlaySound={(type) => {
+          if (type === 'insert') playCoin();
+          if (type === 'click') playMove();
+          if (type === 'powerup') playUnlock();
+        }}
+      />
+
+      {/* 4. HUB DE SYNCHRONISATION SAUVEGARDES & P2P MULTI-POSTES */}
+      <SaveStateSyncModal
+        isOpen={isSaveStateSyncModalOpen}
+        onClose={() => setIsSaveStateSyncModalOpen(false)}
+        games={visibleGames}
+        onPlaySound={(type) => {
+          if (type === 'sync') playSelect();
+          if (type === 'click') playMove();
+          if (type === 'success') playUnlock();
+        }}
+      />
+
+      {/* ASSISTANT DE DÉMARRAGE RAPIDE & PREMIER LANCEMENT */}
+      <QuickStartOnboardingModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        settings={settings}
+        onSaveSettings={(partial) => {
+          setSettings((prev) => ({ ...prev, ...partial }));
+        }}
+        onSelectTab={(tab) => {
+          if (tab === 'companies' || tab === 'museum') {
+            setCurrentTab('companies');
+          } else {
+            setCurrentTab('games');
+          }
+        }}
+        onEnterKiosk={handleEnterKiosk}
+        sampleGamesCount={visibleGames.length}
+        onPlaySound={(type) => {
+          if (type === 'select') playSelect();
+          if (type === 'coin') playCoin();
+          if (type === 'move') playMove();
+          if (type === 'launch') playUnlock();
+          if (type === 'unlock') playUnlock();
         }}
       />
     </div>

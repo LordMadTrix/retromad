@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Game, System, EmulatorProfile } from '../types';
-import { X, Play, Heart, RefreshCw, Calendar, Users, Star, Award, HardDrive, Hash, Terminal, Pencil, Trophy, Code2, BookOpen } from 'lucide-react';
+import { X, Play, Heart, RefreshCw, Calendar, Users, Star, Award, HardDrive, Hash, Terminal, Pencil, Trophy, Code2, BookOpen, Trash2, Tag } from 'lucide-react';
 import { ConsoleLogo } from './ConsoleLogo';
 import { resolveMediaUrl } from '../utils/media';
 
@@ -13,12 +13,14 @@ interface GameDetailModalProps {
   onToggleFavorite: (gameId: string) => void;
   onScrapeGame: (game: Game) => void;
   onEdit?: (game: Game) => void;
+  onDeleteGame?: (game: Game) => void;
   isKioskMode?: boolean;
   isScraping?: boolean;
   onOpenAchievements?: (game: Game) => void;
   onOpenCheats?: (game: Game) => void;
   onOpenSaveStates?: (game: Game) => void;
   onOpenManual?: (game: Game) => void;
+  onFilterByGenre?: (genre: string) => void;
 }
 
 export const GameDetailModal: React.FC<GameDetailModalProps> = ({
@@ -30,14 +32,17 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
   onToggleFavorite,
   onScrapeGame,
   onEdit,
+  onDeleteGame,
   isKioskMode = false,
   isScraping,
   onOpenAchievements,
   onOpenCheats,
   onOpenSaveStates,
   onOpenManual,
+  onFilterByGenre,
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'boxart' | 'snap'>('boxart');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedEmulatorId, setSelectedEmulatorId] = useState<string>('retroarch');
 
   if (!game) return null;
@@ -202,15 +207,26 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
 
               {/* Genres */}
               {game.metadata?.genres && game.metadata.genres.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {game.metadata.genres.map((genre, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] font-medium text-slate-300"
-                    >
-                      {genre}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] text-slate-500 font-semibold uppercase mr-0.5">Genres :</span>
+                  {game.metadata.genres.map((g, idx) => {
+                    const parts = g.split(/[/,]/).map((p) => p.trim()).filter(Boolean);
+                    return parts.map((genre) => (
+                      <button
+                        key={`${idx}-${genre}`}
+                        type="button"
+                        onClick={() => {
+                          onFilterByGenre?.(genre);
+                          onClose();
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-cyan-500/20 border border-slate-700 hover:border-cyan-400/60 text-[11px] font-medium text-slate-300 hover:text-cyan-200 transition cursor-pointer flex items-center gap-1.5 shadow-sm group"
+                        title={`Filtrer tous les jeux du genre &laquo; ${genre} &raquo;`}
+                      >
+                        <Tag className="w-3 h-3 text-cyan-400 group-hover:scale-110 transition-transform" />
+                        <span>{genre}</span>
+                      </button>
+                    ));
+                  })}
                 </div>
               )}
 
@@ -305,6 +321,35 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               </div>
             )}
 
+            {/* Confirmation suppression si active */}
+            {showDeleteConfirm && (
+              <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 flex items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+                <span className="text-rose-200 font-semibold">
+                  Supprimer définitivement ce jeu de la bibliothèque ?
+                </span>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onDeleteGame) onDeleteGame(game);
+                      setShowDeleteConfirm(false);
+                      onClose();
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold transition"
+                  >
+                    Confirmer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Barre d'action inférieure */}
             <div className="pt-2 border-t border-slate-800 flex items-center space-x-3">
               <button
@@ -345,6 +390,16 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               >
                 <RefreshCw className={`w-5 h-5 ${isScraping ? 'animate-spin text-retro-accent' : ''}`} />
               </button>
+
+              {!isKioskMode && onDeleteGame && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="p-3 rounded-xl bg-slate-800/80 text-rose-400 border border-slate-700 hover:bg-rose-500/20 hover:border-rose-500/50 transition font-bold"
+                  title="Supprimer ce jeu définitivement"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
         </div>

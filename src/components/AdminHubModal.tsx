@@ -7,6 +7,7 @@ import {
   EmulatorProfile,
   BiosStatus,
 } from '../types';
+import { markGameDeleted, markMultipleGamesDeleted } from '../services/romStorage';
 import {
   X,
   Settings,
@@ -290,6 +291,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   };
 
   const handleDeleteGame = (gameId: string) => {
+    const target = games.find((g) => g.id === gameId);
+    markGameDeleted(gameId, target?.filename);
     const newGames = games.filter((g) => g.id !== gameId);
     onSaveGames(newGames);
     setSelectedGameIds((prev) => {
@@ -297,7 +300,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
       next.delete(gameId);
       return next;
     });
-    notify('Jeu supprimé de la bibliothèque.');
+    notify('Jeu supprimé définitivement de la bibliothèque (protégé contre la réapparition).');
   };
 
   const handleDuplicateGame = (game: Game) => {
@@ -369,10 +372,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
   const handleBatchDelete = (ids: string[]) => {
     const idSet = new Set(ids);
+    const targets = games
+      .filter((g) => idSet.has(g.id))
+      .map((g) => ({ id: g.id, filename: g.filename }));
+    markMultipleGamesDeleted(targets);
     const updated = games.filter((g) => !idSet.has(g.id));
     onSaveGames(updated);
     setSelectedGameIds(new Set());
-    notify(`${ids.length} jeu(x) supprimé(s).`);
+    notify(`${ids.length} jeu(x) supprimé(s) définitivement (protégés contre la réapparition).`);
   };
 
   const handleBatchToggleFavorite = (ids: string[], fav: boolean) => {

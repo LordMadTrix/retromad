@@ -28,15 +28,15 @@ export const SystemSelector: React.FC<SystemSelectorProps> = ({
   }, [games]);
 
   return (
-    <div className="bg-gradient-to-r from-[#101d44]/95 via-[#1a2860]/95 to-[#1e1748]/95 border-b border-cyan-300/30 px-6 py-3 select-none shadow-[0_4px_20px_rgba(20,47,120,0.35)]">
+    <div className="bg-slate-900/95 border-b border-slate-800 px-6 py-2.5 select-none shadow-[0_4px_20px_rgba(0,0,0,0.35)] backdrop-blur-md">
       <div className="flex items-center space-x-3 overflow-x-auto pb-1 no-scrollbar">
         {/* Bouton "Tous les systèmes" */}
         <button
           onClick={() => onSelectSystem(null)}
-          className={`flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
+          className={`flex items-center space-x-2.5 px-4 py-2 rounded-xl text-xs font-bold shrink-0 transition-all ${
             selectedSystemId === null
               ? 'bg-retro-accent text-retro-900 shadow-neon scale-105'
-              : 'bg-[#22376e]/70 text-slate-200 hover:text-white hover:bg-[#36539d] border border-blue-300/25'
+              : 'bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700/80 border border-slate-700/60'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -45,7 +45,7 @@ export const SystemSelector: React.FC<SystemSelectorProps> = ({
             className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
               selectedSystemId === null
                 ? 'bg-retro-900/40 text-retro-900'
-                : 'bg-slate-700/60 text-slate-300'
+                : 'bg-slate-900/80 text-slate-400'
             }`}
           >
             {games.length}
@@ -65,10 +65,10 @@ export const SystemSelector: React.FC<SystemSelectorProps> = ({
                 borderColor: isSelected ? system.themeColor : undefined,
                 boxShadow: isSelected ? `0 0 15px ${system.themeColor}55` : undefined,
               }}
-              className={`flex items-center space-x-2.5 px-3.5 py-2 rounded-xl text-xs font-bold shrink-0 transition-all ${
+              className={`flex items-center space-x-2.5 px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                 isSelected
                   ? 'bg-slate-800 text-white border-2 scale-105'
-                  : 'bg-[#1a2b5b]/75 text-slate-200 hover:text-white hover:bg-[#304a91] border border-blue-200/20'
+                  : 'bg-slate-800/70 text-slate-300 hover:text-white hover:bg-slate-700/70 border border-slate-700/50'
               }`}
             >
               <ConsoleLogo system={system} size="sm" showFallbackText={false} />
@@ -80,7 +80,7 @@ export const SystemSelector: React.FC<SystemSelectorProps> = ({
                     color: isSelected ? system.themeColor : undefined,
                   }}
                   className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
-                    !isSelected ? 'bg-slate-700/50 text-slate-400' : ''
+                    !isSelected ? 'bg-slate-900/80 text-slate-400' : ''
                   }`}
                 >
                   {count}

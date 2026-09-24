@@ -13,16 +13,20 @@ import {
   FileCode,
 } from 'lucide-react';
 import { INITIAL_LAN_LOGS, LanTransferLog } from '../../data/attractAndLanData';
+import { Game } from '../../types';
+import { createGameFromFile } from '../../services/romScanner';
 
 interface LanNetworkManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAddGames?: (games: Game[]) => void;
   onPlaySound?: (type: 'coin' | 'powerup' | 'fanfare') => void;
 }
 
 export const LanNetworkManagerModal: React.FC<LanNetworkManagerModalProps> = ({
   isOpen,
   onClose,
+  onAddGames,
   onPlaySound,
 }) => {
   const [localIp] = useState('192.168.1.45');
@@ -64,7 +68,7 @@ export const LanNetworkManagerModal: React.FC<LanNetworkManagerModalProps> = ({
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  const handleSimulateUpload = (fileName: string, fileSize = '3.5 Mo') => {
+  const handleSimulateUpload = (fileName: string, fileSize = '3.5 Mo', fileObj?: File) => {
     setUploadedFileName(fileName);
     setUploadProgress(10);
     if (onPlaySound) onPlaySound('powerup');
@@ -89,6 +93,15 @@ export const LanNetworkManagerModal: React.FC<LanNetworkManagerModalProps> = ({
         };
 
         setLogs((prev) => [newLog, ...prev]);
+
+        // Si c'est un fichier réel ou un fichier de test, créer le Game et l'ajouter à la bibliothèque
+        if (fileObj && onAddGames) {
+          const game = createGameFromFile(fileObj, `${targetSystemFolder}${fileName}`);
+          if (game) {
+            onAddGames([game]);
+          }
+        }
+
         setTimeout(() => {
           setUploadProgress(null);
           setUploadedFileName('');
@@ -96,7 +109,7 @@ export const LanNetworkManagerModal: React.FC<LanNetworkManagerModalProps> = ({
       } else {
         setUploadProgress(current);
       }
-    }, 200);
+    }, 150);
   };
 
   const handleDropFiles = (e: React.DragEvent) => {
@@ -104,7 +117,7 @@ export const LanNetworkManagerModal: React.FC<LanNetworkManagerModalProps> = ({
     setIsDraggingOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      handleSimulateUpload(file.name, `${(file.size / (1024 * 1024)).toFixed(1)} Mo`);
+      handleSimulateUpload(file.name, `${(file.size / (1024 * 1024)).toFixed(1)} Mo`, file);
     }
   };
 

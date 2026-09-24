@@ -21,7 +21,9 @@
   "author": "RetroMad Team",
   "license": "MIT",
   "dependencies": {
+    "@types/html2canvas": "^1.0.0",
     "canvas-confetti": "^1.9.4",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
