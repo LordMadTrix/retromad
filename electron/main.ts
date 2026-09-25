@@ -11,7 +11,11 @@ import { COMPANIES } from './data/companies';
 import { extensionInstaller } from './services/extensionInstaller';
 import { Game } from './types';
 
-// Enregistrer le schéma personnalisé de protocole pour les médias locaux
+// Enregistrer les schémas personnalisés :
+//  - retromad-media : médias locaux mis en cache (boxarts…)
+//  - retromad : application de production servie comme un site https
+//    (évite l'origine nulle de file:// qui bloque les iframes YouTube
+//    avec « Erreur 153 », les workers, etc.)
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'retromad-media',
@@ -20,6 +24,16 @@ protocol.registerSchemesAsPrivileged([
       secure: true,
       supportFetchAPI: true,
       bypassCSP: true,
+    },
+  },
+  {
+    scheme: 'retromad',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      bypassCSP: true,
+      stream: true,
     },
   },
 ]);
@@ -46,6 +60,19 @@ function createWindow() {
   const distIndexPath = path.join(__dirname, '../dist/index.html');
   const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production' && !process.env.ELECTRON_FORCE_PROD;
 
+  // YouTube rejette les lecteurs intégrés depuis une origine nulle (file://)
+  // avec « Erreur 153 ». On présente une origine https personnalisée via le
+  // header Referer pour que l'embed soit accepté.
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    { urls: ['https://www.youtube.com/*', 'https://www.youtube-nocookie.com/*', 'https://googlevideo.com/*'] },
+    (details, callback) => {
+      const headers = { ...details.requestHeaders };
+      headers['Origin'] = 'https://www.youtube.com';
+      headers['Referer'] = 'https://www.youtube.com/';
+      callback({ requestHeaders: headers });
+    }
+  );
+
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173').catch(() => {
       console.log('[RetroMad] Basculement automatique sur le bundle dist/index.html...');
@@ -59,7 +86,12 @@ function createWindow() {
       }
     });
   } else {
-    mainWindow.loadFile(distIndexPath);
+    // Protocole https-like : même origine sûre que le web, sans les
+    // restrictions d'origine nulle de file:// (iframes YouTube, workers).
+    mainWindow.loadURL('retromad://app/index.html').catch(() => {
+      console.log('[RetroMad] retromad:// indisponible, repli sur file://...');
+      mainWindow?.loadFile(distIndexPath);
+    });
   }
 
   const initialSettings = storage.getSettings();
@@ -81,6 +113,45 @@ app.whenReady().then(() => {
     const relativePath = parsed.pathname.replace(/^\//, '');
     const fullPath = path.join(storage.getDataDir(), relativePath);
     return net.fetch(`file://${fullPath}`);
+  });
+
+  // Protocole de l'application de production : sert dist/ comme un site.
+  // Les dossiers statiques du projet (roms, bios, logos, music, themes…)
+  // restent servis depuis public/ — Vite ne les copie pas tous dans dist.
+  protocol.handle('retromad', (request) => {
+    const parsed = new URL(request.url);
+    // retromad://app/index.html → dist/index.html
+    let relativePath = decodeURIComponent(parsed.pathname).replace(/^\//, '') || 'index.html';
+    if (relativePath.endsWith('/')) relativePath += 'index.html';
+    const distDir = path.join(__dirname, '../dist');
+    const publicDir = path.join(__dirname, '../public');
+    const projectRoot = path.resolve(distDir, '..');
+
+    const tryPaths: string[] = [];
+    if (/^(roms|bios|logos|music|themes|emulators|saves)\//.test(relativePath)) {
+      tryPaths.push(path.join(publicDir, relativePath));
+    } else {
+      tryPaths.push(path.join(distDir, relativePath));
+      tryPaths.push(path.join(publicDir, relativePath));
+    }
+
+    for (const candidate of tryPaths) {
+      const resolved = path.resolve(candidate);
+      // Garde-fou : interdire la sortie du projet
+      if (!resolved.startsWith(projectRoot)) continue;
+      try {
+        if (fs.statSync(resolved).isFile()) {
+          return net.fetch(`file://${resolved}`);
+        }
+      } catch {
+        /* fichier suivant */
+      }
+    }
+    // SPA fallback : routes applicatives → index.html
+    if (!relativePath.includes('.')) {
+      return net.fetch(`file://${path.join(distDir, 'index.html')}`);
+    }
+    return new Response('Not Found', { status: 404 });
   });
 
   createWindow();
