@@ -167,10 +167,10 @@ export const Navigation: React.FC<NavigationProps> = ({
   );
 
   return (
-    <header className="h-14 bg-slate-950 border-b border-slate-800 shadow-[0_4px_25px_rgba(0,0,0,0.5)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 z-30 select-none shrink-0 overflow-x-auto no-scrollbar">
+    <header className="h-14 bg-slate-950 border-b border-slate-800 shadow-[0_4px_25px_rgba(0,0,0,0.5)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 z-30 select-none shrink-0 overflow-visible">
 
       {/* ── PARTIE GAUCHE : Logo + Onglets Principaux + Menus Déroulants + Kiosque ── */}
-      <div className="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar py-1 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 py-1 shrink">
         {/* Logo */}
         <div
           className="flex items-center space-x-2 cursor-pointer shrink-0 group mr-0.5 sm:mr-1"

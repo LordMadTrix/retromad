@@ -417,6 +417,86 @@ export async function scanFilesList(
 /**
  * Scanne le manifest JSON de /public/roms
  */
+/**
+ * Construit un Game à partir d'une entrée de l'index disque (_index.json).
+ * Renvoie null si le système ne peut pas être détecté.
+ */
+function buildGameFromIndexFile(f: { path: string; filename: string; size: number }): Game | null {
+  const system = detectSystem(f.path);
+  if (!system) return null;
+
+  // Chemin web complet servi par Vite : public/roms/* -> /roms/*
+  const webPath = `/roms${f.path}`;
+
+  const dotIndex = f.filename.lastIndexOf('.');
+  const ext = dotIndex > 0 ? f.filename.substring(dotIndex).toLowerCase() : '.bin';
+  const { cleanTitle, region } = cleanGameTitle(f.filename);
+  // ID unique : inclut le chemin encodé (2 fichiers peuvent avoir le même
+  // nom nettoyé et la même taille, ex: Zelda 2 PRG 0 / PRG 2)
+  const pathSlug = f.path.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(-48);
+
+  return {
+    id: `rom_${system.id}_${pathSlug}`,
+    systemId: system.id,
+    title: dotIndex > 0 ? f.filename.substring(0, dotIndex) : f.filename,
+    cleanTitle,
+    path: webPath,
+    filename: f.filename,
+    extension: ext,
+    size: f.size,
+    region,
+    favorite: false,
+    playCount: 0,
+    playTimeMinutes: 0,
+    metadata: {
+      developer: system.name,
+      publisher: system.name,
+      releaseDate: '1990-01-01',
+      genres: [system.defaultGenre || 'Action'],
+      players: '1-2',
+      rating: 90,
+      synopsis: `ROM servie par le serveur web (${system.name}).`,
+    },
+    media: {},
+  };
+}
+
+/**
+ * Synchronisation incrémentale : détecte les ROMs présentes sur le disque
+ * (index _index.json) qui ne sont pas encore dans la ludothèque et les
+ * renvoie. Utilisée au démarrage pour intégrer automatiquement les
+ * ROMs ajoutées après le dernier scan.
+ */
+export async function syncNewRoms(existingGames: Game[]): Promise<{
+  newGames: Game[];
+  totalOnDisk: number;
+}> {
+  try {
+    const res = await fetch('/roms/_index.json');
+    if (!res.ok) return { newGames: [], totalOnDisk: 0 };
+    const data = await res.json();
+    const files: Array<{ path: string; filename: string; size: number }> = data.files || [];
+
+    const knownPaths = new Set(existingGames.map((g) => g.path));
+    const knownFilenames = new Set(existingGames.map((g) => g.filename));
+    const newGames: Game[] = [];
+
+    for (const f of files) {
+      if (knownPaths.has(`/roms${f.path}`)) continue;
+      // Tolérance : même nom de fichier à un autre emplacement -> déjà connu
+      if (knownFilenames.has(f.filename)) continue;
+      if (isGameDeleted(undefined, f.filename)) continue;
+
+      const game = buildGameFromIndexFile(f);
+      if (game) newGames.push(game);
+    }
+
+    return { newGames, totalOnDisk: files.length };
+  } catch {
+    return { newGames: [], totalOnDisk: 0 };
+  }
+}
+
 export async function scanPublicRomsManifest(): Promise<{
   added: Game[];
   skippedDeleted: number;
@@ -437,45 +517,9 @@ export async function scanPublicRomsManifest(): Promise<{
           skippedDeleted++;
           continue;
         }
-
-        // Détecter le système depuis le chemin (ex: /nintendo/nes/...)
-        const system = detectSystem(f.path);
-        if (!system) continue;
-
-        // Chemin web complet servi par Vite : public/roms/* -> /roms/*
-        const webPath = `/roms${f.path}`;
-
-        const dotIndex = f.filename.lastIndexOf('.');
-        const ext = dotIndex > 0 ? f.filename.substring(dotIndex).toLowerCase() : '.bin';
-        const { cleanTitle, region } = cleanGameTitle(f.filename);
-        // ID unique : inclut le chemin encodé (2 fichiers peuvent avoir le même
-        // nom nettoyé et la même taille, ex: Zelda 2 PRG 0 / PRG 2)
-        const pathSlug = f.path.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(-48);
-
-        added.push({
-          id: `rom_${system.id}_${pathSlug}`,
-          systemId: system.id,
-          title: dotIndex > 0 ? f.filename.substring(0, dotIndex) : f.filename,
-          cleanTitle,
-          path: webPath,
-          filename: f.filename,
-          extension: ext,
-          size: f.size,
-          region,
-          favorite: false,
-          playCount: 0,
-          playTimeMinutes: 0,
-          metadata: {
-            developer: system.name,
-            publisher: system.name,
-            releaseDate: '1990-01-01',
-            genres: [system.defaultGenre || 'Action'],
-            players: '1-2',
-            rating: 90,
-            synopsis: `ROM servie par le serveur web (${system.name}).`,
-          },
-          media: {},
-        });
+        const game = buildGameFromIndexFile(f);
+        if (!game) continue;
+        added.push(game);
       }
 
       if (added.length > 0) {

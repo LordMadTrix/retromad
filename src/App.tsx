@@ -555,6 +555,21 @@ export const App: React.FC = () => {
             const filtered = filterOutDeletedGames(loadedGames);
             setGames(filtered);
             saveStoredGames(filtered);
+
+            // Synchronisation incrémentale : intègre automatiquement les ROMs
+            // ajoutées sur le disque depuis le dernier scan (mode web/dev).
+            try {
+              const { syncNewRoms } = await import('./services/romScanner');
+              const { newGames } = await syncNewRoms(filtered);
+              if (newGames.length > 0) {
+                const merged = [...newGames, ...filtered];
+                setGames(merged);
+                saveStoredGames(merged);
+                showNotification(`${newGames.length} nouvelle(s) ROM(s) détectée(s) et ajoutée(s) à la ludothèque.`, 'success');
+              }
+            } catch (syncErr) {
+              console.warn('Sync ROMs incrémentale ignorée:', syncErr);
+            }
           }
           if (loadedSettings) {
             setSettings(loadedSettings);
@@ -570,6 +585,8 @@ export const App: React.FC = () => {
           ]);
           if (bios) setBiosStatuses(bios);
           if (detectedEmus?.length) setEmulators(detectedEmus);
+
+          // Synchronisation incrémentale supprimée d'ici (déplacée dans le bloc loadedGames)
         } catch (err) {
           console.error('Erreur chargement init:', err);
         }
@@ -839,6 +856,29 @@ export const App: React.FC = () => {
     }
   };
 
+  // Lance le lecteur intégré (EmulatorJS). En mode bureau, la ROM est lue
+  // depuis le disque via IPC et passée en blob: au lecteur.
+  const launchWithIntegratedPlayer = async (game: Game) => {
+    try {
+      const isLocalFile = !!game.path && !game.path.startsWith('/') && !game.path.startsWith('http') && !game.path.startsWith('blob:');
+      if (typeof (window.api as any)?.readRomFile === 'function' && isLocalFile) {
+        const res = await (window.api as any).readRomFile(game.path);
+        if (res?.ok && res.dataB64) {
+          const bytes = Uint8Array.from(atob(res.dataB64), (c) => c.charCodeAt(0));
+          const blob = new Blob([bytes], { type: 'application/octet-stream' });
+          const url = URL.createObjectURL(blob);
+          setWebEmulatorGame({ ...game, path: url });
+          return;
+        }
+        showNotification(`ROM illisible : ${res?.error || 'erreur inconnue'}`, 'error');
+        return;
+      }
+    } catch (e: any) {
+      console.warn('[RetroMad] Lecture ROM via IPC impossible, tentative URL directe :', e);
+    }
+    setWebEmulatorGame(game);
+  };
+
   const handleLaunchGame = async (game: Game, emulatorId?: string) => {
     playLaunch();
 
@@ -893,11 +933,16 @@ export const App: React.FC = () => {
       const result = await window.api.launchGame(game, emulatorId);
       if (result.success) {
         showNotification(result.message, 'success');
-      } else {
-        showNotification(result.message, 'error');
+        return;
       }
+      // Aucun émulateur externe fonctionnel (ex. RetroArch non installé) :
+      // repli automatique sur le lecteur intégré EmulatorJS.
+      console.warn('[RetroMad] Lancement externe échoué, repli émulateur intégré :', result.message);
+      showNotification(`${result.message} — bascule vers le lecteur intégré…`, 'info');
+      await launchWithIntegratedPlayer(game);
     } catch (err: any) {
-      showNotification(`Erreur de lancement : ${err.message}`, 'error');
+      console.warn('[RetroMad] Erreur lancement externe, repli émulateur intégré :', err);
+      await launchWithIntegratedPlayer(game);
     }
   };
 

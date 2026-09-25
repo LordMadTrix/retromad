@@ -101,9 +101,10 @@ export const WebEmulatorModal: React.FC<WebEmulatorModalProps> = ({ game, onClos
     if ((window as any).__retromad_ejs_loaded) return;
     (window as any).__retromad_ejs_loaded = true;
 
-    // Le ROM doit être servie par le serveur web (public/roms/...)
+    // ROM servie par le serveur web (public/roms/...), ou blob:/http fourni
+    // par App.tsx quand la ROM a été lue depuis le disque (mode bureau).
     let romUrl = game.path;
-    if (!romUrl.startsWith('/') && !romUrl.startsWith('http')) {
+    if (!romUrl.startsWith('/') && !romUrl.startsWith('http') && !romUrl.startsWith('blob:')) {
       romUrl = `/roms/${game.systemId}/${game.filename}`;
     }
 

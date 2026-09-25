@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, protocol, net } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { storage } from './services/storage';
 import { scanner } from './services/scanner';
 import { scraper } from './services/scraper';
@@ -234,6 +235,32 @@ ipcMain.handle('check-bios', async () => {
 
 ipcMain.handle('launch-game', async (_, game: Game, emulatorId?: string) => {
   return launcher.launchGame(game, emulatorId);
+});
+
+// Lecture d'une ROM en base64 : permet au lecteur intégré (EmulatorJS) de
+// fonctionner aussi en mode bureau, en repli quand aucun émulateur externe.
+ipcMain.handle('read-rom-file', async (_, romPath: string) => {
+  try {
+    if (typeof romPath !== 'string' || romPath.includes('..')) {
+      return { ok: false, error: 'Chemin invalide' };
+    }
+    const resolved = path.resolve(romPath);
+    const allowedRoots = [
+      path.join(__dirname, '../public/roms'),
+      storage.getSettings().romsDir || '',
+    ].filter(Boolean);
+    const allowed = allowedRoots.some((root) => {
+      const r = path.resolve(root);
+      return resolved === r || resolved.startsWith(r + path.sep);
+    });
+    if (!allowed) {
+      return { ok: false, error: `Chemin non autorisé : ${romPath}` };
+    }
+    const data = await fs.promises.readFile(resolved);
+    return { ok: true, dataB64: data.toString('base64') };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
 });
 
 ipcMain.handle('get-emulators', async () => {

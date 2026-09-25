@@ -44,6 +44,9 @@ export const API = {
   checkBios: () => ipcRenderer.invoke('check-bios'),
   launchGame: (game: Game, emulatorId?: string): Promise<{ success: boolean; message: string }> =>
     ipcRenderer.invoke('launch-game', game, emulatorId),
+  // Lecture directe d'une ROM (base64) pour le lecteur intégré EmulatorJS
+  readRomFile: (romPath: string): Promise<{ ok: boolean; dataB64?: string; error?: string }> =>
+    ipcRenderer.invoke('read-rom-file', romPath),
   getEmulators: (): Promise<EmulatorProfile[]> => ipcRenderer.invoke('get-emulators'),
   saveEmulators: (emulators: EmulatorProfile[]): Promise<EmulatorProfile[]> => ipcRenderer.invoke('save-emulators', emulators),
   detectEmulators: (): Promise<EmulatorProfile[]> => ipcRenderer.invoke('detect-emulators'),
