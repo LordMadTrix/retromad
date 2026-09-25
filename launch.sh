@@ -80,4 +80,15 @@ if [ "$1" == "--build" ] || [ "$1" == "--prod" ] \
 fi
 
 echo -e "${GREEN}[*] Lancement de RetroMad...${NC}"
-ELECTRON_FORCE_PROD=1 exec npx electron .
+
+# Contournement NVIDIA : sur certaines configurations (driver nvidia-drm),
+# le processus GPU d'Electron plante (SIGSEGV) -> écran noir/fermeture.
+# Le rendu logiciel est activé si un premier essai GPU échoue.
+ELECTRON_FORCE_PROD=1 npx electron . "$@"
+RC=$?
+if [ "$RC" -ne 0 ] && [ -n "${DISPLAY:-}" ]; then
+    echo -e "${YELLOW}[!] Plantage GPU détecté, nouvelle tentative en rendu logiciel...${NC}"
+    ELECTRON_FORCE_PROD=1 LIBGL_ALWAYS_SOFTWARE=1 npx electron . --disable-gpu "$@"
+    RC=$?
+fi
+exit $RC

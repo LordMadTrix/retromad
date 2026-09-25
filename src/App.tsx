@@ -905,12 +905,25 @@ export const App: React.FC = () => {
   };
 
   // Lance le lecteur intégré (EmulatorJS). En mode bureau, la ROM est lue
-  // depuis le disque via IPC et passée en blob: au lecteur.
+  // depuis le disque via IPC et passée en blob: au lecteur (il n'y a pas de
+  // serveur web en desktop : les chemins /roms/... ou absolus sont traduits
+  // en fichier réel avant lecture).
   const launchWithIntegratedPlayer = async (game: Game) => {
+    const readRom = (window.api as any)?.readRomFile;
     try {
-      const isLocalFile = !!game.path && !game.path.startsWith('/') && !game.path.startsWith('http') && !game.path.startsWith('blob:');
-      if (typeof (window.api as any)?.readRomFile === 'function' && isLocalFile) {
-        const res = await (window.api as any).readRomFile(game.path);
+      if (typeof readRom === 'function' && game.path && !game.path.startsWith('http') && !game.path.startsWith('blob:')) {
+        // Traduire le chemin en fichier disque réel :
+        //  - chemin absolu (scan desktop) → tel quel
+        //  - chemin web /roms/... (scan web partagé) → romsDir + suffixe
+        let candidate = game.path;
+        if (!candidate.startsWith('/') || candidate.startsWith('/roms/')) {
+          const romsDir = (settings.romsDir || '').replace(/\/$/, '');
+          if (romsDir) {
+            const suffix = candidate.startsWith('/roms/') ? candidate.slice('/roms/'.length) : candidate;
+            candidate = `${romsDir}/${suffix.replace(/^\//, '')}`;
+          }
+        }
+        const res = await readRom(candidate);
         if (res?.ok && res.dataB64) {
           const bytes = Uint8Array.from(atob(res.dataB64), (c) => c.charCodeAt(0));
           const blob = new Blob([bytes], { type: 'application/octet-stream' });
@@ -918,8 +931,7 @@ export const App: React.FC = () => {
           setWebEmulatorGame({ ...game, path: url });
           return;
         }
-        showNotification(`ROM illisible : ${res?.error || 'erreur inconnue'}`, 'error');
-        return;
+        console.warn('[RetroMad] Lecture ROM échouée :', res?.error, candidate);
       }
     } catch (e: any) {
       console.warn('[RetroMad] Lecture ROM via IPC impossible, tentative URL directe :', e);
