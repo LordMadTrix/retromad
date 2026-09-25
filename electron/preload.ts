@@ -1,6 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company } from './types';
 
+// Marqueur d'environnement bureau (différencie Electron du mode navigateur/web)
+contextBridge.exposeInMainWorld('isElectron', true);
+
 export const API = {
   // Paramètres
   getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('get-settings'),

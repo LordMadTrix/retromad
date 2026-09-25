@@ -1969,6 +1969,70 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     />
                   </div>
 
+                  {/* Effets visuels d'ambiance (performance) */}
+                  <div className="pt-3 border-t border-slate-800 space-y-2">
+                    <div>
+                      <span className="text-xs font-bold text-white block">Effets Visuels d'Ambiance (Kiosque)</span>
+                      <span className="text-[11px] text-slate-400 block">
+                        Ajoutez ou retirez les effets d'ambiance. Désactivez-les pour plus de fluidité sur une machine modeste.
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-200 block">🎬 Vidéos de fond des firmes</span>
+                        <span className="text-[10px] text-slate-400 block">Archives YouTube/MP4 derrière les cartes (1 seule active à la fois).</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={formSettings.kioskBackgroundVideos !== false}
+                        onChange={(e) => setFormSettings({ ...formSettings, kioskBackgroundVideos: e.target.checked })}
+                        className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-200 block">✨ Halos lumineux néon</span>
+                        <span className="text-[10px] text-slate-400 block">Lueurs colorées aux couleurs des firmes et consoles.</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={formSettings.kioskNeonGlows !== false}
+                        onChange={(e) => setFormSettings({ ...formSettings, kioskNeonGlows: e.target.checked })}
+                        className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-200 block">🌀 Animations & transitions</span>
+                        <span className="text-[10px] text-slate-400 block">Zooms, apparitions en fondu et transitions de focus.</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={formSettings.kioskAnimations !== false}
+                        onChange={(e) => setFormSettings({ ...formSettings, kioskAnimations: e.target.checked })}
+                        className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                      <div>
+                        <span className="text-[11px] font-bold text-amber-200 block">⚡ Performance automatique</span>
+                        <span className="text-[10px] text-slate-400 block">Coupe les effets ci-dessus si les FPS restent sous 30 pendant 8 secondes.</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        onChange={(e) => {
+                          try {
+                            localStorage.setItem('retromad_auto_performance', e.target.checked ? 'true' : 'false');
+                          } catch {
+                            /* noop */
+                          }
+                        }}
+                        className="w-4 h-4 accent-amber-400 rounded cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
                   {/* Atelier & Thèmes Communautaires */}
                   <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>

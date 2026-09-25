@@ -109,7 +109,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                   {selectedCompany.famousFranchises.map((franchise, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-slate-700/80 text-xs font-semibold text-white shadow"
+                      className="px-2.5 py-1 rounded-lg bg-black/75 border border-slate-700/80 text-xs font-semibold text-white shadow"
                     >
                       {franchise}
                     </span>
@@ -131,7 +131,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                     backgroundColor: selectedCompany.accentColor,
                     boxShadow: `0 0 25px ${selectedCompany.accentColor}77`,
                   }}
-                  className="px-5 py-2.5 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center space-x-2.5 hover:scale-105 active:scale-95 transition shadow-2xl border border-white/30 backdrop-blur-md group"
+                  className="px-5 py-2.5 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center space-x-2.5 hover:scale-105 active:scale-95 transition shadow-2xl border border-white/30 bg-white/5 group"
                 >
                   <Landmark className="w-4 h-4 text-white group-hover:rotate-6 transition-transform" />
                   <span>Musée Virtuel de {selectedCompany.name}</span>
@@ -141,7 +141,7 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
                 {!isKioskMode && onEditCompany && (
                   <button
                     onClick={() => onEditCompany(selectedCompany)}
-                    className="px-4 py-2.5 rounded-2xl bg-black/50 hover:bg-black/70 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-500 text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md"
+                    className="px-4 py-2.5 rounded-2xl bg-black/60 hover:bg-black/75 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-500 text-xs font-bold transition flex items-center space-x-2 shadow"
                     title={`Éditer les données, le musée et les vidéos de ${selectedCompany.name}`}
                   >
                     <Pencil className="w-3.5 h-3.5 text-cyan-400" />

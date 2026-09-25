@@ -88,6 +88,8 @@ import { ArcadeSpeedrunModal } from './components/retro/ArcadeSpeedrunModal';
 import { VirtualCartridgeShelfModal } from './components/retro/VirtualCartridgeShelfModal';
 import { SaveStateSyncModal } from './components/extended/SaveStateSyncModal';
 import { QuickStartOnboardingModal } from './components/QuickStartOnboardingModal';
+import { WebEmulatorModal } from './components/WebEmulatorModal';
+import { useAutoPerformance } from './hooks/useAutoPerformance';
 import {
   INITIAL_CENTRALIZED_ROMS,
   INITIAL_CENTRALIZED_BIOS,
@@ -190,6 +192,16 @@ export const App: React.FC = () => {
   const [directEditingSystem, setDirectEditingSystem] = useState<System | null>(null);
   const [directEditingCompany, setDirectEditingCompany] = useState<Company | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Lecteur d'émulation web (navigateur sans Electron) : ROM jouée via EmulatorJS
+  const [webEmulatorGame, setWebEmulatorGame] = useState<Game | null>(null);
+
+  // Mode performance automatique : coupe les effets si la machine sature.
+  // Les choix manuels de l'utilisateur (réglages) restent prioritaires : on
+  // n'applique la bascule auto que si l'option correspondante est sur "activé".
+  const { lowPerformance } = useAutoPerformance(30, 4000);
+  const effBackgroundVideos = settings.kioskBackgroundVideos !== false && !lowPerformance;
+  const effNeonGlows = settings.kioskNeonGlows !== false && !lowPerformance;
+  const effAnimations = settings.kioskAnimations !== false && !lowPerformance;
   const [isExtensionsModalOpen, setIsExtensionsModalOpen] = useState(false);
   const [isScrapingBatch, setIsScrapingBatch] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -868,8 +880,11 @@ export const App: React.FC = () => {
       }
     });
 
-    if (!window.api) {
-      showNotification(`Simulation de lancement de "${game.cleanTitle}"`, 'info');
+    // window.api existe aussi en mode web (simulation) : on détecte le vrai bureau
+    // Electron via le flag exposé par le preload, sinon émulation web EmulatorJS.
+    const isDesktop = typeof window !== 'undefined' && !!(window as any).isElectron;
+    if (!isDesktop) {
+      setWebEmulatorGame(game);
       return;
     }
 
@@ -1296,6 +1311,9 @@ export const App: React.FC = () => {
           soundVolume={settings.soundVolume ?? 0.8}
           crtEnabled={!!settings.crtEffect}
           onToggleCrt={handleToggleCrt}
+          backgroundVideos={effBackgroundVideos}
+          neonGlows={effNeonGlows}
+          animations={effAnimations}
         />
       ) : (
         <>
@@ -2376,6 +2394,11 @@ export const App: React.FC = () => {
       />
 
       {/* SCANNER DE RÉPERTOIRE & AJOUT DE ROMS INTERACTIF */}
+      {/* Lecteur d'émulation web (mode navigateur) */}
+      {webEmulatorGame && (
+        <WebEmulatorModal game={webEmulatorGame} onClose={() => setWebEmulatorGame(null)} />
+      )}
+
       <RomScannerModal
         isOpen={isRomScannerOpen}
         onClose={() => setIsRomScannerOpen(false)}

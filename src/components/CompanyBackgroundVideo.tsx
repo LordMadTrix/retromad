@@ -21,6 +21,8 @@ interface CompanyBackgroundVideoProps {
   mode?: 'banner' | 'card' | 'mini';
   className?: string;
   defaultMuted?: boolean;
+  /** Si false (cartes non focalisées), aucune vidéo n'est montée : simple miniature statique. */
+  active?: boolean;
 }
 
 const YouTubeBadgeIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
@@ -280,6 +282,7 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
   mode = 'banner',
   className = '',
   defaultMuted = true,
+  active = true,
 }) => {
   const [isMuted, setIsMuted] = useState(defaultMuted);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -303,7 +306,7 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
+    let animId: number = 0;
     let step = 0;
 
     const render = () => {
@@ -344,12 +347,19 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
       animId = requestAnimationFrame(render);
     };
 
+    if (!active) {
+      // Carte non focalisée : une seule frame statique, pas de boucle rAF (économie CPU/GPU)
+      render();
+      if (animId) cancelAnimationFrame(animId);
+      return;
+    }
+
     render();
 
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [company.accentColor]);
+  }, [company.accentColor, active]);
 
   // Extraire ID YouTube ou URL directe
   const rawVideoUrl = company.videoUrl || videoConfig.videoUrl;
@@ -433,8 +443,9 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
         {/* Canvas raster réactif */}
         <canvas ref={canvasRef} width={320} height={400} className="absolute inset-0 w-full h-full object-cover opacity-30" />
 
-        {/* Vidéo MP4 directe si configurée */}
-        {rawVideoUrl ? (
+        {/* Chargement différé : la vidéo n'est montée QUE sur la carte focalisée (active)
+            pour éviter de lancer 30 lecteurs vidéo simultanés qui ralentissent toute la page. */}
+        {active && rawVideoUrl ? (
           <video
             src={rawVideoUrl}
             autoPlay
@@ -443,13 +454,22 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
             playsInline
             className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-55 transition-opacity duration-500 scale-105"
           />
-        ) : currentYoutubeId ? (
-          /* Vidéo YouTube d'archive en boucle */
+        ) : active && currentYoutubeId ? (
+          /* Vidéo YouTube d'archive en boucle (uniquement sur la carte focalisée) */
           <iframe
             src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${currentYoutubeId}&playsinline=1&rel=0`}
             title={`Vidéo de fond ${company.name}`}
             className="absolute inset-0 w-[160%] h-[160%] -top-[30%] -left-[30%] object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none border-0"
             allow="autoplay; encrypted-media"
+          />
+        ) : currentYoutubeId ? (
+          /* Miniature statique instantanée : aucun coût vidéo, rendu immédiat */
+          <img
+            src={`https://img.youtube.com/vi/${currentYoutubeId}/hqdefault.jpg`}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover opacity-30 transition-opacity duration-500"
+            referrerPolicy="no-referrer"
+            loading="lazy"
           />
         ) : null}
 
@@ -540,7 +560,7 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
               prev === 'vivid' ? 'cinema' : prev === 'cinema' ? 'subtle' : 'vivid'
             );
           }}
-          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border backdrop-blur-md transition shadow text-xs font-semibold cursor-pointer ${
+          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border bg-black/40 transition shadow text-xs font-semibold cursor-pointer ${
             bgOpacityLevel === 'cinema'
               ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
               : bgOpacityLevel === 'vivid'
@@ -560,7 +580,7 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
           <button
             type="button"
             onClick={() => setIsCinemaMode(true)}
-            className="p-2 rounded-xl bg-black/60 text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-500 backdrop-blur-md transition shadow cursor-pointer"
+            className="p-2 rounded-xl bg-black/70 text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-500 transition shadow cursor-pointer"
             title="Agrandir la vidéo YouTube (Plein écran avec son)"
           >
             <Maximize2 className="w-3.5 h-3.5" />

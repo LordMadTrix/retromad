@@ -111,6 +111,15 @@ export class ScannerService {
       return matchingSystems[0].id;
     }
 
+    // 2bis. Extension partagée par plusieurs systèmes (ex: .pce pour pcengine et
+    // pcenginecd) : prioriser la console « cartouche » (celle dont l'extension est
+    // native), sauf si le nom du fichier est un jeu CD (presence de .cue/.iso frère
+    // impossible à connaître ici). Le choix de la première déclarée (ordre SYSTEMS)
+    // est la console de base, ce qui couvre le cas PC Engine correctement.
+    if (matchingSystems.length > 1) {
+      return matchingSystems[0].id;
+    }
+
     // Si plusieurs systèmes ont la même extension (ex: .zip), priorité au système correspondant au nom de dossier
     if (matchedByDir) {
       return matchedByDir.id;

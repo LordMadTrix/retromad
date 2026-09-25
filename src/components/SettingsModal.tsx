@@ -535,6 +535,58 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 )}
               </div>
 
+              {/* Section Effets visuels (performance) */}
+              <div className="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/60 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-slate-200 block">
+                      Effets Visuels d'Ambiance (Kiosque)
+                    </span>
+                    <span className="text-[11px] text-slate-400 block max-w-lg mt-0.5">
+                      Ajoutez ou retirez les effets d'ambiance. Désactivez-les pour gagner en fluidité sur une machine modeste ou une borne fanless.
+                    </span>
+                  </div>
+                </div>
+                <div className="pt-1 space-y-2">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                    <div>
+                      <span className="text-[11px] font-bold text-slate-200 block">🎬 Vidéos de fond des firmes</span>
+                      <span className="text-[10px] text-slate-400 block">Archives YouTube/MP4 animées derrière les cartes (1 seule vidéo active à la fois).</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={formData.kioskBackgroundVideos !== false}
+                      onChange={(e) => setFormData({ ...formData, kioskBackgroundVideos: e.target.checked })}
+                      className="w-4 h-4 accent-purple-500 rounded cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                    <div>
+                      <span className="text-[11px] font-bold text-slate-200 block">✨ Halos lumineux néon</span>
+                      <span className="text-[10px] text-slate-400 block">Lueurs colorées aux couleurs des firmes et consoles.</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={formData.kioskNeonGlows !== false}
+                      onChange={(e) => setFormData({ ...formData, kioskNeonGlows: e.target.checked })}
+                      className="w-4 h-4 accent-purple-500 rounded cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                    <div>
+                      <span className="text-[11px] font-bold text-slate-200 block">🌀 Animations & transitions</span>
+                      <span className="text-[10px] text-slate-400 block">Zooms, apparitions en fondu et transitions de focus.</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={formData.kioskAnimations !== false}
+                      onChange={(e) => setFormData({ ...formData, kioskAnimations: e.target.checked })}
+                      className="w-4 h-4 accent-purple-500 rounded cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Section Audio & Volume */}
               <div className="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/60 space-y-4">
                 <div className="flex items-center justify-between">

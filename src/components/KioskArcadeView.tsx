@@ -51,6 +51,10 @@ interface KioskArcadeViewProps {
   soundVolume?: number;
   crtEnabled?: boolean;
   onToggleCrt?: () => void;
+  /** Effets visuels désactivables (voir Réglages > Apparence) */
+  backgroundVideos?: boolean;
+  neonGlows?: boolean;
+  animations?: boolean;
 }
 
 type KioskStep = 'companies' | 'consoles' | 'games';
@@ -217,6 +221,9 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   soundVolume = 0.8,
   crtEnabled = false,
   onToggleCrt,
+  backgroundVideos = true,
+  neonGlows = true,
+  animations = true,
 }) => {
   // Navigation hiérarchique Kiosk à 3 niveaux : Firmes -> Consoles -> ROMs
   const [step, setStep] = useState<KioskStep>('companies');
@@ -252,13 +259,22 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   }, [systems, selectedCompany]);
 
   // Jeux de la console sélectionnée (avec filtre favoris optionnel)
+  // Tri : derniers joués d'abord (reprise rapide), puis favoris, puis alphabétique
   const consoleGames = useMemo(() => {
     if (!selectedSystem) return [];
     let list = games.filter((g) => g.systemId === selectedSystem.id);
     if (kioskFavoritesOnly) {
       list = list.filter((g) => g.favorite);
     }
-    return list;
+    return [...list].sort((a, b) => {
+      const ra = a.lastPlayed || '';
+      const rb = b.lastPlayed || '';
+      if (ra && rb && ra !== rb) return rb.localeCompare(ra); // récents d'abord
+      if (ra && !rb) return -1;
+      if (!ra && rb) return 1;
+      if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
+      return (a.cleanTitle || '').localeCompare(b.cleanTitle || '');
+    });
   }, [games, selectedSystem, kioskFavoritesOnly]);
 
   const currentGame = consoleGames[gameIndex] || consoleGames[0] || null;
@@ -848,36 +864,41 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     borderColor: isFocused ? company.accentColor : 'rgba(51, 65, 85, 0.6)',
                     boxShadow: isFocused ? `0 0 25px ${company.accentColor}55` : undefined,
                   }}
-                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px] sm:min-h-[180px]' : 'p-3.5 sm:p-5 min-h-[200px] sm:min-h-[250px]'} flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
+                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px] sm:min-h-[180px]' : 'p-3.5 sm:p-5 min-h-[200px] sm:min-h-[250px]'} flex flex-col items-center justify-between text-center ${animations ? 'transition-[transform,background-color,border-color,opacity,box-shadow] duration-300' : ''} cursor-pointer overflow-hidden ${
                     isFocused
-                      ? 'bg-slate-900/95 scale-102 sm:scale-105 border-2 z-10'
-                      : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100'
+                      ? `bg-slate-900/95 border-2 z-10 ${animations ? 'scale-102 sm:scale-105' : ''}`
+                      : `bg-slate-900/60 hover:bg-slate-900/80 border ${animations ? 'hover:scale-102' : ''} opacity-90 hover:opacity-100`
                   }`}
                 >
-                  {/* Vidéo de fond de l'encadré de la firme */}
-                  <CompanyBackgroundVideo company={company} mode="card" />
+                  {/* Vidéo de fond : uniquement sur la carte focalisée, et seulement si l'effet est activé */}
+                  <CompanyBackgroundVideo company={company} mode="card" active={isFocused && backgroundVideos} />
 
-                  {/* Halo lumineux d'arrière-plan avec la couleur de la firme */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-15 blur-2xl transition-opacity group-hover:opacity-30 pointer-events-none"
-                    style={{ backgroundColor: company.accentColor }}
-                  />
+                  {/* Halo lumineux d'arrière-plan avec la couleur de la firme
+                      (dégradé radial au lieu de blur: rendu GPU en une seule passe) */}
+                  {neonGlows && (
+                    <div
+                      className={`absolute inset-0 rounded-3xl opacity-15 ${animations ? 'transition-opacity group-hover:opacity-30' : ''} pointer-events-none`}
+                      style={{
+                        background: `radial-gradient(ellipse at 50% 30%, ${company.accentColor}66 0%, transparent 70%)`,
+                      }}
+                    />
+                  )}
 
                   {/* Contenu de la carte positionné au-dessus de la vidéo */}
                   <div className="relative z-10 w-full flex flex-col items-center justify-between flex-1">
                     {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND */}
-                    <div className="w-full h-16 sm:h-20 flex items-center justify-center my-1 sm:my-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                    <div className="w-full h-16 sm:h-20 flex items-center justify-center my-1 sm:my-2 transition-transform duration-300 group-hover:scale-110">
                       <CompanyLogo companyId={company.id} size="xl" />
                     </div>
 
                     {/* Nom de la firme */}
-                    <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-wider mb-1 drop-shadow">
+                    <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-wider mb-1">
                       {company.name}
                     </h3>
 
                     {/* Badges de statistiques */}
                     <div className="flex items-center space-x-2 my-1 sm:my-2">
-                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-[10px] sm:text-[11px] font-bold text-slate-200 shadow">
+                      <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-900/80 border border-slate-700 text-[10px] sm:text-[11px] font-bold text-slate-200 shadow">
                         {consoleCount} Console{consoleCount > 1 ? 's' : ''}
                       </span>
                       <span
@@ -886,7 +907,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                           borderColor: romCount > 0 ? `${company.accentColor}70` : undefined,
                           color: romCount > 0 ? company.accentColor : '#94a3b8',
                         }}
-                        className="px-2.5 py-0.5 sm:py-1 rounded-xl border text-[10px] sm:text-[11px] font-black backdrop-blur-md shadow"
+                        className="px-2.5 py-0.5 sm:py-1 rounded-xl border text-[10px] sm:text-[11px] font-black shadow"
                       >
                         {romCount} ROM{romCount > 1 ? 's' : ''}
                       </span>
@@ -894,7 +915,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
                     {/* Citation / Mascotte */}
                     {heroes.length > 0 && (
-                      <div className="mt-1 text-[10px] text-slate-300 italic line-clamp-1 drop-shadow">
+                      <div className="mt-1 text-[10px] text-slate-300 italic line-clamp-1">
                         "{heroes[0].quote}"
                       </div>
                     )}
@@ -911,7 +932,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                       className={`w-full py-2 sm:py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
                         isFocused
                           ? 'shadow-neon font-black'
-                          : 'bg-slate-900/80 backdrop-blur-md group-hover:bg-slate-800 text-slate-200 border border-slate-700'
+                          : 'bg-slate-900/80 group-hover:bg-slate-800 text-slate-200 border border-slate-700'
                       }`}
                     >
                       <span>Consoles {company.name}</span>
@@ -930,7 +951,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                         backgroundColor: isFocused ? `${company.accentColor}25` : 'rgba(15, 23, 42, 0.7)',
                         color: isFocused ? '#ffffff' : '#cbd5e1',
                       }}
-                      className="w-full py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border shadow backdrop-blur-md hover:scale-102 hover:text-white group/mus"
+                      className="w-full py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border shadow hover:scale-102 hover:text-white group/mus"
                       title={`Découvrir l'histoire complète, les fondateurs et archives de ${company.name} (Touche Y ou M)`}
                     >
                       <Landmark className="w-3.5 h-3.5 text-amber-400 group-hover/mus:rotate-6 transition-transform" />
@@ -957,7 +978,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   color: '#ffffff',
                   boxShadow: `0 0 25px ${companies[companyIndex].accentColor}44`,
                 }}
-                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md group"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer group"
               >
                 <Landmark className="w-4 h-4 text-amber-400 group-hover:rotate-6 transition-transform" />
                 <span>Visiter le Grand Musée Virtuel de {companies[companyIndex].name}</span>
@@ -997,7 +1018,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   borderColor: `${selectedCompany.accentColor}70`,
                   boxShadow: `0 0 15px ${selectedCompany.accentColor}33`,
                 }}
-                className="px-3.5 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 backdrop-blur-md hover:scale-105 active:scale-95 shadow"
+                className="px-3.5 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 hover:scale-105 active:scale-95 shadow"
                 title={`Explorer le Musée historique complet de ${selectedCompany.name}`}
               >
                 <Landmark className="w-3.5 h-3.5 text-amber-400" />
@@ -1028,17 +1049,21 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     borderColor: isFocused ? sys.themeColor : 'rgba(51, 65, 85, 0.6)',
                     boxShadow: isFocused ? `0 0 25px ${sys.themeColor}55` : undefined,
                   }}
-                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px]' : 'p-3.5 sm:p-5 min-h-[220px]'} flex flex-col items-center justify-between text-center transition-all duration-300 cursor-pointer overflow-hidden ${
+                  className={`group relative rounded-2xl sm:rounded-3xl ${isCompactFit ? 'p-2.5 sm:p-3 min-h-[160px]' : 'p-3.5 sm:p-5 min-h-[220px]'} flex flex-col items-center justify-between text-center ${animations ? 'transition-[transform,background-color,border-color,opacity,box-shadow] duration-300' : ''} cursor-pointer overflow-hidden ${
                     isFocused
-                      ? 'bg-slate-900/95 scale-102 sm:scale-105 border-2 z-10'
-                      : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100'
+                      ? `bg-slate-900/95 border-2 z-10 ${animations ? 'scale-102 sm:scale-105' : ''}`
+                      : `bg-slate-900/60 hover:bg-slate-900/80 border ${animations ? 'hover:scale-102' : ''} opacity-90 hover:opacity-100`
                   }`}
                 >
-                  {/* Halo lumineux d'arrière-plan de la console */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-15 blur-2xl transition-opacity group-hover:opacity-30 pointer-events-none"
-                    style={{ backgroundColor: sys.themeColor }}
-                  />
+                  {/* Halo lumineux d'arrière-plan de la console (dégradé radial, sans blur) */}
+                  {neonGlows && (
+                    <div
+                      className={`absolute inset-0 rounded-3xl opacity-15 ${animations ? 'transition-opacity group-hover:opacity-30' : ''} pointer-events-none`}
+                      style={{
+                        background: `radial-gradient(ellipse at 50% 30%, ${sys.themeColor}66 0%, transparent 70%)`,
+                      }}
+                    />
+                  )}
 
                   {/* Vrai Logo Haute Définition de la Console EN GRAND */}
                   <div className={`w-full ${isCompactFit ? 'h-12 sm:h-14' : 'h-14 sm:h-18'} flex items-center justify-center my-1 p-1 transition-transform duration-300 group-hover:scale-110`}>
@@ -1132,7 +1157,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 backgroundColor: `${selectedCompany.accentColor}25`,
                 borderColor: `${selectedCompany.accentColor}70`,
               }}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow backdrop-blur-md hover:scale-105 active:scale-95 cursor-pointer"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow hover:scale-105 active:scale-95 cursor-pointer"
               title={`Consulter le Grand Musée de la firme ${selectedCompany.name}`}
             >
               <Landmark className="w-4 h-4 text-amber-400" />
@@ -1169,11 +1194,15 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
               <>
                 {/* Colonne Gauche : Grande Jaquette 3D & Reflet au sol */}
                 <div className="flex flex-col items-center justify-center w-full md:w-1/2 max-w-sm relative group shrink-0">
-                  {/* Effet halo lumineux néon aux couleurs de la console */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-40 blur-3xl transition-colors duration-500 pointer-events-none"
-                    style={{ backgroundColor: selectedSystem.themeColor }}
-                  />
+                  {/* Effet halo lumineux néon aux couleurs de la console (dégradé radial, sans blur) */}
+                  {neonGlows && (
+                    <div
+                      className="absolute inset-0 rounded-3xl opacity-40 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(ellipse at 50% 40%, ${selectedSystem.themeColor}80 0%, transparent 70%)`,
+                      }}
+                    />
+                  )}
 
                   <div className={`relative aspect-[3/4] ${isCompactFit ? 'w-32 sm:w-44 max-h-[20vh] sm:max-h-[24vh] p-1.5' : 'w-36 sm:w-48 md:w-56 lg:w-64 max-h-[24vh] sm:max-h-[30vh] md:max-h-[36vh] p-2 sm:p-3'} rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105`}>
                     {currentGame.media?.boxart2d && !failedImageIds.has(currentGame.id) ? (
@@ -1203,7 +1232,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                           backgroundColor: 'rgba(11, 13, 20, 0.85)',
                           borderColor: `${selectedSystem.themeColor}77`,
                         }}
-                        className="px-2 py-0.5 sm:py-1 rounded-xl border backdrop-blur-md shadow-2xl flex items-center justify-center max-w-[130px]"
+                        className="px-2 py-0.5 sm:py-1 rounded-xl border shadow-2xl flex items-center justify-center max-w-[130px]"
                       >
                         <ConsoleLogo system={selectedSystem} size="md" />
                       </div>

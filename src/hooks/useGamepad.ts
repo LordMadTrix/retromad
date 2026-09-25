@@ -148,6 +148,7 @@ export function useGamepad(handlers: GamepadHandlers, enabled = true) {
     if (!enabled) return;
 
     let animFrameId: number;
+    let frameCount = 0;
 
     const checkGamepad = () => {
       const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -203,6 +204,14 @@ export function useGamepad(handlers: GamepadHandlers, enabled = true) {
 
         // Select / R3 pour jeu au hasard
         trigger('onRandom', !!(gp.buttons[8]?.pressed || gp.buttons[11]?.pressed));
+      }
+
+      // Polling à ~30 Hz (une frame sur deux) : amplement suffisant vu les
+      // délais anti-rebond (150-280 ms), et divise le coût CPU par 2.
+      frameCount++;
+      if (frameCount % 2 === 0) {
+        animFrameId = requestAnimationFrame(checkGamepad);
+        return;
       }
 
       animFrameId = requestAnimationFrame(checkGamepad);

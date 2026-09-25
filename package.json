@@ -5,7 +5,9 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.electron.json",
+    "build:web": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "lint": "tsc --noEmit",
     "test": "npx tsx test/verify.ts"

@@ -425,6 +425,68 @@ export async function scanPublicRomsManifest(): Promise<{
   const added: Game[] = [];
   let skippedDeleted = 0;
 
+  // 1) Index des vraies ROMs présentes sur le disque (généré par Vite : _index.json)
+  try {
+    const res = await fetch('/roms/_index.json');
+    if (res.ok) {
+      const data = await res.json();
+      const files: Array<{ path: string; filename: string; size: number }> = data.files || [];
+
+      for (const f of files) {
+        if (isGameDeleted(undefined, f.filename)) {
+          skippedDeleted++;
+          continue;
+        }
+
+        // Détecter le système depuis le chemin (ex: /nintendo/nes/...)
+        const system = detectSystem(f.path);
+        if (!system) continue;
+
+        // Chemin web complet servi par Vite : public/roms/* -> /roms/*
+        const webPath = `/roms${f.path}`;
+
+        const dotIndex = f.filename.lastIndexOf('.');
+        const ext = dotIndex > 0 ? f.filename.substring(dotIndex).toLowerCase() : '.bin';
+        const { cleanTitle, region } = cleanGameTitle(f.filename);
+        // ID unique : inclut le chemin encodé (2 fichiers peuvent avoir le même
+        // nom nettoyé et la même taille, ex: Zelda 2 PRG 0 / PRG 2)
+        const pathSlug = f.path.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(-48);
+
+        added.push({
+          id: `rom_${system.id}_${pathSlug}`,
+          systemId: system.id,
+          title: dotIndex > 0 ? f.filename.substring(0, dotIndex) : f.filename,
+          cleanTitle,
+          path: webPath,
+          filename: f.filename,
+          extension: ext,
+          size: f.size,
+          region,
+          favorite: false,
+          playCount: 0,
+          playTimeMinutes: 0,
+          metadata: {
+            developer: system.name,
+            publisher: system.name,
+            releaseDate: '1990-01-01',
+            genres: [system.defaultGenre || 'Action'],
+            players: '1-2',
+            rating: 90,
+            synopsis: `ROM servie par le serveur web (${system.name}).`,
+          },
+          media: {},
+        });
+      }
+
+      if (added.length > 0) {
+        return { added, skippedDeleted, totalScanned: files.length };
+      }
+    }
+  } catch {
+    // Repli sur le manifest statique ci-dessous
+  }
+
+  // 2) Repli : manifest statique (ROMs de démonstration)
   try {
     const res = await fetch('/roms/roms_manifest.json');
     if (!res.ok) {

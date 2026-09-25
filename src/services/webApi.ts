@@ -2,15 +2,34 @@ import { SYSTEMS } from '../../electron/data/systems';
 import { COMPANIES } from '../../electron/data/companies';
 import { BUILTIN_EMULATORS } from '../../electron/data/emulators';
 import { ALL_BIOS_DEFINITIONS } from '../../electron/data/biosData';
-import { AppSettings, BiosStatus, EmulatorProfile, ExtensionInfo, ExtensionProgress, Game } from '../types';
+import { AppSettings, BiosStatus, Company, EmulatorProfile, ExtensionInfo, ExtensionProgress, Game, System } from '../types';
 import {
   getStoredGames,
   saveStoredGames,
   filterOutDeletedGames,
 } from './romStorage';
-import { scanPublicRomsManifest } from './romScanner';
+import { scanPublicRomsManifest, SYSTEM_MAPPINGS } from './romScanner';
 
 const STORAGE_KEY_SETTINGS = 'retromad_web_settings';
+
+/**
+ * Charge une collection depuis le cache localStorage (modifications admin en mode web),
+ * avec repli sur les données par défaut si absente ou corrompue.
+ */
+function loadCached<T>(key: string, fallback: T[]): T[] {
+  try {
+    const saved = localStorage.getItem(`retromad_${key}_cache`);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Fallback
+  }
+  return fallback;
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
   romsDir: '~/RetroMad/Roms',
@@ -374,11 +393,11 @@ export function createWebApi() {
     },
 
     getSystems: async () => {
-      return SYSTEMS;
+      return loadCached('systems', SYSTEMS);
     },
 
     getCompanies: async () => {
-      return COMPANIES;
+      return loadCached('companies', COMPANIES);
     },
 
     getGames: async (): Promise<Game[]> => {
@@ -426,9 +445,32 @@ export function createWebApi() {
 
     scrapeGame: async (game: Game): Promise<Game> => {
       await new Promise((r) => setTimeout(r, 350));
+
+      // Scraping réel des jaquettes depuis le CDN libretro (sans clé API)
+      const mapping = SYSTEM_MAPPINGS.find((m) => m.id === game.systemId);
+      const media: Game['media'] = { ...game.media };
+      if (mapping?.libretroName) {
+        const baseUrl = `https://raw.githubusercontent.com/libretro-thumbnails/${mapping.libretroName}/master`;
+        const safeName = game.cleanTitle || game.title;
+        media.boxart2d = `${baseUrl}/Named_Boxarts/${encodeURIComponent(safeName)}.png`;
+        media.snap = `${baseUrl}/Named_Snaps/${encodeURIComponent(safeName)}.png`;
+        // Vérifier l'existence de la jaquette (le CDN renvoie 404 sinon)
+        try {
+          const probe = await fetch(media.boxart2d, { method: 'HEAD' });
+          if (!probe.ok) {
+            delete media.boxart2d;
+            delete media.snap;
+          }
+        } catch {
+          delete media.boxart2d;
+          delete media.snap;
+        }
+      }
+
       const current = loadGames();
       const updatedGame: Game = {
         ...game,
+        media,
         metadata: {
           ...game.metadata,
           rating: game.metadata?.rating || 90,
@@ -468,24 +510,45 @@ export function createWebApi() {
     },
 
     checkBios: async (): Promise<BiosStatus[]> => {
-      // Construction des statuts pour chaque BIOS référencé
-      const statuses: BiosStatus[] = ALL_BIOS_DEFINITIONS.map((def, idx) => {
-        // Simuler certains BIOS présents (les plus courants) et quelques-uns manquants
-        const isCommon = ['psx', 'gba', 'neogeo', 'snes', 'megadrive', 'genesis', 'arcade'].includes(def.systemId);
-        const found = isCommon || idx % 2 === 0;
-        return {
-          systemId: def.systemId,
-          systemName: def.systemName,
-          filename: def.filename,
-          description: def.description,
-          expectedMd5: def.md5,
-          found,
-          actualMd5: found ? def.md5 : undefined,
-          md5Match: found,
-          path: found ? `~/RetroMad/Bios/${def.filename}` : undefined,
-          optional: def.optional ?? false,
-        };
-      });
+      // Vérification réelle : le manifest central liste les BIOS attendus,
+      // et on teste leur présence effective via un fetch HEAD sur /bios/*.
+      let manifestFiles: Record<string, any> = {};
+      try {
+        const res = await fetch('/bios/bios_manifest.json');
+        if (res.ok) {
+          const data = await res.json();
+          manifestFiles = Object.fromEntries((data.biosList || []).map((b: any) => [b.filename, b]));
+        }
+      } catch {
+        // manifest indisponible : on continue avec les définitions seules
+      }
+
+      const statuses: BiosStatus[] = await Promise.all(
+        ALL_BIOS_DEFINITIONS.map(async (def) => {
+          let found = false;
+          // 1) présent dans le manifest central ET physiquement servi ?
+          if (manifestFiles[def.filename]) {
+            try {
+              const head = await fetch(`/bios/${encodeURIComponent(def.filename)}`, { method: 'HEAD' });
+              found = head.ok;
+            } catch {
+              found = false;
+            }
+          }
+          return {
+            systemId: def.systemId,
+            systemName: def.systemName,
+            filename: def.filename,
+            description: def.description,
+            expectedMd5: def.md5,
+            found,
+            actualMd5: found ? def.md5 : undefined,
+            md5Match: found,
+            path: found ? `/bios/${def.filename}` : undefined,
+            optional: def.optional ?? false,
+          } as BiosStatus;
+        })
+      );
       return statuses;
     },
 
@@ -512,7 +575,36 @@ export function createWebApi() {
     },
 
     getEmulators: async (): Promise<EmulatorProfile[]> => {
-      return BUILTIN_EMULATORS;
+      return loadCached('emulators', BUILTIN_EMULATORS);
+    },
+
+    // Persistance web des éditeurs admin (consoles / firmes / émulateurs)
+    // Electron passe par le filesystem ; le web stocke dans localStorage.
+    saveSystems: async (systems: System[]): Promise<boolean> => {
+      try {
+        localStorage.setItem('retromad_systems_cache', JSON.stringify(systems));
+        return true;
+      } catch {
+        return false;
+      }
+    },
+
+    saveCompanies: async (companies: Company[]): Promise<boolean> => {
+      try {
+        localStorage.setItem('retromad_companies_cache', JSON.stringify(companies));
+        return true;
+      } catch {
+        return false;
+      }
+    },
+
+    saveEmulators: async (emulators: EmulatorProfile[]): Promise<boolean> => {
+      try {
+        localStorage.setItem('retromad_emulators_cache', JSON.stringify(emulators));
+        return true;
+      } catch {
+        return false;
+      }
     },
 
     detectEmulators: async (): Promise<EmulatorProfile[]> => {

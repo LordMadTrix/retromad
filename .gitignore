@@ -6,3 +6,9 @@ release/
 .directory
 *.log
 .DS_Store
+
+# Métadonnées Freebuff
+.freebuff/
+
+# Index des ROMs généré automatiquement par Vite
+public/roms/_index.json

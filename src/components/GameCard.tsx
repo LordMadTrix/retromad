@@ -73,12 +73,13 @@ export const GameCard: React.FC<GameCardProps> = ({
   return (
     <div
       onClick={() => onSelect(game)}
+      onDoubleClick={() => onLaunch(game)}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsContextMenuOpen(true);
       }}
-      className={`arcade-card group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900/90 border transition-all duration-200 cursor-pointer select-none ${
+      className={`arcade-card group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900/90 border transition-[transform,border-color,box-shadow] duration-200 cursor-pointer select-none ${
         isSelected
           ? 'border-retro-accent shadow-[0_0_20px_rgba(0,242,254,0.45)] scale-[1.03] z-10'
           : 'border-slate-800 hover:border-retro-accent/60 hover:shadow-[0_0_18px_rgba(0,242,254,0.22)] hover:scale-[1.02]'
@@ -210,13 +211,13 @@ export const GameCard: React.FC<GameCardProps> = ({
           {system && (
             <span
               style={{ backgroundColor: `${system.themeColor}dd` }}
-              className="px-2 py-0.5 rounded-md text-[10px] font-black text-white uppercase tracking-wider shadow-md backdrop-blur-sm"
+              className="px-2 py-0.5 rounded-md text-[10px] font-black text-white uppercase tracking-wider shadow-md"
             >
               {system.shortName}
             </span>
           )}
           {game.region && (
-            <span className="px-1.5 py-0.5 rounded-md bg-slate-900/80 text-xs backdrop-blur-sm border border-slate-700/50">
+            <span className="px-1.5 py-0.5 rounded-md bg-slate-900/85 text-xs border border-slate-700/50">
               {getRegionBadge(game.region)}
             </span>
           )}
@@ -230,7 +231,7 @@ export const GameCard: React.FC<GameCardProps> = ({
               e.stopPropagation();
               setIsContextMenuOpen((p) => !p);
             }}
-            className="p-1.5 rounded-full bg-slate-900/70 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 backdrop-blur-sm transition"
+            className="p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition"
             title="Menu contextuel et genres"
           >
             <MoreVertical className="w-3.5 h-3.5" />
@@ -245,7 +246,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             className={`p-1.5 rounded-full transition ${
               game.favorite
                 ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
-                : 'bg-slate-900/70 text-slate-400 hover:text-rose-400 backdrop-blur-sm'
+                : 'bg-slate-900/80 text-slate-400 hover:text-rose-400'
             }`}
             title={game.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           >
@@ -254,7 +255,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         </div>
 
         {/* Overlay d'actions rapides au survol */}
-        <div className="absolute inset-0 bg-retro-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-3 p-4 backdrop-blur-[2px]">
+        <div className="absolute inset-0 bg-retro-900/85 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-3 p-4">
           <button
             onClick={(e) => {
               e.stopPropagation();

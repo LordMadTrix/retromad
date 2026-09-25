@@ -180,6 +180,10 @@ export interface AppSettings {
   bgmVolume?: number; // 0 to 1
   crtEffect?: boolean;
   crtShaderProfile?: 'arcade-15khz' | 'trinitron-pvm' | 'dmg-matrix' | 'gba-tft' | 'vectrex' | 'pure';
+  // Effets visuels d'ambiance (perf. : désactivables sur machines modestes)
+  kioskBackgroundVideos?: boolean; // Vidéos YouTube/MP4 de fond des cartes (défaut: activé)
+  kioskNeonGlows?: boolean; // Halos lumineux autour des cartes (défaut: activé)
+  kioskAnimations?: boolean; // Transitions et zooms au survol (défaut: activé)
   attractMode?: boolean; // Mode démonstration écran de veille Kiosk
   attractDelaySeconds?: number; // Délai d'inactivité avant Attract Mode (défaut: 60s)
   uiTheme: 'neon-dark' | 'arcade' | 'cyberpunk';

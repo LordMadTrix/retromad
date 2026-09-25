@@ -199,7 +199,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
       )}
 
       {/* ── Barre d'outils compacte ── */}
-      <div className="border-b border-slate-800 px-4 py-2.5 bg-slate-900/95 backdrop-blur shrink-0">
+      <div className="border-b border-slate-800 px-4 py-2.5 bg-slate-900 shrink-0">
 
         {/* Ligne 1 : titre + badge + barre de recherche et actions */}
         <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
@@ -328,7 +328,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
             <button
               key={col.id}
               onClick={() => setCollection(col.id as Collection)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
                 collection === col.id
                   ? 'bg-retro-accent/20 text-retro-accent border-retro-accent/50 shadow-[0_0_8px_rgba(0,242,254,0.18)]'
                   : 'bg-slate-800/40 text-slate-400 border-slate-700/40 hover:text-slate-200 hover:border-slate-600'

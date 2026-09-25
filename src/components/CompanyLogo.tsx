@@ -50,7 +50,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       src={logoSrc}
       alt={companyId}
       onError={handleError}
-      className={`${sizeClasses} ${className} max-w-full object-contain object-center transition-transform duration-200 drop-shadow-[0_4px_14px_rgba(0,0,0,0.6)]`}
+      className={`${sizeClasses} ${className} max-w-full object-contain object-center transition-transform duration-200`}
       loading="eager"
       decoding="sync"
     />

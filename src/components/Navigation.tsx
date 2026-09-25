@@ -167,7 +167,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   );
 
   return (
-    <header className="h-14 bg-slate-950/95 border-b border-slate-800 shadow-[0_4px_25px_rgba(0,0,0,0.5)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 z-30 select-none shrink-0 overflow-x-auto no-scrollbar backdrop-blur-md">
+    <header className="h-14 bg-slate-950 border-b border-slate-800 shadow-[0_4px_25px_rgba(0,0,0,0.5)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 z-30 select-none shrink-0 overflow-x-auto no-scrollbar">
 
       {/* ── PARTIE GAUCHE : Logo + Onglets Principaux + Menus Déroulants + Kiosque ── */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar py-1 shrink-0">
@@ -948,7 +948,7 @@ const NavBtn: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
       active
         ? 'bg-retro-accent/20 text-retro-accent border border-retro-accent/40 shadow-[0_0_8px_rgba(0,242,254,0.25)]'
         : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'

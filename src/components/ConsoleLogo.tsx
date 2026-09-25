@@ -73,7 +73,7 @@ export const ConsoleLogo: React.FC<ConsoleLogoProps> = ({
       alt={alt || displayName}
       loading="eager"
       onError={handleError}
-      className={`${sizeClasses} ${className} max-w-full shrink-0 object-contain object-center inline-block drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] filter transition-all duration-200 group-hover:brightness-110`}
+      className={`${sizeClasses} ${className} max-w-full shrink-0 object-contain object-center inline-block transition-[filter] duration-200 group-hover:brightness-110`}
     />
   );
 };
