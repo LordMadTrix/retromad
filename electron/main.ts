@@ -369,20 +369,46 @@ ipcMain.handle('read-rom-file', async (_, romPath: string) => {
     if (typeof romPath !== 'string' || romPath.includes('..')) {
       return { ok: false, error: 'Chemin invalide' };
     }
-    const resolved = path.resolve(romPath);
     const allowedRoots = [
       path.join(__dirname, '../public/roms'),
       storage.getSettings().romsDir || '',
-    ].filter(Boolean);
-    const allowed = allowedRoots.some((root) => {
-      const r = path.resolve(root);
-      return resolved === r || resolved.startsWith(r + path.sep);
-    });
-    if (!allowed) {
-      return { ok: false, error: `Chemin non autorisé : ${romPath}` };
+    ].filter(Boolean).map((r) => path.resolve(r));
+
+    const isAllowed = (resolved: string) =>
+      allowedRoots.some((root) => resolved === root || resolved.startsWith(root + path.sep));
+
+    // 1) Chemin tel quel (absolu ou traduit côté renderer)
+    const resolved = path.resolve(romPath);
+    if (isAllowed(resolved) && fs.existsSync(resolved)) {
+      const data = await fs.promises.readFile(resolved);
+      return { ok: true, dataB64: data.toString('base64') };
     }
-    const data = await fs.promises.readFile(resolved);
-    return { ok: true, dataB64: data.toString('base64') };
+
+    // 2) Chemin relatif hérité d'anciens scans (ex: "nes/Action 52 (E).nes") :
+    //    retrouver le fichier par son nom, récursivement, dans les racines autorisées.
+    const basename = path.basename(romPath);
+    for (const root of allowedRoots) {
+      if (!fs.existsSync(root)) continue;
+      const queue: string[] = [root];
+      while (queue.length) {
+        const dir = queue.shift()!;
+        let entries: fs.Dirent[] = [];
+        try {
+          entries = fs.readdirSync(dir, { withFileTypes: true });
+        } catch { continue; }
+        for (const entry of entries) {
+          const full = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            if (!entry.name.startsWith('.')) queue.push(full);
+          } else if (entry.name === basename) {
+            const data = await fs.promises.readFile(full);
+            return { ok: true, dataB64: data.toString('base64') };
+          }
+        }
+      }
+    }
+
+    return { ok: false, error: `ROM introuvable : ${basename}` };
   } catch (e: any) {
     return { ok: false, error: e.message };
   }
