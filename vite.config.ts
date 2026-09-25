@@ -65,7 +65,9 @@ function romIndexPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), romIndexPlugin()],
-  base: '/',
+// Chemins relatifs : indispensables pour le mode bureau Electron (file://).
+// Avec '/', le build référence /assets/... qui ne se résout pas en file:// → écran noir.
+  base: './',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
