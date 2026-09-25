@@ -183,6 +183,23 @@ export class ScannerService {
               }
               const { md5, crc32 } = await this.getFileHashes(fullPath);
 
+              // Jaquette candidate (format No-Intro : « Nom (USA).png »).
+              // La vérification réelle (HEAD) se fait au scraping ; ici on
+              // fournit l'URL la plus probable pour un affichage immédiat.
+              const libretroRepo = inferredSystem?.libretroSystemName
+                || SYSTEMS.find(s => s.id === systemId)?.libretroSystemName || '';
+              const baseMedia: Game['media'] = {};
+              if (libretroRepo && cleanTitle) {
+                const regionTags = [' (USA, Europe)', ' (USA)', ' (Europe)', ''];
+                // La région détectée du fichier oriente la première variante
+                const regionFirst = region === 'Japan' ? ' (Japan)'
+                  : region === 'Europe' || region === 'France' ? ' (Europe)'
+                  : region === 'World' ? ' (USA, Europe)'
+                  : ' (USA)';
+                const ordered = [regionFirst, ...regionTags.filter(r => r !== regionFirst)];
+                baseMedia.boxart2d = `https://raw.githubusercontent.com/libretro-thumbnails/${libretroRepo}/master/Named_Boxarts/${encodeURIComponent(cleanTitle + ordered[0])}.png`;
+              }
+
               const game: Game = {
                 id: `${systemId}_${crypto.createHash('sha256').update(path.resolve(fullPath)).digest('hex').slice(0, 24)}`,
                 systemId,
@@ -198,7 +215,7 @@ export class ScannerService {
                 favorite: false,
                 playCount: 0,
                 metadata: {},
-                media: {}
+                media: baseMedia
               };
 
               games.push(game);

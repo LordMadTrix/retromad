@@ -85,6 +85,8 @@ function createWindow() {
         mainWindow?.loadFile(distIndexPath);
       }
     });
+  } else if (process.env.RETROMAD_USE_FILE) {
+    mainWindow.loadFile(distIndexPath);
   } else {
     // Protocole https-like : même origine sûre que le web, sans les
     // restrictions d'origine nulle de file:// (iframes YouTube, workers).
@@ -116,42 +118,71 @@ app.whenReady().then(() => {
   });
 
   // Protocole de l'application de production : sert dist/ comme un site.
+  // NB : on lit les fichiers avec fs (pas net.fetch file://) — net.fetch
+  // depuis un handler de protocole provoquait un SIGSEGV sur certaines
+  // configurations GPU (nvidia).
   // Les dossiers statiques du projet (roms, bios, logos, music, themes…)
   // restent servis depuis public/ — Vite ne les copie pas tous dans dist.
-  protocol.handle('retromad', (request) => {
-    const parsed = new URL(request.url);
-    // retromad://app/index.html → dist/index.html
-    let relativePath = decodeURIComponent(parsed.pathname).replace(/^\//, '') || 'index.html';
-    if (relativePath.endsWith('/')) relativePath += 'index.html';
-    const distDir = path.join(__dirname, '../dist');
-    const publicDir = path.join(__dirname, '../public');
-    const projectRoot = path.resolve(distDir, '..');
+  const MIME_TYPES: Record<string, string> = {
+    '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript',
+    '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml',
+    '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif', '.webp': 'image/webp', '.ico': 'image/x-icon',
+    '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf',
+    '.nes': 'application/octet-stream', '.sfc': 'application/octet-stream',
+    '.smc': 'application/octet-stream', '.gb': 'application/octet-stream',
+    '.gbc': 'application/octet-stream', '.gba': 'application/octet-stream',
+    '.md': 'application/octet-stream', '.zip': 'application/zip',
+    '.z64': 'application/octet-stream', '.n64': 'application/octet-stream',
+    '.cue': 'application/octet-stream', '.iso': 'application/octet-stream',
+  };
+  const serveFile = async (resolved: string): Promise<Response> => {
+    const data = await fs.promises.readFile(resolved);
+    const ext = path.extname(resolved).toLowerCase();
+    return new Response(data, {
+      headers: { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' },
+    });
+  };
 
-    const tryPaths: string[] = [];
-    if (/^(roms|bios|logos|music|themes|emulators|saves)\//.test(relativePath)) {
-      tryPaths.push(path.join(publicDir, relativePath));
-    } else {
-      tryPaths.push(path.join(distDir, relativePath));
-      tryPaths.push(path.join(publicDir, relativePath));
-    }
+  protocol.handle('retromad', async (request) => {
+    try {
+      const parsed = new URL(request.url);
+      // retromad://app/index.html → dist/index.html
+      let relativePath = decodeURIComponent(parsed.pathname).replace(/^\//, '') || 'index.html';
+      if (relativePath.endsWith('/')) relativePath += 'index.html';
+      const distDir = path.join(__dirname, '../dist');
+      const publicDir = path.join(__dirname, '../public');
+      const projectRoot = path.resolve(distDir, '..');
 
-    for (const candidate of tryPaths) {
-      const resolved = path.resolve(candidate);
-      // Garde-fou : interdire la sortie du projet
-      if (!resolved.startsWith(projectRoot)) continue;
-      try {
-        if (fs.statSync(resolved).isFile()) {
-          return net.fetch(`file://${resolved}`);
-        }
-      } catch {
-        /* fichier suivant */
+      const tryPaths: string[] = [];
+      if (/^(roms|bios|logos|music|themes|emulators|saves)\//.test(relativePath)) {
+        tryPaths.push(path.join(publicDir, relativePath));
+      } else {
+        tryPaths.push(path.join(distDir, relativePath));
+        tryPaths.push(path.join(publicDir, relativePath));
       }
+
+      for (const candidate of tryPaths) {
+        const resolved = path.resolve(candidate);
+        // Garde-fou : interdire la sortie du projet
+        if (!resolved.startsWith(projectRoot)) continue;
+        try {
+          if (fs.statSync(resolved).isFile()) {
+            return await serveFile(resolved);
+          }
+        } catch {
+          /* fichier suivant */
+        }
+      }
+      // SPA fallback : routes applicatives → index.html
+      if (!relativePath.includes('.')) {
+        return await serveFile(path.join(distDir, 'index.html'));
+      }
+      return new Response('Not Found', { status: 404 });
+    } catch (e) {
+      console.error('[RetroMad] Erreur protocole retromad://:', e);
+      return new Response('Internal Error', { status: 500 });
     }
-    // SPA fallback : routes applicatives → index.html
-    if (!relativePath.includes('.')) {
-      return net.fetch(`file://${path.join(distDir, 'index.html')}`);
-    }
-    return new Response('Not Found', { status: 404 });
   });
 
   createWindow();

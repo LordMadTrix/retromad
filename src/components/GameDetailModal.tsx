@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Game, System, EmulatorProfile } from '../types';
 import { X, Play, Heart, RefreshCw, Calendar, Users, Star, Award, HardDrive, Hash, Terminal, Pencil, Trophy, Code2, BookOpen, Trash2, Tag } from 'lucide-react';
 import { ConsoleLogo } from './ConsoleLogo';
@@ -44,6 +44,14 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
   const [activeMediaTab, setActiveMediaTab] = useState<'boxart' | 'snap'>('boxart');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedEmulatorId, setSelectedEmulatorId] = useState<string>('retroarch');
+  // Image cassée détectée (URL morte, 404...) : on propose la recherche
+  const [boxartBroken, setBoxartBroken] = useState(false);
+  const [snapBroken, setSnapBroken] = useState(false);
+
+  useEffect(() => {
+    setBoxartBroken(false);
+    setSnapBroken(false);
+  }, [game?.id]);
 
   if (!game) return null;
 
@@ -102,15 +110,16 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
           <div className="md:col-span-5 flex flex-col space-y-3">
             <div className="relative aspect-[3/4] w-full rounded-2xl bg-black/40 border border-slate-800 flex items-center justify-center overflow-hidden shadow-lg p-2">
               {activeMediaTab === 'boxart' ? (
-                boxartUrl ? (
+                boxartUrl && !boxartBroken ? (
                   <img
                     src={boxartUrl}
                     alt={game.title}
                     className="w-full h-full object-contain drop-shadow-2xl animate-in zoom-in-95 duration-200"
+                    onError={() => setBoxartBroken(true)}
                   />
                 ) : (
                   <div className="text-center p-6 text-slate-500">
-                    <p className="text-xs">Jaquette non disponible</p>
+                    <p className="text-xs">{boxartBroken ? 'Jaquette inaccessible (lien mort)' : 'Jaquette non disponible'}</p>
                     <button
                       onClick={() => onScrapeGame(game)}
                       disabled={isScraping}
@@ -121,15 +130,24 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
                     </button>
                   </div>
                 )
-              ) : snapUrl ? (
+              ) : snapUrl && !snapBroken ? (
                 <img
                   src={snapUrl}
                   alt="Capture de jeu"
                   className="w-full h-full object-contain animate-in zoom-in-95 duration-200"
+                  onError={() => setSnapBroken(true)}
                 />
               ) : (
                 <div className="text-center p-6 text-slate-500 text-xs">
                   Aucune capture d'écran disponible
+                  <button
+                    onClick={() => onScrapeGame(game)}
+                    disabled={isScraping}
+                    className="mt-3 px-3 py-1.5 rounded-lg bg-retro-accent/20 text-retro-accent border border-retro-accent/40 text-xs font-bold hover:bg-retro-accent/30 transition flex items-center space-x-1.5 mx-auto"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isScraping ? 'animate-spin' : ''}`} />
+                    <span>Rechercher des médias</span>
+                  </button>
                 </div>
               )}
             </div>

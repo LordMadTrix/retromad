@@ -81,14 +81,14 @@ fi
 
 echo -e "${GREEN}[*] Lancement de RetroMad...${NC}"
 
-# Contournement NVIDIA : sur certaines configurations (driver nvidia-drm),
-# le processus GPU d'Electron plante (SIGSEGV) -> écran noir/fermeture.
-# Le rendu logiciel est activé si un premier essai GPU échoue.
-ELECTRON_FORCE_PROD=1 npx electron . "$@"
+# Contournement NVIDIA/sandbox : le processus GPU d'Electron plante
+# (SIGSEGV) avec le sandbox GPU sur certains drivers (nvidia-drm).
+# Le rendu logiciel désactivé-GPU est le chemin fiable sur ces machines.
+ELECTRON_FORCE_PROD=1 npx electron . --disable-gpu --disable-gpu-sandbox "$@"
 RC=$?
 if [ "$RC" -ne 0 ] && [ -n "${DISPLAY:-}" ]; then
-    echo -e "${YELLOW}[!] Plantage GPU détecté, nouvelle tentative en rendu logiciel...${NC}"
-    ELECTRON_FORCE_PROD=1 LIBGL_ALWAYS_SOFTWARE=1 npx electron . --disable-gpu "$@"
+    echo -e "${YELLOW}[!] Plantage détecté, nouvelle tentative en mode sans sandbox...${NC}"
+    ELECTRON_FORCE_PROD=1 LIBGL_ALWAYS_SOFTWARE=1 npx electron . --disable-gpu --disable-gpu-sandbox --no-sandbox "$@"
     RC=$?
 fi
 exit $RC
