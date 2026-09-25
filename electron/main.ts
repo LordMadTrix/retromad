@@ -157,7 +157,7 @@ ipcMain.handle('toggle-favorite', async (_, gameId: string) => {
   return false;
 });
 
-ipcMain.handle('scan-roms', async () => {
+async function scanAndMergeRoms(): Promise<Game[]> {
   const settings = storage.getSettings();
   const existingGames = storage.getGames();
   const existingMap = new Map(existingGames.map((g) => [g.path, g]));
@@ -186,6 +186,29 @@ ipcMain.handle('scan-roms', async () => {
 
   storage.saveGames(mergedGames);
   return mergedGames;
+}
+
+ipcMain.handle('scan-roms', async () => {
+  return scanAndMergeRoms();
+});
+
+// Auto-scan au démarrage : si la bibliothèque desktop est vide alors que le
+// dossier ROMs contient des fichiers, on la peuple automatiquement (sinon
+// l'utilisateur voit une collection vide et "aucun jeu ne se lance").
+app.whenReady().then(async () => {
+  try {
+    const games = storage.getGames();
+    const settings = storage.getSettings();
+    if (games.length === 0 && settings.romsDir && fs.existsSync(settings.romsDir)) {
+      const scanned = await scanAndMergeRoms();
+      console.log(`[RetroMad] Auto-scan initial : ${scanned.length} jeu(x) importé(s) depuis ${settings.romsDir}`);
+      if (mainWindow && scanned.length > 0) {
+        mainWindow.webContents.send('games-auto-imported', scanned.length);
+      }
+    }
+  } catch (e) {
+    console.error('[RetroMad] Échec auto-scan initial :', e);
+  }
 });
 
 ipcMain.handle('scrape-game', async (_, game: Game) => {

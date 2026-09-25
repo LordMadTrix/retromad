@@ -21,6 +21,14 @@ export const API = {
   saveGames: (games: Game[]): Promise<boolean> => ipcRenderer.invoke('save-games', games),
   toggleFavorite: (gameId: string): Promise<boolean> => ipcRenderer.invoke('toggle-favorite', gameId),
   scanRoms: (): Promise<Game[]> => ipcRenderer.invoke('scan-roms'),
+  // Notification de l'auto-scan initial (bibliothèque vide -> import auto)
+  refreshGamesAfterAutoScan: (callback: (count: number) => void) => {
+    const handler = (_: any, count: number) => callback(count);
+    ipcRenderer.on('games-auto-imported', handler);
+    return () => {
+      ipcRenderer.removeListener('games-auto-imported', handler);
+    };
+  },
   onScanProgress: (callback: (data: { count: number; file: string }) => void) => {
     const handler = (_: any, data: any) => callback(data);
     ipcRenderer.on('scan-progress', handler);

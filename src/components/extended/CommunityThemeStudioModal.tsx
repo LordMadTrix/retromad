@@ -301,7 +301,14 @@ export const CommunityThemeStudioModal: React.FC<CommunityThemeStudioModalProps>
       author: currentTheme.author,
       accentColor: currentTheme.colors.accent,
       secondaryColor: currentTheme.colors.secondary,
-      bgClass: `from-[${currentTheme.colors.background}] to-[${currentTheme.colors.surface}]`,
+      // NB : pas de classes Tailwind construites dynamiquement (Tailwind ne
+      // peut pas les compiler, ce qui produit du CSS invalide au build). On
+      // passe les couleurs réelles, appliquées en style inline.
+      bgColors: {
+        background: currentTheme.colors.background,
+        surface: currentTheme.colors.surface,
+        text: currentTheme.colors.text,
+      },
       crtShader: currentTheme.crt.shader,
       bezelStyle: currentTheme.style.bezelStyle,
       description: currentTheme.description,
@@ -1013,7 +1020,11 @@ export const CommunityThemeStudioModal: React.FC<CommunityThemeStudioModalProps>
                             author: tmpl.author,
                             accentColor: tmpl.colors.accent,
                             secondaryColor: tmpl.colors.secondary,
-                            bgClass: `from-[${tmpl.colors.background}] to-[${tmpl.colors.surface}]`,
+                            bgColors: {
+                              background: tmpl.colors.background,
+                              surface: tmpl.colors.surface,
+                              text: tmpl.colors.text,
+                            },
                             crtShader: tmpl.crt.shader,
                             bezelStyle: tmpl.style.bezelStyle,
                             description: tmpl.description,

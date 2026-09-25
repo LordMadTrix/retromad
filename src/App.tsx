@@ -396,6 +396,29 @@ export const App: React.FC = () => {
     showNotification(`Thème "${theme.name}" appliqué avec succès !`, 'success');
   };
 
+  // Application réelle du thème actif : variables CSS globales (accent, fond,
+  // surface). Consommées par les styles (voir index.css : body/var(--theme-*)).
+  useEffect(() => {
+    const active = centralizedThemes.find((t) => t.id === (settings.uiTheme || 'neon-dark'));
+    const root = document.documentElement;
+    if (!active || active.id === 'neon-dark') {
+      // Thème par défaut : réinitialiser
+      root.style.removeProperty('--theme-accent');
+      root.style.removeProperty('--theme-secondary');
+      root.style.removeProperty('--theme-background');
+      root.style.removeProperty('--theme-surface');
+      root.style.removeProperty('--theme-text');
+      return;
+    }
+    root.style.setProperty('--theme-accent', active.accentColor);
+    root.style.setProperty('--theme-secondary', active.secondaryColor);
+    if (active.bgColors) {
+      root.style.setProperty('--theme-background', active.bgColors.background);
+      root.style.setProperty('--theme-surface', active.bgColors.surface);
+      root.style.setProperty('--theme-text', active.bgColors.text);
+    }
+  }, [centralizedThemes, settings.uiTheme]);
+
   // Synchroniser games dans localStorage
   useEffect(() => {
     saveStoredGames(games);
@@ -594,6 +617,31 @@ export const App: React.FC = () => {
     };
 
     initData();
+  }, []);
+
+  // Auto-import desktop : le main process peut scanner les ROMs au démarrage
+  // (bibliothèque vide) et notifier le renderer pour rafraîchir la liste.
+  useEffect(() => {
+    const api = window.api as any;
+    if (!api?.on || !api?.invoke) return;
+    const handler = async (_: unknown, count: number) => {
+      try {
+        const fresh = await window.api!.getGames();
+        if (fresh?.length) {
+          setGames(fresh);
+          saveStoredGames(fresh);
+          showNotification(`${count} jeu(x) importé(s) automatiquement depuis votre dossier ROMs.`, 'success');
+        }
+      } catch (e) {
+        console.warn('Rafraîchissement post auto-scan échoué:', e);
+      }
+    };
+    // L'API preload n'expose pas ipcRenderer.on génériquement : on passe par
+    // l'écouteur dédié si disponible, sinon on interroge après coup.
+    if (typeof api.refreshGamesAfterAutoScan === 'function') {
+      api.refreshGamesAfterAutoScan(handler);
+    }
+    return () => {};
   }, []);
 
   // Écouteur de progression du scraping

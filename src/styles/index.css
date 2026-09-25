@@ -4,14 +4,16 @@
 
 @layer base {
   body {
-    @apply bg-[#090d1a] text-slate-100 font-display antialiased overflow-hidden select-none;
+    @apply text-slate-100 font-display antialiased overflow-hidden select-none;
+    background-color: var(--theme-background, #090d1a);
+    color: var(--theme-text, rgb(241 245 249));
   }
 
   #root {
-    background-color: #090d1a;
+    background-color: var(--theme-background, #090d1a);
     background-image:
-      radial-gradient(circle at 15% 5%, rgba(0, 242, 254, 0.16), transparent 34rem),
-      radial-gradient(circle at 90% 10%, rgba(255, 0, 127, 0.14), transparent 30rem),
+      radial-gradient(circle at 15% 5%, color-mix(in srgb, var(--theme-accent, #00f2fe) 16%, transparent), transparent 34rem),
+      radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--theme-secondary, #ff007f) 14%, transparent), transparent 30rem),
       linear-gradient(rgba(96, 165, 250, 0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(96, 165, 250, 0.04) 1px, transparent 1px);
     background-size: auto, auto, 28px 28px, 28px 28px;

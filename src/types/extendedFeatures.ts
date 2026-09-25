@@ -218,7 +218,10 @@ export interface CentralizedThemeItem {
   author: string;
   accentColor: string;
   secondaryColor: string;
-  bgClass: string;
+  /** @deprecated classes Tailwind dynamiques non compilables — utiliser bgColors */
+  bgClass?: string;
+  /** Couleurs de fond réelles (hex) appliquées en style inline */
+  bgColors?: { background: string; surface: string; text: string };
   crtShader: string;
   bezelStyle: string;
   description: string;
