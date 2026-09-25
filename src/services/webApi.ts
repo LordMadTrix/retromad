@@ -446,24 +446,47 @@ export function createWebApi() {
     scrapeGame: async (game: Game): Promise<Game> => {
       await new Promise((r) => setTimeout(r, 350));
 
-      // Scraping réel des jaquettes depuis le CDN libretro (sans clé API)
+      // Scraping réel des jaquettes depuis le CDN libretro (sans clé API).
+      // Les noms de fichiers libretro suivent le format No-Intro :
+      // "Mega Man 2 (USA).png", "Zelda II - The Adventure of Link (Europe).png".
+      // On essaie plusieurs variantes (régions + chiffres romains, car No-Intro
+      // mélange "2" et "II" selon les séries) jusqu'à trouver (HEAD 200).
       const mapping = SYSTEM_MAPPINGS.find((m) => m.id === game.systemId);
       const media: Game['media'] = { ...game.media };
       if (mapping?.libretroName) {
         const baseUrl = `https://raw.githubusercontent.com/libretro-thumbnails/${mapping.libretroName}/master`;
-        const safeName = game.cleanTitle || game.title;
-        media.boxart2d = `${baseUrl}/Named_Boxarts/${encodeURIComponent(safeName)}.png`;
-        media.snap = `${baseUrl}/Named_Snaps/${encodeURIComponent(safeName)}.png`;
-        // Vérifier l'existence de la jaquette (le CDN renvoie 404 sinon)
-        try {
-          const probe = await fetch(media.boxart2d, { method: 'HEAD' });
-          if (!probe.ok) {
-            delete media.boxart2d;
-            delete media.snap;
+        const name = game.cleanTitle || game.title;
+        const toRoman = (n: number): string => {
+          const map: Array<[number, string]> = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+          let out = '';
+          for (const [v, s] of map) { while (n >= v) { out += s; n -= v; } }
+          return out;
+        };
+        const romanized = name.replace(/\b(\d{1,2})\b/g, (m) => {
+          const n = parseInt(m, 10);
+          return n >= 1 && n <= 20 ? toRoman(n) : m;
+        });
+        // Abréviations avec point final : No-Intro écrit "Super Mario Bros. 3"
+        const dotted = name.replace(/\bBros\b/g, 'Bros.').replace(/\bBros\.(?=\s*\d)/g, 'Bros.');
+        const baseNames = [...new Set([name, romanized, dotted, romanized.replace(/\bBros\b/g, 'Bros.')])];
+        const regions = [' (USA, Europe)', ' (USA)', ' (Europe)', ' (Japan, USA)', ' (Japan, Europe)', ''];
+        const candidates: string[] = [];
+        for (const base of baseNames) {
+          for (const region of regions) {
+            candidates.push(`${baseUrl}/Named_Boxarts/${encodeURIComponent(base + region)}.png`);
           }
-        } catch {
-          delete media.boxart2d;
-          delete media.snap;
+        }
+        for (const candidate of candidates) {
+          try {
+            const probe = await fetch(candidate, { method: 'HEAD' });
+            if (probe.ok) {
+              media.boxart2d = candidate;
+              media.snap = candidate.replace('/Named_Boxarts/', '/Named_Snaps/');
+              break;
+            }
+          } catch {
+            /* réseau indisponible : variante suivante */
+          }
         }
       }
 
