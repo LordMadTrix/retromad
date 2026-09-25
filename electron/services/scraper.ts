@@ -99,6 +99,36 @@ export class ScraperService {
   /**
    * Scrape les médias depuis Libretro Thumbnails CDN (Gratuit, rapide, sans clé)
    */
+  // Cache des listings libretro (1 requête paginée par système/dossier)
+  private libretroIndexCache = new Map<string, string[]>();
+
+  async getLibretroIndex(libretroSystem: string, folder: string): Promise<string[]> {
+    const cacheKey = `${libretroSystem}/${folder}`;
+    const cached = this.libretroIndexCache.get(cacheKey);
+    if (cached) return cached;
+
+    const names: string[] = [];
+    try {
+      // Récupère jusqu'à 6 pages de 1000 (60 000 fichiers, largement assez)
+      for (let page = 1; page <= 6; page++) {
+        const url = `https://api.github.com/repos/libretro-thumbnails/${libretroSystem}/contents/${folder}?per_page=1000&page=${page}`;
+        const res = await fetch(url, {
+          headers: { 'User-Agent': 'RetroMad-Scraper/1.0', Accept: 'application/vnd.github+json' },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) break;
+        const list = (await res.json()) as Array<{ name: string }>;
+        if (!Array.isArray(list) || list.length === 0) break;
+        names.push(...list.map((f) => f.name));
+        if (list.length < 1000) break;
+      }
+    } catch {
+      // réseau indisponible : on renvoie ce qu'on a
+    }
+    this.libretroIndexCache.set(cacheKey, names);
+    return names;
+  }
+
   async scrapeLibretro(game: Game): Promise<Partial<Game>> {
     const system = SYSTEMS.find(s => s.id === game.systemId);
     if (!system) return {};
@@ -106,16 +136,35 @@ export class ScraperService {
     const libretroSystem = system.libretroSystemName;
     const baseUrl = `https://raw.githubusercontent.com/libretro-thumbnails/${libretroSystem}/master`;
 
-    // Essayer différentes variantes de noms pour trouver la jaquette
-    const candidates = [
-      game.title,
-      game.cleanTitle,
-      game.region ? `${game.cleanTitle} (${game.region})` : null,
-      `${game.cleanTitle} (USA)`,
-      `${game.cleanTitle} (Europe)`,
-      `${game.cleanTitle} (Japan)`,
-      `${game.cleanTitle} (World)`
-    ].filter(Boolean) as string[];
+    // Essayer différentes variantes de noms pour trouver la jaquette.
+    // Les noms No-Intro varient : régions, chiffres romains (2 -> II),
+    // points d'abréviation (Bros -> Bros.), suffixes (Rev A) (Unl)...
+    const toRoman = (n: number): string => {
+      const map: Array<[number, string]> = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+      let out = '';
+      for (const [v, s] of map) { while (n >= v) { out += s; n -= v; } }
+      return out;
+    };
+    const base = game.cleanTitle || game.title;
+    const romanized = base.replace(/\b(\d{1,2})\b/g, (m) => {
+      const n = parseInt(m, 10);
+      return n >= 1 && n <= 20 ? toRoman(n) : m;
+    });
+    const dotted = base.replace(/\bBros\b/g, 'Bros.');
+    const romanDotted = romanized.replace(/\bBros\b/g, 'Bros.');
+    const nameBases = [...new Set([base, romanized, dotted, romanDotted])];
+    const regionTags = [' (USA)', ' (Europe)', ' (Japan)', ' (USA, Europe)', ' (World)', ''];
+
+    const candidates: string[] = [];
+    for (const nb of nameBases) {
+      for (const tag of regionTags) {
+        candidates.push(nb + tag);
+      }
+    }
+    // Le titre brut peut contenir des suffixes (Rev A) (Unl) utiles
+    if (game.title && !nameBases.includes(game.title)) {
+      candidates.unshift(game.title);
+    }
 
     const boxartDest = path.join(storage.mediaDir, 'boxarts', `${game.id}.png`);
     const snapDest = path.join(storage.mediaDir, 'snaps', `${game.id}.png`);
@@ -123,7 +172,14 @@ export class ScraperService {
     let foundBoxart = false;
     let foundSnap = false;
 
-    // 1. Recherche Jaquette 2D
+    // 0. Index des noms réels du dépôt libretro (listing GitHub paginé, cache).
+    //    Les noms No-Intro ont des suffixes imprévisibles ((Rev A) (Unl)...) :
+    //    matcher par préfixe normalisé est plus fiable que deviner.
+    const normalize = (s: string) =>
+      s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const boxartNames = await this.getLibretroIndex(libretroSystem, 'Named_Boxarts');
+
+    // 1. Recherche Jaquette 2D : variantes d'abord, puis index par préfixe
     for (const name of candidates) {
       const safeName = name.replace(/[:\/\\*?"<>|]/g, '_');
       const boxartUrl = `${baseUrl}/Named_Boxarts/${encodeURIComponent(safeName)}.png`;
@@ -132,8 +188,23 @@ export class ScraperService {
         break;
       }
     }
+    if (!foundBoxart && boxartNames.length > 0) {
+      const wanted = normalize(base);
+      if (wanted) {
+        const match = boxartNames.find((n) => {
+          const stem = n.replace(/\.png$/i, '');
+          return normalize(stem).startsWith(wanted);
+        });
+        if (match) {
+          const boxartUrl = `${baseUrl}/Named_Boxarts/${encodeURIComponent(match.replace(/\.png$/i, ''))}.png`;
+          if (await this.downloadImage(boxartUrl, boxartDest)) {
+            foundBoxart = true;
+          }
+        }
+      }
+    }
 
-    // 2. Recherche Capture de jeu (Snap)
+    // 2. Recherche Capture de jeu (Snap) : mêmes variantes
     for (const name of candidates) {
       const safeName = name.replace(/[:\/\\*?"<>|]/g, '_');
       const snapUrl = `${baseUrl}/Named_Snaps/${encodeURIComponent(safeName)}.png`;
