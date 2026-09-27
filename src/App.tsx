@@ -18,6 +18,7 @@ import { ExtensionsDownloaderModal } from './components/ExtensionsDownloaderModa
 import { KioskPinModal } from './components/KioskPinModal';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { ConsoleExhibitionModal } from './components/ConsoleExhibitionModal';
+import { ComputingView } from './components/extended/ComputingView';
 import { CompanyExhibitionModal } from './components/CompanyExhibitionModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { KioskAttractMode } from './components/KioskAttractMode';
@@ -1635,6 +1636,23 @@ export const App: React.FC = () => {
             </div>
           )}
 
+          {currentTab === 'computing' && (
+            <ComputingView
+              systems={systems}
+              games={visibleGames}
+              onOpenGames={(sysId) => {
+                playSelect();
+                setSelectedSystemId(sysId);
+                setCurrentTab('games');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenSystemExhibition={(sys) => {
+                playSelect();
+                setExhibitionSystem(sys);
+              }}
+            />
+          )}
+
           {currentTab === 'companies' && (
             <CompanyView
               companies={companies}
@@ -2623,7 +2641,7 @@ export const App: React.FC = () => {
         }}
         onSelectTab={(tab) => {
           if (tab === 'companies' || tab === 'museum') {
-            setCurrentTab('companies');
+            setCurrentTab(tab === 'museum' ? 'companies' : tab);
           } else {
             setCurrentTab('games');
           }

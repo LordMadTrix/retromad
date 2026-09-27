@@ -9,7 +9,7 @@ import {
   Rocket, Tag, X
 } from 'lucide-react';
 
-export type NavTab = 'games' | 'companies' | 'bios' | 'settings';
+export type NavTab = 'games' | 'companies' | 'computing' | 'bios' | 'settings';
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -210,6 +210,13 @@ export const Navigation: React.FC<NavigationProps> = ({
             icon={<Gamepad2 className="w-3.5 h-3.5" />}
             label="Jeux"
             badge={totalGames > 0 ? String(totalGames) : undefined}
+          />
+          <NavBtn
+            active={currentTab === 'computing'}
+            onClick={() => onTabChange('computing')}
+            icon={<HardDrive className="w-3.5 h-3.5" />}
+            label="Info"
+            badge="OS"
           />
           <NavBtn
             active={currentTab === 'companies'}
