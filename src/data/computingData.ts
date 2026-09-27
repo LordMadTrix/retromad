@@ -8,15 +8,104 @@ export interface OsEra {
   year: number;
   name: string;
   maker: string;
-  family: 'unix' | 'dos' | 'mac' | 'windows' | 'linux' | 'amiga' | 'autre';
+  family: 'pionnier' | 'unix' | 'dos' | 'mac' | 'windows' | 'linux' | 'amiga' | 'autre';
   color: string;
   icon: string; // nom d'icône lucide-react
   description: string;
   funFact?: string;
 }
 
-/** Frise chronologique des OS — du pionnier UNIX aux systèmes modernes. */
+/** Frise chronologique des ordinateurs et OS — de la Pascaline (1642) à nos jours.
+ *  Jalons historiques d'après « Histoire des ordinateurs » (Wikipédia). */
 export const OS_TIMELINE: OsEra[] = [
+  {
+    year: 1642,
+    name: 'La Pascaline',
+    maker: 'Blaise Pascal',
+    family: 'pionnier',
+    color: '#b08968',
+    icon: 'Calculator',
+    description:
+      "La première machine à calculer de l'histoire, réalisée à 19 ans pour soulager son père, percepteur de Rouen. Elle effectue les quatre opérations par engrenages — multiplications et divisions par répétitions. Blaise Pascal est crédité de l'invention de la machine à calculer.",
+    funFact: "Une Pascaline signée Pascal (1652) est visible au musée des Arts et Métiers à Paris, avec une reproduction géante qui montre ses mécanismes internes.",
+  },
+  {
+    year: 1834,
+    name: 'Machine analytique',
+    maker: 'Charles Babbage & Ada Lovelace',
+    family: 'pionnier',
+    color: '#8d6cab',
+    icon: 'Cog',
+    description:
+      "Le premier ordinateur programmable conçu : calculateur mécanique à vapeur utilisant des cartes perforées (inspirées du métier de Jacquard) pour données ET instructions. Ada Lovelace, fille de Lord Byron, y conçoit le premier programme de l'histoire — la première programmeuse du monde.",
+    funFact: "La machine ne fut jamais construite : Babbage lassa son constructeur comme ses financeurs par son arrogance et ses changements de plans successifs. Les programmes d'Ada, eux, étaient justes.",
+  },
+  {
+    year: 1890,
+    name: 'Cartes perforées',
+    maker: 'Herman Hollerith',
+    family: 'pionnier',
+    color: '#5a7d9a',
+    icon: 'CreditCard',
+    description:
+      "Pour le recensement américain de 1890, la machine d'Hollerith analyse les cartes perforées deux fois plus vite que ses concurrentes (le précédent recensement avait pris 7 ans !). Sa Tabulating Machine Company fusionnera en 1911 — donnant naissance à IBM.",
+    funFact: "Hollerith réutilisait le principe des cartes perforées du métier à tisser de Jacquard, popularisé un siècle plus tôt.",
+  },
+  {
+    year: 1941,
+    name: 'Zuse Z3',
+    maker: 'Konrad Zuse',
+    family: 'pionnier',
+    color: '#9a7d5a',
+    icon: 'Binary',
+    description:
+      "Le premier calculateur programmable fonctionnel de l'histoire : 2 600 relais de téléphone, programmes sur bande magnétique, arithmétique binaire et nombres à virgule flottante. A posteriori, il sera déterminé Turing-complet.",
+    funFact: "Konrad Zuse, ingénieur allemand, avait peu entendu parler d'Alan Turing : il a tout inventé dans le salon de ses parents. Le Z4 fut ensuite loué à l'ETH Zurich jusqu'en 1955.",
+  },
+  {
+    year: 1945,
+    name: 'ENIAC',
+    maker: 'Eckert & Mauchly',
+    family: 'pionnier',
+    color: '#7d5a9a',
+    icon: 'Cpu',
+    description:
+      "Le premier ordinateur entièrement électronique : 17 468 tubes à vide, 30 tonnes, 167 m2, 160 kW pour 100 000 additions par seconde. Commandé par l'armée américaine pour les calculs de balistique — et étonnamment fiable pour l'époque.",
+    funFact: "Sa programmatrice Jean Bartik et ses collègues femmes mathématiciennes ont inventé le métier de programmeur — elles n'ont été reconnues que 50 ans plus tard.",
+  },
+  {
+    year: 1947,
+    name: 'Le transistor',
+    maker: 'Bell Labs',
+    family: 'pionnier',
+    color: '#c9a227',
+    icon: 'Zap',
+    description:
+      "L'invention du transistor chez Bell Labs remplace le fragile et encombrant tube électronique par un composant plus petit et fiable : c'est la base de la deuxième génération d'ordinateurs (1957-1965) et de toute l'électronique moderne.",
+    funFact: "Sans le transistor, pas de micro-ordinateur abordable : chaque tube à vide coûtait cher, chauffait, et mourait. Le transistor miniaturise tout.",
+  },
+  {
+    year: 1948,
+    name: 'Architecture von Neumann',
+    maker: 'Université de Manchester',
+    family: 'pionnier',
+    color: '#5a9a6d',
+    icon: 'Database',
+    description:
+      "Le Small-Scale Experimental Machine (SSEM) est la première machine à stocker programmes ET données dans la même mémoire : l'architecture de von Neumann. Tous les ordinateurs actuels en dérivent (Manchester Mark I, EDSAC, EDVAC).",
+    funFact: "Avant cette date, reprogrammer l'ENIAC demandait des jours de re-câblage manuel. Après : changer de programme = charger de nouvelles données.",
+  },
+  {
+    year: 1958,
+    name: 'Circuit intégré',
+    maker: 'Jack Kilby (Texas Instruments)',
+    family: 'pionnier',
+    color: '#5a9a9a',
+    icon: 'CircuitBoard',
+    description:
+      "Le circuit intégré de Jack Kilby rassemble plusieurs transistors sur un seul semi-conducteur : c'est la troisième génération d'ordinateurs, et à partir de cette date que l'utilisation de l'informatique a explosé.",
+    funFact: "Kilby a conçu son premier circuit intégré en septembre 1958, seul au labo pendant que tous ses collègues étaient en vacances — il n'avait pas encore droit aux congés.",
+  },
   {
     year: 1969,
     name: 'UNIX',
@@ -27,6 +116,17 @@ export const OS_TIMELINE: OsEra[] = [
     description:
       "L'ancêtre de presque tout. Conçu sur un PDP-7 dérisoire, UNIX invente l'arborescence de fichiers, le shell et la portabilité (réécrit en C en 1973). Linux, macOS, Android et iOS en descendent directement.",
     funFact: "Le premier UNIX tournait sur une machine de 4 Ko de mémoire. Le nom est un jeu de mots sur « Multics », son projet parent jugé trop gonflé.",
+  },
+  {
+    year: 1971,
+    name: 'Intel 4004',
+    maker: 'Intel (Federico Faggin)',
+    family: 'pionnier',
+    color: '#2d7dd2',
+    icon: 'Microchip',
+    description:
+      "Le premier microprocesseur commercial : un CPU complet sur une seule puce de 92 000 transistors... non, 2 300 transistors ! Cette miniaturisation rend possible le micro-ordinateur personnel : l'ère des machines de salon peut commencer.",
+    funFact: "Le 4004 avait été commandé par une société japonaise de calculatrices (Busicom). Intel a racheté les droits pour 60 000 $ — la meilleure affaire de son histoire.",
   },
   {
     year: 1974,
@@ -201,24 +301,25 @@ export const COMPUTING_ERAS: { id: string; label: string; years: string; systemI
     id: 'pioneer',
     label: "Les Pionniers",
     years: '1977 — 1982',
-    systemIds: ['appleii', 'odyssey2', 'c64', 'zx81'],
+    systemIds: ['appleii', 'odyssey2', 'atari8bit', 'vic20', 'pc8000', 'zx81', 'c64'],
   },
   {
     id: 'golden8bit',
     label: "L'Âge d'or 8-bit",
     years: '1982 — 1987',
-    systemIds: ['zxspectrum', 'bbcmicro', 'amstradcpc', 'msx', 'msx2', 'pc8801', 'atarist'],
+    systemIds: ['zxspectrum', 'bbcmicro', 'amstradcpc', 'gx4000', 'thomson', 'msx', 'msx2', 'pc8801', 'x1', 'atarist', 'plus4', 'c128'],
   },
   {
     id: 'sixteenbit',
     label: 'La Révolution 16/32-bit & CD',
     years: '1985 — 1995',
-    systemIds: ['amiga', 'amiga1200', 'msdos', 'pc9801', 'fmtowns', 'cdi'],
+    systemIds: ['amiga', 'amiga1200', 'msdos', 'pc9801', 'x68000', 'fmtowns', 'cdi'],
   },
 ];
 
 export const COMPUTING_SYSTEM_IDS = new Set<string>([
   'appleii', 'c64', 'amstradcpc', 'msx', 'msx2', 'atarist', 'amiga', 'msdos',
   'zxspectrum', 'zx81', 'pc8801', 'pc9801', 'amiga1200', 'cdi', 'fmtowns',
-  'bbcmicro', 'odyssey2',
+  'bbcmicro', 'odyssey2', 'x68000', 'x1', 'atari8bit', 'vic20', 'c128',
+  'plus4', 'thomson', 'pc8000', 'gx4000',
 ]);
