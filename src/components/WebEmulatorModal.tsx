@@ -67,6 +67,13 @@ const EJS_CORE_BY_SYSTEM: Record<string, string> = {
   msdos: 'dos',
   amstradcpc: 'cap32',
   zx81: 'zx81',
+  amiga1200: 'amiga',
+  cdi: 'cdi',
+  fmtowns: 'fmtowns',
+  bbcmicro: 'bbcmicro',
+  cps1: 'arcade',
+  cps2: 'arcade',
+  cps3: 'arcade',
 };
 
 interface WebEmulatorModalProps {

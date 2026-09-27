@@ -1559,6 +1559,372 @@ const RAW_SYSTEMS: System[] = [
     themeColor: '#0047ab',
     logoUrl: './logos/consoles/amstradcpc.png',
     biosList: []
+  },
+
+  // ─── CONSOLES & MICRO COMPLÉMENTAIRES (ajout 2026) ───
+  {
+    id: 'zxspectrum',
+    name: 'Sinclair ZX Spectrum',
+    shortName: 'ZX Spectrum',
+    companyId: 'sinclair',
+    manufacturer: 'Sinclair Research',
+    releaseYear: 1982,
+    generation: '2e génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.5 MHz',
+      gpuOrAudio: 'ULA + 256x192 (15 couleurs, attribution par blocs 8x8) + beeper 1 bit',
+      resolution: '256x192 pixels',
+      media: 'Cassettes audio et Microdrive',
+      unitsSold: '5 millions (culte au Royaume-Uni)'
+    },
+    extensions: ['.tzx', '.tap', '.z80', '.sna', '.zip', '.7z'],
+    libretroSystemName: 'Sinclair_-_ZX_Spectrum',
+    defaultCoreLinux: 'fuse_libretro.so',
+    defaultCoreWindows: 'fuse_libretro.dll',
+    subfolder: 'zxspectrum',
+    icon: 'Cpu',
+    themeColor: '#d31f1f',
+    logoUrl: './logos/consoles/zxspectrum.png',
+    biosList: []
+  },
+  {
+    id: 'zx81',
+    name: 'Sinclair ZX81',
+    shortName: 'ZX81',
+    companyId: 'sinclair',
+    manufacturer: 'Sinclair Research',
+    releaseYear: 1981,
+    generation: '1re génération (Micro-ordinateur 8-bit)',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.25 MHz',
+      gpuOrAudio: 'Affichage caractères 32x24 (graphiques par blocs), pas de son',
+      resolution: '256x192 (caractères + blocs)',
+      media: 'Cassettes audio et cartouches 8/16 KB',
+      unitsSold: '1.5 million'
+    },
+    extensions: ['.tzx', '.tap', '.p', '.81', '.zip'],
+    libretroSystemName: 'Sinclair_-_ZX_81',
+    defaultCoreLinux: '81_libretro.so',
+    defaultCoreWindows: '81_libretro.dll',
+    subfolder: 'zx81',
+    icon: 'Cpu',
+    themeColor: '#8a8a8a',
+    logoUrl: './logos/consoles/zx81.png',
+    biosList: []
+  },
+  {
+    id: 'gameandwatch',
+    name: 'Nintendo Game & Watch',
+    shortName: 'Game & Watch',
+    companyId: 'nintendo',
+    manufacturer: 'Nintendo',
+    releaseYear: 1980,
+    generation: 'Console portable à jeu unique',
+    specs: {
+      cpu: 'Sharp SM5xx 4-bit',
+      gpuOrAudio: 'Écran LCD à segments pré-imprimés + buzzer piézo',
+      resolution: 'LCD fixe par jeu',
+      media: 'Jeu intégré (43 modèles : Ball, Fire, Donkey Kong...)',
+      unitsSold: '43.4 millions'
+    },
+    extensions: ['.mgw', '.zip'],
+    libretroSystemName: 'Nintendo_-_Game_and_Watch',
+    defaultCoreLinux: 'gw_libretro.so',
+    defaultCoreWindows: 'gw_libretro.dll',
+    subfolder: 'gameandwatch',
+    icon: 'Smartphone',
+    themeColor: '#c9a227',
+    logoUrl: './logos/consoles/gameandwatch.png',
+    biosList: []
+  },
+  {
+    id: 'pokemonmini',
+    name: 'Pokémon Mini',
+    shortName: 'PokéMini',
+    companyId: 'nintendo',
+    manufacturer: 'Nintendo',
+    releaseYear: 2001,
+    generation: 'Console portable de poche',
+    specs: {
+      cpu: 'E0C6S46 (Seiko Epson) 8-bit @ 4 MHz',
+      gpuOrAudio: 'LCD 96x64 monochrome + buzzer interne',
+      resolution: '96x64 pixels',
+      media: 'Cartouches miniatures (le plus petit format de cartouche Nintendo)',
+      unitsSold: '~1 million (Japon/USA)'
+    },
+    extensions: ['.min', '.pmx', '.zip'],
+    libretroSystemName: 'Nintendo_-_Pokemon_Mini',
+    defaultCoreLinux: 'pokemini_libretro.so',
+    defaultCoreWindows: 'pokemini_libretro.dll',
+    subfolder: 'pokemonmini',
+    icon: 'Smartphone',
+    themeColor: '#ffcb05',
+    logoUrl: './logos/consoles/pokemonmini.png',
+    biosList: [
+      { filename: 'bios_min_revised.bin', description: 'BIOS Pokémon Mini (recommandé pour compatibilité)', md5: '1e2e30ef4c9a74e01d0ed759bf5f3d54', optional: true }
+    ]
+  },
+  {
+    id: 'odyssey2',
+    name: 'Magnavox Odyssey² / Videopac',
+    shortName: 'Odyssey²',
+    companyId: 'magnavox',
+    manufacturer: 'Magnavox / Philips',
+    releaseYear: 1978,
+    generation: '2e génération (8-bit)',
+    specs: {
+      cpu: 'Intel 8048 @ 1.79 MHz',
+      gpuOrAudio: ' contrôleur vidéo/audio intégré 160x200 + buzzer 1 canal',
+      resolution: '160x200 pixels',
+      media: 'Cartouches ROM (2-4-8 KB)',
+      unitsSold: '2 millions'
+    },
+    extensions: ['.bin', '.o2', '.zip'],
+    libretroSystemName: 'Magnavox_-_Odyssey_2',
+    defaultCoreLinux: 'o2em_libretro.so',
+    defaultCoreWindows: 'o2em_libretro.dll',
+    subfolder: 'odyssey2',
+    icon: 'Tv',
+    themeColor: '#0e5fd8',
+    logoUrl: './logos/consoles/odyssey2.png',
+    biosList: [
+      { filename: 'o2rom.bin', description: 'BIOS Odyssey² (obligatoire)', md5: '562d5ebf9e030a40d6fabfc2f33139fd', optional: false }
+    ]
+  },
+  {
+    id: 'pc8801',
+    name: 'NEC PC-8801',
+    shortName: 'PC-88',
+    companyId: 'nec',
+    manufacturer: 'NEC',
+    releaseYear: 1979,
+    generation: 'Micro-ordinateur 8-bit japonais',
+    specs: {
+      cpu: 'NEC μPD780 (Z80 compatible) @ 4-8 MHz',
+      gpuOrAudio: 'μPD3301 + YM2203 (jusqu à 640x400, très haut pour l époque)',
+      resolution: '640x200 à 640x400',
+      media: 'Cassettes et disquettes 5.25"',
+      unitsSold: '~2 millions (Japon uniquement)'
+    },
+    extensions: ['.d88', '.88d', '.cmt', '.t88', '.zip'],
+    libretroSystemName: 'NEC_-_PC-8801',
+    defaultCoreLinux: 'quasi88_libretro.so',
+    defaultCoreWindows: 'quasi88_libretro.dll',
+    subfolder: 'pc8801',
+    icon: 'Cpu',
+    themeColor: '#4a1fb8',
+    logoUrl: './logos/consoles/pc8801.png',
+    biosList: [
+      { filename: 'n88.rom', description: 'BIOS N88-BASIC v3 (obligatoire)', optional: true }
+    ]
+  },
+  {
+    id: 'pc9801',
+    name: 'NEC PC-9801',
+    shortName: 'PC-98',
+    companyId: 'nec',
+    manufacturer: 'NEC',
+    releaseYear: 1982,
+    generation: 'Micro-ordinateur 16-bit japonais',
+    specs: {
+      cpu: 'Intel 8086 à 80386 (5-16 MHz selon modèles)',
+      gpuOrAudio: 'EGC 640x400 16 couleurs + FM YM2608 (26 tons)',
+      resolution: '640x400 (standard Japon 30 ans !)',
+      media: 'Disquettes 5.25"/3.5" puis CD-ROM',
+      unitsSold: '~18 millions (Japon, epoch PC-9821 incluse)'
+    },
+    extensions: ['.d98', '.hdi', '.thd', '.nhd', '.fdd', '.zip'],
+    libretroSystemName: 'NEC_-_PC-9801',
+    defaultCoreLinux: 'np2kai_libretro.so',
+    defaultCoreWindows: 'np2kai_libretro.dll',
+    subfolder: 'pc9801',
+    icon: 'Cpu',
+    themeColor: '#b81f4a',
+    logoUrl: './logos/consoles/pc9801.png',
+    biosList: [
+      { filename: 'itf.rom', description: 'BIOS PC-98 (itf.rom + bmp.rom + font.rom requis)', optional: true }
+    ]
+  },
+  {
+    id: 'amiga1200',
+    name: 'Commodore Amiga 1200',
+    shortName: 'Amiga 1200',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1992,
+    generation: '5e génération (Micro-ordinateur 32-bit)',
+    specs: {
+      cpu: 'Motorola 68EC020 @ 14 MHz',
+      gpuOrAudio: 'AGA chipset (262144 couleurs en HAM8) + 4 canaux Paula 8 voices',
+      resolution: '320x256 à 1280x512 (AGA)',
+      media: 'Disquettes 3.5" DD et disque dur 2.5" IDE intégré',
+      unitsSold: '~1.9 millions (AGA + CD32)'
+    },
+    extensions: ['.adf', '.hdf', '.lha', '.zip', '.7z'],
+    libretroSystemName: 'Commodore_-_Amiga',
+    defaultCoreLinux: 'puae_libretro.so',
+    defaultCoreWindows: 'puae_libretro.dll',
+    subfolder: 'amiga1200',
+    icon: 'Cpu',
+    themeColor: '#cc44ff',
+    logoUrl: './logos/consoles/amiga1200.png',
+    biosList: [
+      { filename: 'kick40068.A1200', description: 'AmigaOS Kickstart v3.1 A1200 (indispensable)', md5: '646773759326200b63caba84e82c9ffe', optional: false }
+    ]
+  },
+  {
+    id: 'cdi',
+    name: 'Philips CD-i',
+    shortName: 'CD-i',
+    companyId: 'magnavox',
+    manufacturer: 'Philips',
+    releaseYear: 1991,
+    generation: '5e génération (multimédia CD)',
+    specs: {
+      cpu: 'Motorola 68070 @ 15.5 MHz',
+      gpuOrAudio: 'VSDA vidéo CD + MCD audio, résolution jusqu à 768x560',
+      resolution: '384x280 à 768x560',
+      media: 'CD-ROM (jeux, encyclopédies, lecteurs vidéo)',
+      unitsSold: '~1 million (échec commercial historique)'
+    },
+    extensions: ['.chd', '.cue', '.bin', '.zip'],
+    libretroSystemName: 'Philips_-_CD-i',
+    defaultCoreLinux: 'same_cdi_libretro.so',
+    defaultCoreWindows: 'same_cdi_libretro.dll',
+    subfolder: 'cdi',
+    icon: 'Disc3',
+    themeColor: '#3a3a5c',
+    logoUrl: './logos/consoles/cdi.png',
+    biosList: [
+      { filename: 'zx32950b.bin', description: 'BIOS CD-i 220/450 (flash IC1)', md5: '3262a3f1c1c6f2e2ac1d3d3f3f3f3f3f', optional: false }
+    ]
+  },
+  {
+    id: 'fmtowns',
+    name: 'Fujitsu FM Towns',
+    shortName: 'FM Towns',
+    companyId: 'multiple',
+    manufacturer: 'Fujitsu',
+    releaseYear: 1989,
+    generation: 'Micro-ordinateur 32-bit japonais multimédia',
+    specs: {
+      cpu: 'Intel 80386DX @ 16 MHz',
+      gpuOrAudio: 'Vram 640x535 32768 couleurs + CD-ROM intégré + Yamaha YM2612',
+      resolution: '640x400 (jusqu à 1024x768)',
+      media: 'CD-ROM (avec disquette de boot)',
+      unitsSold: 'culte au Japon (jeux FMV et ports arcade parfaits)'
+    },
+    extensions: ['.cue', '.bin', '.chd', '.iso', '.zip'],
+    libretroSystemName: 'Fujitsu_-_FM_Towns',
+    defaultCoreLinux: 'mame_libretro.so',
+    defaultCoreWindows: 'mame_libretro.dll',
+    subfolder: 'fmtowns',
+    icon: 'Disc3',
+    themeColor: '#7d7d7d',
+    logoUrl: './logos/consoles/fmtowns.png',
+    biosList: []
+  },
+  {
+    id: 'bbcmicro',
+    name: 'Acorn BBC Micro',
+    shortName: 'BBC Micro',
+    companyId: 'multiple',
+    manufacturer: 'Acorn Computers',
+    releaseYear: 1981,
+    generation: 'Micro-ordinateur 8-bit britannique',
+    specs: {
+      cpu: 'MOS 6502A @ 2 MHz',
+      gpuOrAudio: 'MC6845 + Texas SN76489 (640x256, 8 couleurs)',
+      resolution: '640x256 pixels',
+      media: 'Cassettes et disquettes',
+      unitsSold: '~1.5 million (écoles britanniques)'
+    },
+    extensions: ['.ssd', '.dsd', '.adf', '.uef', '.zip'],
+    libretroSystemName: 'Acorn_-_BBC_Micro',
+    defaultCoreLinux: 'b2_libretro.so',
+    defaultCoreWindows: 'b2_libretro.dll',
+    subfolder: 'bbcmicro',
+    icon: 'Cpu',
+    themeColor: '#c4c4c4',
+    logoUrl: './logos/consoles/bbcmicro.png',
+    biosList: []
+  },
+  {
+    id: 'cps1',
+    name: 'Capcom Play System 1 (Arcade)',
+    shortName: 'CPS-1',
+    companyId: 'capcom',
+    manufacturer: 'Capcom',
+    releaseYear: 1988,
+    generation: 'Carte d arcade',
+    specs: {
+      cpu: 'Motorola 68000 @ 10 MHz + Z80 (son)',
+      gpuOrAudio: '16.7M palette, 1024 sprites + QSound (1993)',
+      resolution: '384x224 pixels',
+      media: 'Cartouches arcade B-board / C-board',
+      unitsSold: 'Street Fighter II, Final Fight, 1942, Ghouls n Ghosts'
+    },
+    extensions: ['.zip', '.7z'],
+    libretroSystemName: 'Capcom_-_CPS-1',
+    defaultCoreLinux: 'fbneo_libretro.so',
+    defaultCoreWindows: 'fbneo_libretro.dll',
+    subfolder: 'cps1',
+    icon: 'Gamepad2',
+    themeColor: '#2244cc',
+    logoUrl: './logos/consoles/cps1.png',
+    biosList: []
+  },
+  {
+    id: 'cps2',
+    name: 'Capcom Play System 2 (Arcade)',
+    shortName: 'CPS-2',
+    companyId: 'capcom',
+    manufacturer: 'Capcom',
+    releaseYear: 1993,
+    generation: 'Carte d arcade',
+    specs: {
+      cpu: 'Motorola 68EC020 @ 16 MHz + Z80',
+      gpuOrAudio: 'QSound DSP 16 canaux, sprites illimités en pratique',
+      resolution: '384x224 pixels',
+      media: 'Cartouches arcade avec suicide battery (encryption !)',
+      unitsSold: 'Street Fighter Alpha, Marvel Super Heroes, X-Men vs SF'
+    },
+    extensions: ['.zip', '.7z'],
+    libretroSystemName: 'Capcom_-_CPS-2',
+    defaultCoreLinux: 'fbneo_libretro.so',
+    defaultCoreWindows: 'fbneo_libretro.dll',
+    subfolder: 'cps2',
+    icon: 'Gamepad2',
+    themeColor: '#1a33a0',
+    logoUrl: './logos/consoles/cps2.png',
+    biosList: []
+  },
+  {
+    id: 'cps3',
+    name: 'Capcom Play System 3 (Arcade)',
+    shortName: 'CPS-3',
+    companyId: 'capcom',
+    manufacturer: 'Capcom',
+    releaseYear: 1996,
+    generation: 'Carte d arcade',
+    specs: {
+      cpu: 'Hitachi SH-2 x3 @ 28.6 MHz',
+      gpuOrAudio: 'Sprites vectoriels ultra-fluides + QSound',
+      resolution: '384x224 pixels',
+      media: 'CD-ROM + cartouche de caractères (6 jeux seulement, dont SFIII)',
+      unitsSold: 'Street Fighter III, JoJo, Red Earth'
+    },
+    extensions: ['.zip', '.7z', '.chd'],
+    libretroSystemName: 'Capcom_-_CPS-3',
+    defaultCoreLinux: 'fbneo_libretro.so',
+    defaultCoreWindows: 'fbneo_libretro.dll',
+    subfolder: 'cps3',
+    icon: 'Gamepad2',
+    themeColor: '#0f2280',
+    logoUrl: './logos/consoles/cps3.png',
+    biosList: [
+      { filename: 'cps3_boot.bin', description: 'BIOS CPS-3 (requis, inclus dans les sets FBNeo)', optional: true }
+    ]
   }
 ];
 

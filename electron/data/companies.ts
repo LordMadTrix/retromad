@@ -182,6 +182,39 @@ export const COMPANIES: Company[] = [
     consoles: ['amstradcpc']
   },
   {
+    id: 'sinclair',
+    name: 'Sinclair Research',
+    country: 'Royaume-Uni (Cambridge)',
+    founded: 1961,
+    logoText: 'SINCLAIR',
+    accentColor: '#d31f1f',
+    description: "Fondée par Sir Clive Sinclair, l'entreprise britannique a révolutionné l'informatique abordable avec le ZX81 (49,95 £ !) puis le ZX Spectrum, l'ordinateur culte du Royaume-Uni dans les années 80. Des milliers de jeux tapés depuis les cassettes et les magazines ont formé une génération de programmeurs britanniques.",
+    famousFranchises: ['ZX Spectrum', 'ZX81', 'Manic Miner', 'Jet Set Willy', 'Chuckie Egg'],
+    consoles: ['zxspectrum', 'zx81']
+  },
+  {
+    id: 'magnavox',
+    name: 'Magnavox / Philips',
+    country: 'États-Unis / Pays-Bas',
+    founded: 1910,
+    logoText: 'MAGNAVOX',
+    accentColor: '#0e5fd8',
+    description: "Magnavox a lancé l'Odyssey en 1972, la toute première console de salon de l'histoire — avant même la Pong de Atari. Philips a ensuite racheté la branche jeux et produit l'Odyssey² (1978) en Amérique et le Videopac en Europe, ainsi que la malheureuse CD-i.",
+    famousFranchises: ['Odyssey', 'Odyssey² / Videopac', 'K.C. Munchkin!', 'Pick Axe Pete'],
+    consoles: ['odyssey2', 'cdi']
+  },
+  {
+    id: 'capcom',
+    name: 'Capcom',
+    country: 'Japon (Osaka)',
+    founded: 1979,
+    logoText: 'CAPCOM',
+    accentColor: '#2244cc',
+    description: "Le roi du jeu d'arcade 90s : Capcom a défini le beat'em up (Final Fight), le jeu de combat (Street Fighter II) et le shoot'em up CPS-2 avec une qualité graphique inégalée. Ses cartes CPS-1/2/3 ont animé les salles d'arcade du monde entier.",
+    famousFranchises: ['Street Fighter', 'Mega Man', 'Final Fight', 'Resident Evil', '1942'],
+    consoles: ['cps1', 'cps2', 'cps3']
+  },
+  {
     id: 'multiple',
     name: 'Multi-fabricants (Arcade / MSX)',
     country: 'Monde entier',

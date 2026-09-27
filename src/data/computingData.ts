@@ -201,22 +201,24 @@ export const COMPUTING_ERAS: { id: string; label: string; years: string; systemI
     id: 'pioneer',
     label: "Les Pionniers",
     years: '1977 — 1982',
-    systemIds: ['appleii', 'c64'],
+    systemIds: ['appleii', 'odyssey2', 'c64', 'zx81'],
   },
   {
     id: 'golden8bit',
     label: "L'Âge d'or 8-bit",
-    years: '1984 — 1987',
-    systemIds: ['amstradcpc', 'msx', 'msx2', 'atarist'],
+    years: '1982 — 1987',
+    systemIds: ['zxspectrum', 'bbcmicro', 'amstradcpc', 'msx', 'msx2', 'pc8801', 'atarist'],
   },
   {
     id: 'sixteenbit',
-    label: 'La Révolution 16/32-bit',
-    years: '1985 — 1993',
-    systemIds: ['amiga', 'msdos'],
+    label: 'La Révolution 16/32-bit & CD',
+    years: '1985 — 1995',
+    systemIds: ['amiga', 'amiga1200', 'msdos', 'pc9801', 'fmtowns', 'cdi'],
   },
 ];
 
 export const COMPUTING_SYSTEM_IDS = new Set<string>([
   'appleii', 'c64', 'amstradcpc', 'msx', 'msx2', 'atarist', 'amiga', 'msdos',
+  'zxspectrum', 'zx81', 'pc8801', 'pc9801', 'amiga1200', 'cdi', 'fmtowns',
+  'bbcmicro', 'odyssey2',
 ]);

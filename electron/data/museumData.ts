@@ -1968,5 +1968,362 @@ export const MUSEUM_DATA: Record<string, MuseumExhibition> = {
     rivalry: "Combat européen intense contre le ZX Spectrum de Sinclair et le Commodore 64 — l'Amstrad CPC gagnait sur l'accessibilité et le moniteur intégré.",
     curatorNote: "L'Amstrad CPC a été pour des millions d'enfants européens le premier contact avec l'informatique et le jeu vidéo. Dizzy et R-Type CPC restent des références absolues de la culture rétro européenne.",
   },
+
+  zxspectrum: {
+    tagline: "Le micro arco-en-ciel qui a fait aimer l'informatique à tout un pays.",
+    history: "Lancé en 1982 à 125 £, le ZX Spectrum de Clive Sinclair a rendu l'ordinateur personnel abordable pour des millions de foyers britanniques. Sa palette 15 couleurs (avec la fameuse couleur 'BRIGHT BLACK') et son clavier en caoutchouc sont devenus des icônes. Des milliers de jeux distribués sur cassettes bon marché ont fait émerger une industrie britannique du jeu exubérante.",
+    innovations: [
+      "Prix plancher : 125 £, un dixième du prix d'un ordinateur de bureau de l'époque",
+      "Clavier caoutchouc 40 touches avec mots-clés BASIC en une touche",
+      "Graphismes 'attribute block' : couleur par bloc 8x8, une contrainte artistique devenue style",
+      "Écosystème de magazines tape-in : taper des jeux en BASIC depuis le papier",
+    ],
+    anecdotes: [
+      "Matthew Smith, créateur de Manic Miner, a programmé le jeu en dormant dans un placard — son éditeur Software Projects a encaissé des millions de cassettes.",
+      "La charge d'une cassette durait 3 à 5 minutes avec son sifflement caractéristique — et une surintensité manquait = tout recommencer.",
+      "Le ZX Spectrum 48K avait 48 Ko de RAM : le même ordre de grandeur que ce texte descriptif.",
+    ],
+    iconicGames: ['Manic Miner', 'Jet Set Willy', 'Chuckie Egg', 'Sabre Wulf', 'Atic Atac', 'Knight Lore'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Zilog Z80A 8-bit @ 3.5 MHz',
+      ram: '16 ou 48 KB (extension 128K en 1985 avec canal audio AY)',
+      soundChip: 'Beeper 1-bit (10 canaux logiciels chez les pros !) puis AY-3-8912 sur 128K',
+      videoChip: 'ULA Ferranti — 256x192, 15 couleurs (2 par bloc 8x8)',
+      colors: '8 couleurs x 2 niveaux (normal/bright) = 15 teintes',
+      controllers: 'Interface 1/2 + joysticks Kempston, Sinclair, Cursor',
+    },
+    rivalry: "Guerre des micros britannique contre le Commodore 64 (meilleur son) et l'Amstrad CPC (moniteur intégré). Le Spectrum gagnait sur le prix et la légèreté.",
+    curatorNote: "Le ZX Spectrum est au Royaume-Uni ce que la NES est au Japon : LA machine formatrice d'une génération de joueurs et de développeurs. La scène homebrew est encore très active aujourd'hui.",
+  },
+
+  odyssey2: {
+    tagline: "La console qui a inventé le jeu de salon — avant Atari.",
+    history: "L'Odyssey de Magnavox (1972) est la toute première console de salon commercialisée, avec des overlays en plastique à poser sur l'écran pour simuler les graphismes ! Son héritière l'Odyssey² (1978) ajoutait clavier, cartouches ROM et un micro-processeur Intel. Vendue à 2 millions d'exemplaires, elle a dominé le marché européen sous le nom Videopac.",
+    innovations: [
+      "Première console de salon de l'histoire (Odyssey 1972, 28 jeux dont Table Tennis)",
+      "Clavier membrane intégré pour les jeux éducatifs et de programmation (1978)",
+      "Contrôleur joystick amovible avec manche en caoutchouc et 12 boutons",
+      "Le jeu Pick Axe Pete préfigurait les plateformers d'action modernes",
+    ],
+    anecdotes: [
+      "Ralph Baer, père de l'Odyssey, a conçu la Brown Box en 1966-68 — le procès qui en a découlé a permis à Magnavox de récupérer des millions à Atari pour Pong.",
+      "K.C. Munchkin! était si proche de Pac-Man qu'Atari a gagné un procès — un des premiers sur la propriété intellectuelle vidéoludique (1982).",
+      "En Europe, la console s'appelait Videopac G7000 et a vendu autant qu'aux États-Unis.",
+    ],
+    iconicGames: ['K.C. Munchkin!', 'Pick Axe Pete', 'Quest for the Rings', 'Demon Attack', 'UFO!'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Intel 8048 8-bit @ 1.79 MHz',
+      ram: '64 Bytes internes + 128 Bytes externes',
+      soundChip: 'Buzzer monophonique 1 canal',
+      videoChip: 'Contrôleur intégré : 160x200, 4 couleurs, 4 sprites',
+      colors: '8 couleurs affichables',
+      controllers: '2 joysticks amovibles avec 12 boutons + direction 8 voies',
+    },
+    rivalry: "Face à l'Atari 2600 toute-puissante : moins puissante, mais avec clavier et prix plus bas. La guerre des brevets contre Atari a marqué l'industrie naissante.",
+    curatorNote: "Sans l'Odyssey de 1972, le jeu de salon n'existerait peut-être pas tel quel. Ralph Baer est aujourd'hui reconnu comme le père de la console.",
+  },
+
+  cdi: {
+    tagline: "Le multimédia avant l'heure — et l'échec le plus instructif des années 90.",
+    history: "Le CD-i (Compact Disc Interactive) de Philips voulait être le lecteur multimédia du salon : jeux, encyclopédies, Photo CD et lecteurs vidéo dans une seule machine. Vendu 700 $ en 1991, il a souffert de ses jeux FMV médiocres (dont les infâmes jeux Zelda sous licence Nintendo !) et d'un positionnement flou entre console et lecteur DVD avant l'heure.",
+    innovations: [
+      "CD-ROM intégré en standard : 550 MB par disque, immense pour l'époque",
+      "Full Motion Video : des films sur CD interactifs dès 1992",
+      "Manette innovante avec pouce analogique (préfigurant la Dual Analog)",
+      "Le Green Book : un vrai standard d'interactivité multimédia ISO",
+    ],
+    anecdotes: [
+      "Les jeux Zelda et Mario du CD-i (Hotel Mario, Zelda: Wand of Gamelon) sont devenus des mèmes immortels — et n'ont été ni développés ni approuvés par Nintendo.",
+      "Philips a perdu environ un milliard de dollars sur le CD-i avant d'abandonner en 1998.",
+      "La manette originale en forme de télécommande était si inconfortable que Philips a dû sortir une vraie manette de jeu rapidement.",
+    ],
+    iconicGames: ['Hotel Mario', 'Zelda: Wand of Gamelon', 'Burn:Cycle', 'The 7th Guest', 'Myst'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68070 (compatible 68000) @ 15.5 MHz',
+      ram: '1 MB',
+      soundChip: 'MCD audio CD qualité + synthèse FM',
+      videoChip: 'VSDA décodage vidéo CD, 384x280 à 768x560',
+      colors: '16.7 millions de couleurs en palette',
+      controllers: 'Télécommande-pointeur ou manette avec pad directionnel',
+    },
+    rivalry: "Positionnée entre console et matériel hi-fi, elle n'a convaincu ni les joueurs (face à Mega Drive et SNES) ni les familles (face au futur lecteur DVD).",
+    curatorNote: "Un échec fascinant : le CD-i prouvait que la technologie seule ne suffit pas sans bibliothèque de jeux convaincante. Les Youtubeurs d'aujourd'hui le réhabilitent comme objet culte.",
+  },
+
+  zx81: {
+    tagline: "Le premier ordinateur du peuple — 49,95 £, le prix d'une semaine de salaire d'été.",
+    history: "Le ZX81 (1981) a vendu 1,5 million d'exemplaires en kits ou monté, faisant entrer l'informatique dans les foyers britanniques. 1 Ko de RAM, clavier membrane, et pourtant une vraie machine BASIC dont les jeux tapés dans les magazines ont formé la première génération de programmeurs maison.",
+    innovations: [
+      "Prix cassé radical : le premier ordinateur sous la barre des 50 £",
+      "Génération vidéo logicielle : l'image est calculée par le Z80, sans puce graphique",
+      "Kit à souder soi-même (écoles et familles) ou version montée",
+    ],
+    anecdotes: [
+      "La RAM de 1 Ko obligeait les jeux à tenir en moins de 1000 caractères — les programmeurs comptaient chaque octet.",
+      "3D Monster Maze (1981), premier jeu 3D grand public, tournait dessus !",
+    ],
+    iconicGames: ['3D Monster Maze', 'Mazogs', 'Chess (Psion)'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Zilog Z80A @ 3.25 MHz',
+      ram: '1 KB (extensible à 16 KB)',
+      soundChip: 'Aucun (buzzer ajouté par les bidouilleurs)',
+      videoChip: 'Génération vidéo par logiciel, 32x24 caractères',
+      colors: 'Noir et blanc',
+      controllers: 'Clavier membrane 40 touches',
+    },
+    rivalry: "Face au Commodore VIC-20 : Sinclair gagnait sur le prix, Commodore sur la couleur et le son.",
+    curatorNote: "L'ancêtre de tout : sans le ZX81, pas de ZX Spectrum ni de démocratisation britannique du jeu vidéo.",
+  },
+
+  gameandwatch: {
+    tagline: "43 consoles dans une seule collection — l'ancêtre de la Game Boy.",
+    history: "Créée par Gunpei Yokoi en 1980 après qu'il vit un homme pressé jouer avec sa calculatrice dans un train, la Game & Watch combine un jeu LCD et une horloge dans un boîtier doré. 43 modèles (Ball, Fire, Donkey Kong...) vendus à 43,4 millions d'exemplaires avant de céder la place à la Game Boy.",
+    innovations: [
+      "Première console portable à succès de l'histoire",
+      "Croix directionnelle inventée sur le modèle Donkey Kong (1982) !",
+      "Double écran (Multi Screen) préfigurant la Nintendo DS",
+    ],
+    anecdotes: [
+      "La croix directionnelle du modèle Donkey Kong est le design D-pad encore utilisé aujourd'hui — inventé par Yokoi pour permettre de jouer d'une main.",
+      "Les écrans LCD à segments fixes obligeaient à pré-dessiner chaque objet possible du jeu.",
+    ],
+    iconicGames: ['Ball', 'Fire', 'Donkey Kong', 'Mario Bros.', 'Zelda'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Sharp SM5xx 4-bit',
+      ram: 'Quelques dizaines de bytes',
+      soundChip: 'Buzzer piézo (bips)',
+      videoChip: 'LCD à segments pré-imprimés',
+      colors: 'Écran monochrome + fonds colorés imprimés',
+      controllers: 'Boutons dédiés par jeu (+ D-pad sur les derniers modèles)',
+    },
+    rivalry: "Sans vraie rivale : les LCD games de Tandy, Tiger et Bandai tentaient d'imiter la formule.",
+    curatorNote: "La collection Game & Watch est le Graal des collectionneurs : les modèles complets en boîte atteignent des prix record. Nintendo l'a rééditée en 2020 pour ses 35 ans de Mario.",
+  },
+
+  pokemonmini: {
+    tagline: "La plus petite cartouche Nintendo — une console-pokéball.",
+    history: "La Pokémon Mini (2001) est la console la plus petite de Nintendo : format pokéball, cartouches minuscules, écran 96x64 monochrome. 9 jeux seulement, mais sa scène homebrew et son hacking (capteur de choc, IR, rumble intégrés !) en font un objet culte des bidouilleurs.",
+    innovations: [
+      "Rumble intégré dès 2001 (avant le Rumble Pak sur manettes de salon)",
+      "Capteur de choc : des jeux réagissent aux secousses réelles",
+      "Port infrarouge pour échanger entre consoles",
+    ],
+    anecdotes: [
+      "Pokémon Party Mini était vendu avec la console ; les autres cartouches coûtent aujourd'hui une fortune en état neuf.",
+      "Le hacking total de la console a permis des démos 3D et des jeux inédits 20 ans après sa mort commerciale.",
+    ],
+    iconicGames: ['Pokémon Party Mini', 'Pokémon Pinball Mini', 'Pokémon Tetris'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Seiko Epson E0C6S46 8-bit @ 4 MHz',
+      ram: '4 KB',
+      soundChip: 'Buzzer interne (1 canal)',
+      videoChip: 'LCD 96x64 monochrome 4 tons de gris',
+      colors: 'Monochrome',
+      controllers: 'D-pad + 2 boutons + bouton shake (capteur)',
+    },
+    rivalry: "Sans rivale directe : un gadget collector face aux GBA qui dominaient l'époque.",
+    curatorNote: "Un ovni commercial qui est devenu une pièce de collection et un terrain de jeu homebrew grâce à sa communauté de hackers.",
+  },
+
+  pc8801: {
+    tagline: "Le micro du jeu japonais haut de gamme des années 80.",
+    history: "Le PC-8801 de NEC (1979) dominait le jeu japonais des années 80 : résolution 640x400 exceptionnelle, adapté aux visual novels fondateurs et aux ports arcade fidèles. Les studios légendaires (Enix, Falcom, Koei, Chunsoft) y ont fait leurs armes avant la dissolution du marché vers le PC-98.",
+    innovations: [
+      "Résolution 640x400 en 1981 : le double de la norme mondiale",
+      "Standard de facto du jeu japonais haut de gamme (ports d'arcade quasi parfaits)",
+      "Berceau des RPG et visual novels japonais (Portopia, Ys, Dragon Slayer)",
+    ],
+    anecdotes: [
+      "The Portopia Serial Murder Case (1983) a inspiré Hideo Kojima pour créer Snatcher puis Metal Gear.",
+      "Les jeux PC-88 possèdent un style musical FM unique (YM2203) devenu culte chiptune.",
+    ],
+    iconicGames: ['Portopia Renzoku Satsujin Jiken', 'Dragon Slayer', 'Ys I', 'Sokoban', 'Thexder'],
+    hardwareHighlights: {
+      cpuArchitecture: 'NEC μPD780 (compatible Z80) @ 4-8 MHz',
+      ram: '64 KB à 256 KB',
+      soundChip: 'YM2203 (FM 3 voix + PSG) puis OPNA sur PC-88VA',
+      videoChip: 'μPD3301, 640x200 à 640x400, 8 couleurs',
+      colors: '8 couleurs (640x400)',
+      controllers: 'Clavier + joystick DB9',
+    },
+    rivalry: "Duel japonais 8-bit face au PC-98 puis au FM-7 de Fujitsu : NEC gagnait sur la base installée.",
+    curatorNote: "Sans le PC-88, l'école japonaise du RPG et du visual novel n'aurait pas la même histoire. Les Archives d88 sont un trésor culturel.",
+  },
+
+  pc9801: {
+    tagline: "Le PC du Japon — 18 ans de règne absolu sur l'archipel.",
+    history: "Le PC-98 de NEC (1982) a dominé l'informatique japonaise pendant 18 ans avec 18 millions d'exemplaires : le PC du pays. Son écran 640x400 et son audio FM YM2608 en ont fait la machine de référence du jeu japonais 16-bit : Touhou, Ys, les visual novels cultes et les premiers shmups de Castrate sont nés là.",
+    innovations: [
+      "640x400 natif dès 1982 : la norme japonaise pour le texte ET le jeu",
+      "Audio FM OPNA 8 canaux stéréo intégré (musiques cultes)",
+      "Compatibilité ascendante totale : un jeu de 1985 tournait sur un PC-9821 de 1997",
+    ],
+    anecdotes: [
+      "Touhou Project a débuté sur PC-98 (5 premiers épisodes) avant de migrer vers Windows.",
+      "L'écosystème PC-98 était si fermé que les PC compatibles IBM n'ont détrôné NEC qu'à la fin des années 90.",
+    ],
+    iconicGames: ['Touhou 1-5', 'Ys II', 'Sorcerian', 'Doukyuusei', 'Rusty'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Intel 8086 à i386 (5-25 MHz selon modèles)',
+      ram: '128 KB à 16 MB',
+      soundChip: 'Yamaha YM2608 OPNA (8 FM + rhythm), alors PC-9821 : MPU-PCM',
+      videoChip: 'EGC puis PC-9821 Graph**, 640x400 16 couleurs (4096 palette)',
+      colors: '16 parmi 4096 (256 couleurs sur PC-9821)',
+      controllers: 'Clavier + souris (la souris était standard !) + joystick',
+    },
+    rivalry: "NEC contre Fujitsu FM Towns et IBM PC : NEC a tenu le Japon 18 ans avant la vague Windows 95.",
+    curatorNote: "Une civilisation informatique à part : comprendre le PC-98, c'est comprendre le jeu japonais moderne (Touhou, Type-Moon, Leaf).",
+  },
+
+  amiga1200: {
+    tagline: "Le chant du cygne AGA — la dernière borne de l'empire Amiga.",
+    history: "L'Amiga 1200 (1992) embarque le chipset AGA : 262 144 couleurs et des ports d'arcade éblouissants, dans le format compact 600. Malgré ses qualités (disque dur IDE intégré, Agnus avancé), le contexte Commodore en faillite l'a empêché d'imposer l'AGA ; il reste l'ultime Amiga natif avant la disparition de Commodore en 1994.",
+    innovations: [
+      "Chipset AGA : 256 couleurs en chunky, 262 144 en HAM8",
+      "Disque dur IDE 2.5 pouces intégré de série",
+      "Compatibilité totale OCS/ECS : 25 000 jeux et démos restent jouables",
+    ],
+    anecdotes: [
+      "La scène démos AGA (Space Balls, Melon Dezign) a repoussé le chipset jusqu'à des effets que personne ne pensait possibles.",
+      "Commodore a fait faillite deux ans après sa sortie : l'A1200 fut vendu en liquidation à prix cassé, sauvant sa popularité.",
+    ],
+    iconicGames: ['Superfrog', 'The Chaos Engine', 'Zool 2', 'Guardian', 'Banshee'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68EC020 @ 14 MHz',
+      ram: '2 MB Chip RAM (extensible par trappe accelerator)',
+      soundChip: 'Paula 4 canaux 8-bit stéréo',
+      videoChip: 'AGA (Lisa), 262 144 couleurs HAM8',
+      colors: '262 144 (HAM8) / 256 simultanés',
+      controllers: 'Joystick DB9 + souris + ports série/parallèle',
+    },
+    rivalry: "Face aux PC VGA 486 qui montaient : l'A1200 gagnait sur le prix et le design, perdu sur la course à la 3D.",
+    curatorNote: "L'ultime Amiga officiel : sa communauté continue de le faire vivre avec des accelerators modernes et des jeux inédits en 2026.",
+  },
+
+  fmtowns: {
+    tagline: "Le Rolls-Royce du CD-ROM japonais — ports d'arcade parfaits.",
+    history: "Le FM Towns de Fujitsu (1989) est le premier PC de masse avec CD-ROM intégré : audio qualité Red Book, vidéo, ports arcade quasi identiques aux cartes d'origine. Sa bibliothèque (FMV, ports parfaits deAfter Burner, Galaxy Force) en fait l'objet de collection absolu de l'émulation japonaise.",
+    innovations: [
+      "Premier ordinateur grand public avec lecteur CD-ROM intégré (1989 !)",
+      "Ports d'arcade considérés comme les plus fidèles de l'ère 16/32-bit",
+      "Audio CD Red Book en jeu : bande-son qualité album", 
+    ],
+    anecdotes: [
+      "Le nom vient de Charles Hard Townes, prix Nobel de physique — un clin d'œil interne Fujitsu.",
+      "Ses jeux FMV (Yumimi Mix, D no Shokutaku) ont inspiré l'esthétique du jeu japonais moderne.",
+    ],
+    iconicGames: ['D no Shokutaku (D)', 'Galaxy Force II', 'Yumimi Mix', 'After Burner III'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Intel i386DX @ 16 MHz (i486 sur Marty/Hunter)',
+      ram: '2 MB à 32 MB',
+      soundChip: 'Yamaha YM3438 (OPN4, synthèse FM 8 canaux) + CD Red Book',
+      videoChip: 'Cirrus Logic CD-A/V, 640x400 32768 couleurs',
+      colors: '32768 simultanés',
+      controllers: 'Clavier + souris + gamepad 6 boutons',
+    },
+    rivalry: "Face au PC-98 et au X68000 : Fujitsu gagnait sur le CD-ROM intégré et la vidéo, perdait sur la base installée.",
+    curatorNote: "Le FM Towns est la machine des collectionneurs : ses CD d'origine sont des œuvres d'art et l'émulation (MAME) a enfin rattrapé sa complexité.",
+  },
+
+  bbcmicro: {
+    tagline: "L'ordinateur des écoles britanniques qui a formé des décennies de programmeurs.",
+    history: "Le BBC Micro d'Acorn (1981) est né d'un projet de la BBC d'alphabétiser la Grande-Bretagne à l'informatique : série documentaire + ordinateur officiel. 1,5 million d'exemplaires dans les écoles, un BASIC ultra-rapide et des ports arcade solides (Repton, Frak!). Sa filiale Acorn RISC Machine... est devenue ARM, processeur dans votre poche.",
+    innovations: [
+      "Projet éducatif national : documentaires BBC + ordinateur en classe",
+      "BASIC II ultra-performant avec assembleur intégré",
+      "EconoTube : le réseau local Econet dès 1981",
+      "Sa lignée processeur a donné naissance à ARM (Archimedes → votre smartphone)",
+    ],
+    anecdotes: [
+      "Les élèves britanniques des années 80 apprenaient à coder sur BBC Micro dans le cadre du programme national Computer Literacy Project.",
+      "Elite (1984) de Braben et Bell, le jeu spatial légendaire, tenait sur disquette grâce au processeur 6502 à 2 MHz de la machine.",
+    ],
+    iconicGames: ['Elite', 'Repton', 'Frak!', 'Exile', 'Chuckie Egg'],
+    hardwareHighlights: {
+      cpuArchitecture: 'MOS 6502A @ 2 MHz (le double des concurrents)',
+      ram: '16/32/64 KB selon modèles',
+      soundChip: 'Texas Instruments SN76489 (3 voix + bruit)',
+      videoChip: 'MC6845, 640x256 en mono',
+      colors: '8 couleurs (2/4/16 selon modes)',
+      controllers: 'Clavier Brown/orange + 2 ports joystick analogiques',
+    },
+    rivalry: "Face au ZX Spectrum en classe : le BBC Micro coûtait 10x plus cher mais était 10x plus solide et rapide.",
+    curatorNote: "L'ordinateur qui a changé le monde deux fois : en formant des générations de codeurs britanniques, et en engendrant ARM — le processeur qui fait tourner l'humanité connectée.",
+  },
+
+  cps1: {
+    tagline: "La carte qui a fait tripler les recettes d'arcade Capcom.",
+    history: "Le CP System (1988) de Capcom a donné au beat'em up et au jeu de combat leurs standards : Final Fight, Forgotten Worlds, et surtout Street Fighter II (1991) qui a lancé la folie mondiale de l'arcade versus. Ses graphismes 384x224 et ses sprites fluides ont défini le look arcade 90s.",
+    innovations: [
+      "Graphismes 4096 couleurs avec dégradés hardware inédits",
+      "QSound (1991) : la première spatialisation audio arcade (casque recommandé !)",
+      "Le modèle économique : SFII a généré des milliards de yens de recettes arcade",
+    ],
+    anecdotes: [
+      "Street Fighter II a causé des émeutes de pièces dans les salles du monde entier : certains opérateurs ont remis des fiches gratuites pour calmer la foule.",
+      "La suicide battery des cartouches CPS-2 (chiffrement qui meurt) a déclenché une course au décryptage communautaire légendaire.",
+    ],
+    iconicGames: ['Street Fighter II', 'Final Fight', '1942', 'Ghouls n Ghosts', 'Strider'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68000 @ 10 MHz + Z80 @ 3.58 MHz (son)',
+      ram: '64 KB + 64 KB vidéo',
+      soundChip: 'YM2151 FM + OKI MSM6295 ADPCM (puis QSound)',
+      videoChip: 'CPS-A/B/C, 384x224, 1024 sprites',
+      colors: '4096 palette, 1024 simultanés',
+      controllers: 'Stick + 2 boutons (6 boutons pour SFII !)',
+    },
+    rivalry: "Face aux cartes SNK Neo Geo : Capcom gagnait sur la puissance graphique, perdait sur la capacité de stockage.",
+    curatorNote: "Le CPS-1 est le socle du versus fighting : sans Street Fighter II sur CPS-1, l'e-sport n'aurait pas la même histoire.",
+  },
+
+  cps2: {
+    tagline: "L'apothéose 2D de Capcom — et sa légendaire suicide battery.",
+    history: "Le CP System II (1993) pousse la 2D arcade à son sommet : Street Fighter Alpha, X-Men vs Street Fighter, Marvel Super Heroes. Sa particularité : les données jeu sont chiffrées par une pile lithium sur la cartouche — quand elle meurt, le jeu devient inutilisable. La communauté a réussi à décrypter l'ensemble en 2016.",
+    innovations: [
+      "Chiffrement matériel des ROMs (anti-piratage par pile lithium)",
+      "QSound DSP 16 canaux : l'audio arcade le plus immersif de 1993",
+      "Sprites illimités en pratique : les versus 2v2 deviennent possibles",
+    ],
+    anecdotes: [
+      "La suicide battery dure environ 10 ans : vers 2003, les cartouches CPS-2 ont commencé à mourir en masse dans les salles.",
+      "Razoola (Neo-Ace) a passé des années à décrypter le système — une des plus grandes réussites de rétro-ingénierie communautaire.",
+    ],
+    iconicGames: ['Street Fighter Alpha 3', 'X-Men vs Street Fighter', 'Marvel vs Capcom', 'Super Puzzle Fighter II'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68EC020 @ 16 MHz + Z80',
+      ram: '128 KB + mémoire vidéo dédiée',
+      soundChip: 'QSound DSP (16 canaux) + Z80 YM2151',
+      videoChip: 'CPS-B (évolution CPS-1), 384x224',
+      colors: '4096 palette',
+      controllers: 'Stick + 6 boutons (le standard versus)',
+    },
+    rivalry: "Face au Neo Geo MVS de SNK : la guerre des versus fighting (SF Alpha vs KOF) a dominé les salles 1995-2000.",
+    curatorNote: "Le CPS-2 est l'apogée technique du 2D arcade : sa sauvegarde communautaire par décryptage est un moment historique de la préservation vidéoludique.",
+  },
+
+  cps3: {
+    tagline: "6 jeux, perfection absolue — le Saint Graal de l'arcade 2D.",
+    history: "Le CP System III (1996) n'a accueilli que 6 jeux, mais lesquels : Street Fighter III (1, 2, 3rd Strike), JoJo's Bizarre Adventure, Red Earth et Warzard. Son animation 60 fps fluide, sa qualité graphique inégalée et sa bande-son streaming CD en font la carte 2D la plus convoitée — et la plus difficile à émuler correctement.",
+    innovations: [
+      "Puce de décompression graphique : animation d'une fluidité inégalée",
+      "Bande-son streaming depuis CD-ROM (qualité album dans l'arcade)",
+      "Seulement 6 jeux : la bibliothèque la plus sélective de l'arcade",
+    ],
+    anecdotes: [
+      "3rd Strike (1999) reste LE jeu de combat de référence des tournois mondiaux (Evo Moment #37, le parry d'Evo 2004).",
+      "Les cartouches CPS-3 utilisaient des CD-ROM gravés + une cartouche SIMM : le set complet est introuvable, l'émulation MAME l'a sauvé.",
+    ],
+    iconicGames: ['Street Fighter III: 3rd Strike', "JoJo's Bizarre Adventure", 'Red Earth', 'Street Fighter III: New Generation'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Hitachi SH-2 x3 @ 28.63 MHz',
+      ram: '16 MB (énorme pour 1996)',
+      soundChip: 'QSound (streaming CD + synthèse)',
+      videoChip: 'Raster + décompression hardware, 384x224',
+      colors: '16.7 millions palette',
+      controllers: 'Stick + 6 boutons',
+    },
+    rivalry: "Sans vraie rivale : la Naomi de Sega (3D) allait bientôt remplacer le 2D arcade. Le CPS-3 fut le chant du cygne 2D.",
+    curatorNote: "6 jeux, aucun compromis : le CPS-3 est la carte la plus parfaite jamais produite par Capcom — et l'émulation de sa puce de cryptage fut un défi de 20 ans pour MAME.",
+  },
 };
 
