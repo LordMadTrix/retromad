@@ -16,13 +16,31 @@ const STORAGE_KEY_SETTINGS = 'retromad_web_settings';
  * Charge une collection depuis le cache localStorage (modifications admin en mode web),
  * avec repli sur les données par défaut si absente ou corrompue.
  */
-function loadCached<T>(key: string, fallback: T[]): T[] {
+function loadCached<T extends { id: string }>(key: string, fallback: T[]): T[] {
   try {
     const saved = localStorage.getItem(`retromad_${key}_cache`);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        // Fusion avec les valeurs d'usine : les nouveaux systèmes/firmes ajoutés
+        // par les mises à jour apparaissent même si un ancien cache existe.
+        const savedById = new Map(parsed.map((item: T) => [item.id, item]));
+        fallback.forEach((factoryItem) => {
+          if (!savedById.has(factoryItem.id)) {
+            savedById.set(factoryItem.id, factoryItem);
+          }
+        });
+        // Conserver l'ordre d'usine pour les éléments d'usine, cache pour les autres
+        const result: T[] = [];
+        const seen = new Set<string>();
+        fallback.forEach((f) => {
+          result.push(savedById.get(f.id)!);
+          seen.add(f.id);
+        });
+        parsed.forEach((p: T) => {
+          if (!seen.has(p.id)) result.push(p);
+        });
+        return result;
       }
     }
   } catch {

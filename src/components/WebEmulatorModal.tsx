@@ -74,6 +74,16 @@ const EJS_CORE_BY_SYSTEM: Record<string, string> = {
   cps1: 'arcade',
   cps2: 'arcade',
   cps3: 'arcade',
+  x68000: 'px68k',
+  x1: 'x1',
+  atari8bit: 'atari800',
+  vic20: 'vice_xvic',
+  c128: 'vice_x128',
+  plus4: 'vice_xplus4',
+  thomson: 'theodore',
+  neogeocd: 'neocd',
+  pc8000: 'pc8000',
+  gx4000: 'cap32',
 };
 
 interface WebEmulatorModalProps {

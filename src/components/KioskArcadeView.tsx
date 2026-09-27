@@ -28,6 +28,8 @@ import {
   Layers,
   Sliders,
   Maximize2,
+  Monitor,
+  X,
 } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
@@ -58,6 +60,25 @@ interface KioskArcadeViewProps {
 }
 
 type KioskStep = 'companies' | 'consoles' | 'games';
+type KioskCategory = 'all' | 'consoles' | 'computing';
+
+/** Systèmes « informatique » (micro-ordinateurs) présentés dans le cadre PC. */
+const KIOSK_COMPUTING_IDS = new Set([
+  'appleii', 'c64', 'amstradcpc', 'msx', 'msx2', 'atarist', 'amiga', 'msdos',
+  'zxspectrum', 'zx81', 'pc8801', 'pc9801', 'amiga1200', 'cdi', 'fmtowns',
+  'bbcmicro', 'odyssey2', 'x68000', 'x1', 'atari8bit', 'vic20', 'c128',
+  'plus4', 'thomson', 'pc8000', 'gx4000',
+]);
+
+/** Filtrer les firmes selon la catégorie choisie (PC / Consoles). */
+function companyMatchesCategory(companyId: string, systems: System[], category: KioskCategory): boolean {
+  if (category === 'all') return true;
+  const compSystems = systems.filter((s) => s.companyId === companyId);
+  if (compSystems.length === 0) return false;
+  const hasComputing = compSystems.some((s) => KIOSK_COMPUTING_IDS.has(s.id));
+  const hasConsoles = compSystems.some((s) => !KIOSK_COMPUTING_IDS.has(s.id));
+  return category === 'computing' ? hasComputing : hasConsoles;
+}
 
 // Héros mythiques par firme pour enrichir l'habillage arcade
 interface HeroShowcase {
@@ -242,7 +263,30 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [isCompactFit, setIsCompactFit] = useState<boolean>(false);
 
+  // Cadre actif au niveau 1 : PC (micro-ordinateurs) ou Consoles
+  const [category, setCategory] = useState<KioskCategory>('all');
+
   const { playMove, playSelect, playLaunch, playBack, playCoin, playFavorite, playDice } = useAudio(soundEnabled, soundVolume);
+
+  // Firmes filtrées par cadre (PC / Consoles)
+  const visibleCompanies = useMemo(() => {
+    if (category === 'all') return companies;
+    return companies.filter((c) => companyMatchesCategory(c.id, systems, category));
+  }, [companies, systems, category]);
+
+  // Garantir un index valide quand le filtre change
+  useEffect(() => {
+    setCompanyIndex((prev) => (prev >= visibleCompanies.length ? 0 : prev));
+  }, [visibleCompanies.length]);
+
+  const switchCategory = useCallback((next: KioskCategory) => {
+    setCategory((prev) => {
+      if (prev === next) return prev;
+      playSelect();
+      return next;
+    });
+    setCompanyIndex(0);
+  }, [playSelect]);
 
   // Effet d'ambiance monnayeur arcade au démarrage
   useEffect(() => {
@@ -252,11 +296,16 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     return () => clearTimeout(timer);
   }, [playCoin]);
 
-  // Consoles de la firme sélectionnée
+  // Consoles de la firme sélectionnée (filtrées selon le cadre actif : PC / Consoles)
   const companySystems = useMemo(() => {
     if (!selectedCompany) return [];
-    return systems.filter((s) => s.companyId === selectedCompany.id);
-  }, [systems, selectedCompany]);
+    return systems.filter((s) => {
+      if (s.companyId !== selectedCompany.id) return false;
+      if (category === 'consoles') return !KIOSK_COMPUTING_IDS.has(s.id);
+      if (category === 'computing') return KIOSK_COMPUTING_IDS.has(s.id);
+      return true;
+    });
+  }, [systems, selectedCompany, category]);
 
   // Jeux de la console sélectionnée (avec filtre favoris optionnel)
   // Tri : derniers joués d'abord (reprise rapide), puis favoris, puis alphabétique
@@ -367,7 +416,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       onLeft: () => {
         playMove();
         if (step === 'companies') {
-          setCompanyIndex((prev) => (prev > 0 ? prev - 1 : companies.length - 1));
+          setCompanyIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, visibleCompanies.length - 1)));
         } else if (step === 'consoles') {
           setConsoleIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, companySystems.length - 1)));
         } else if (step === 'games') {
@@ -377,7 +426,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       onRight: () => {
         playMove();
         if (step === 'companies') {
-          setCompanyIndex((prev) => (prev < companies.length - 1 ? prev + 1 : 0));
+          setCompanyIndex((prev) => (prev < visibleCompanies.length - 1 ? prev + 1 : 0));
         } else if (step === 'consoles') {
           setConsoleIndex((prev) => (prev < companySystems.length - 1 ? prev + 1 : 0));
         } else if (step === 'games') {
@@ -393,7 +442,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           return;
         }
         if (step === 'companies') {
-          const comp = companies[companyIndex];
+          const comp = visibleCompanies[companyIndex];
           if (comp) handleSelectCompany(comp);
         } else if (step === 'consoles') {
           const sys = companySystems[consoleIndex];
@@ -427,7 +476,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       onFavorite: () => {
         if (exhibitionSystem || exhibitionCompany) return;
         if (step === 'companies') {
-          const comp = companies[companyIndex];
+          const comp = visibleCompanies[companyIndex];
           if (comp) {
             playSelect();
             setExhibitionCompany(comp);
@@ -446,7 +495,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       onDetails: () => {
         if (exhibitionSystem || exhibitionCompany) return;
         if (step === 'companies') {
-          const comp = companies[companyIndex];
+          const comp = visibleCompanies[companyIndex];
           if (comp) {
             playSelect();
             setExhibitionCompany(comp);
@@ -480,7 +529,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         if (exhibitionSystem || exhibitionCompany) return;
         playMove();
         if (step === 'companies') {
-          setCompanyIndex((prev) => (prev > 0 ? prev - 1 : companies.length - 1));
+          setCompanyIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, visibleCompanies.length - 1)));
         } else if (step === 'consoles') {
           setConsoleIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, companySystems.length - 1)));
         } else if (step === 'games') {
@@ -490,7 +539,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         if (exhibitionSystem || exhibitionCompany) return;
         playMove();
         if (step === 'companies') {
-          setCompanyIndex((prev) => (prev < companies.length - 1 ? prev + 1 : 0));
+          setCompanyIndex((prev) => (prev < visibleCompanies.length - 1 ? prev + 1 : 0));
         } else if (step === 'consoles') {
           setConsoleIndex((prev) => (prev < companySystems.length - 1 ? prev + 1 : 0));
         } else if (step === 'games') {
@@ -505,7 +554,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           return;
         }
         if (step === 'companies') {
-          const comp = companies[companyIndex];
+          const comp = visibleCompanies[companyIndex];
           if (comp) handleSelectCompany(comp);
         } else if (step === 'consoles') {
           const sys = companySystems[consoleIndex];
@@ -534,9 +583,15 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
         } else {
           onUnlockAdmin();
         }
+      } else if (e.key === 'Tab') {
+        // Basculer entre les cadres PC et Consoles au niveau firmes
+        if (step === 'companies' && !exhibitionSystem && !exhibitionCompany) {
+          e.preventDefault();
+          switchCategory(category === 'computing' ? 'consoles' : 'computing');
+        }
       } else if (e.key.toLowerCase() === 'm' || e.key.toLowerCase() === 'e') {
         if (step === 'companies') {
-          const comp = companies[companyIndex];
+          const comp = visibleCompanies[companyIndex];
           if (comp) {
             playSelect();
             setExhibitionCompany(comp);
@@ -831,7 +886,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           <div className={`text-center ${isCompactFit ? 'mb-2' : 'mb-3 sm:mb-5'}`}>
             <div className="inline-flex items-center space-x-2 px-3 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Étape 1 sur 3 • Choisissez votre constructeur</span>
+              <span>Étape 1 sur 3 • Choisissez votre univers</span>
             </div>
             <h1 className={`${isCompactFit ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'} font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]`}>
               LES GRANDES FIRMES DU JEU VIDÉO
@@ -841,9 +896,76 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </p>
           </div>
 
-          {/* Grille des Firmes en Grand au Centre */}
+          {/* ── LES DEUX CADRES : PC & CONSOLES ── */}
+          <div className="flex items-stretch justify-center gap-3 sm:gap-5 max-w-4xl w-full mx-auto mb-4">
+            {/* Cadre PC — Informatique */}
+            <button
+              type="button"
+              onClick={() => switchCategory('computing')}
+              onMouseEnter={() => { if (category !== 'computing') playMove(); }}
+              className={`relative flex-1 max-w-[340px] rounded-2xl border-2 p-4 text-left transition-all duration-300 overflow-hidden ${
+                category === 'computing'
+                  ? 'border-amber-400 bg-amber-500/10 shadow-[0_0_30px_rgba(251,191,36,0.35)] scale-[1.03]'
+                  : 'border-slate-700/70 bg-slate-900/60 hover:border-amber-500/50 opacity-80 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Monitor className={`w-9 h-9 shrink-0 ${category === 'computing' ? 'text-amber-300' : 'text-slate-500'}`} />
+                <div className="min-w-0">
+                  <div className="text-base sm:text-lg font-black text-white uppercase tracking-wider leading-tight">PC</div>
+                  <div className="text-[10px] sm:text-[11px] text-amber-200/90 font-bold uppercase tracking-widest">Informatique · Micros</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                    {systems.filter((s) => KIOSK_COMPUTING_IDS.has(s.id)).length} machines · ZX Spectrum, CPC, Amiga...
+                  </div>
+                </div>
+              </div>
+              {category === 'computing' && (
+                <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-400 text-slate-900 text-[9px] font-black uppercase">Actif</span>
+              )}
+            </button>
+
+            {/* Cadre Consoles */}
+            <button
+              type="button"
+              onClick={() => switchCategory('consoles')}
+              onMouseEnter={() => { if (category !== 'consoles') playMove(); }}
+              className={`relative flex-1 max-w-[340px] rounded-2xl border-2 p-4 text-left transition-all duration-300 overflow-hidden ${
+                category === 'consoles'
+                  ? 'border-cyan-400 bg-cyan-500/10 shadow-[0_0_30px_rgba(34,211,238,0.35)] scale-[1.03]'
+                  : 'border-slate-700/70 bg-slate-900/60 hover:border-cyan-500/50 opacity-80 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Gamepad2 className={`w-9 h-9 shrink-0 ${category === 'consoles' ? 'text-cyan-300' : 'text-slate-500'}`} />
+                <div className="min-w-0">
+                  <div className="text-base sm:text-lg font-black text-white uppercase tracking-wider leading-tight">Consoles</div>
+                  <div className="text-[10px] sm:text-[11px] text-cyan-200/90 font-bold uppercase tracking-widest">Salon & Portables</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                    {systems.filter((s) => !KIOSK_COMPUTING_IDS.has(s.id)).length} machines · NES, Mega Drive, PlayStation...
+                  </div>
+                </div>
+              </div>
+              {category === 'consoles' && (
+                <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-cyan-400 text-slate-900 text-[9px] font-black uppercase">Actif</span>
+              )}
+            </button>
+          </div>
+
+          {/* Bouton réinitialiser le filtre quand un cadre est actif */}
+          {category !== 'all' && (
+            <button
+              type="button"
+              onClick={() => switchCategory('all')}
+              className="mx-auto mb-3 flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600/70 bg-slate-900/70 text-[10px] font-bold text-slate-300 hover:text-white hover:border-slate-400 transition"
+            >
+              <X className="w-3 h-3" />
+              Afficher toutes les firmes (Tab pour changer de cadre)
+            </button>
+          )}
+
+          {/* Grille des Firmes en Grand au Centre (filtrée par cadre) */}
           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${isCompactFit ? 'gap-2.5 sm:gap-3' : 'gap-3 sm:gap-5'} max-w-6xl w-full justify-center`}>
-            {companies.map((company, idx) => {
+            {visibleCompanies.map((company, idx) => {
               const isFocused = idx === companyIndex;
               const consoleCount = systems.filter((s) => s.companyId === company.id).length;
               const romCount = gamesCountByCompany.get(company.id) || 0;

@@ -1925,6 +1925,270 @@ const RAW_SYSTEMS: System[] = [
     biosList: [
       { filename: 'cps3_boot.bin', description: 'BIOS CPS-3 (requis, inclus dans les sets FBNeo)', optional: true }
     ]
+  },
+  {
+    id: 'x68000',
+    name: 'Sharp X68000',
+    shortName: 'X68000',
+    companyId: 'multiple',
+    manufacturer: 'Sharp',
+    releaseYear: 1987,
+    generation: 'Micro-ordinateur 16/32-bit japonais',
+    specs: {
+      cpu: 'Motorola 68000 @ 10 MHz',
+      gpuOrAudio: 'Custom Sharp (640x512, 65 536 couleurs) + Oki MSM6258 + YM2151',
+      resolution: '640x512 pixels',
+      media: 'Disquettes 5.25" (la tour iconique)',
+      unitsSold: 'culte au Japon (ports arcade parfaits)'
+    },
+    extensions: ['.dim', '.img', '.d88', '.hdf', '.zip'],
+    libretroSystemName: 'Sharp_-_X68000',
+    defaultCoreLinux: 'px68k_libretro.so',
+    defaultCoreWindows: 'px68k_libretro.dll',
+    subfolder: 'x68000',
+    icon: 'Cpu',
+    themeColor: '#2a2a35',
+    logoUrl: './logos/consoles/x68000.png',
+    biosList: [
+      { filename: 'iplrom.dat', description: 'IPLROM X68000 (obligatoire pour PX68K)', optional: false },
+      { filename: 'cgrom.dat', description: 'CGROM polices X68000 (obligatoire)', optional: false }
+    ]
+  },
+  {
+    id: 'x1',
+    name: 'Sharp X1',
+    shortName: 'X1',
+    companyId: 'multiple',
+    manufacturer: 'Sharp',
+    releaseYear: 1982,
+    generation: 'Micro-ordinateur 8-bit japonais',
+    specs: {
+      cpu: 'Zilog Z80 @ 4 MHz',
+      gpuOrAudio: 'CRTC Sharp (640x400) + AY-3-8910 PSG 3 voix',
+      resolution: '640x200 à 640x400',
+      media: 'Cassettes et disquettes 5.25"',
+      unitsSold: 'culte au Japon (ports Taito)'
+    },
+    extensions: ['.d88', '.t88', '.zip'],
+    libretroSystemName: 'Sharp_-_X1',
+    defaultCoreLinux: 'x1_libretro.so',
+    defaultCoreWindows: 'x1_libretro.dll',
+    subfolder: 'x1',
+    icon: 'Cpu',
+    themeColor: '#c0392b',
+    logoUrl: './logos/consoles/x1.png',
+    biosList: [
+      { filename: 'IPLROM.X1', description: 'IPLROM Sharp X1 (recommandé)', optional: true }
+    ]
+  },
+  {
+    id: 'atari8bit',
+    name: 'Atari 8-bit Family',
+    shortName: 'Atari 8-bit',
+    companyId: 'atari',
+    manufacturer: 'Atari',
+    releaseYear: 1979,
+    generation: 'Micro-ordinateur 8-bit pionnier',
+    specs: {
+      cpu: 'MOS 6502C @ 1.79 MHz (ANTIC + GTIA + POKEY intégrés)',
+      gpuOrAudio: 'ANTIC/GTIA (256 couleurs) + POKEY 4 voix (la puce est un son !)',
+      resolution: '320x192 à 640x400',
+      media: 'Cassettes, disquettes 5.25" et cartouches ROM',
+      unitsSold: '~4 millions (800/800XL/130XE...)'
+    },
+    extensions: ['.atr', '.xfd', '.dsk', '.atr.gz', '.zip'],
+    libretroSystemName: 'Atari_-_8-bit_Family',
+    defaultCoreLinux: 'atari800_libretro.so',
+    defaultCoreWindows: 'atari800_libretro.dll',
+    subfolder: 'atari8bit',
+    icon: 'Cpu',
+    themeColor: '#c94f2b',
+    logoUrl: './logos/consoles/atari8bit.png',
+    biosList: [
+      { filename: 'ATARIXL.ROM', description: 'OS XL (obligatoire pour XL/XE)', optional: true },
+      { filename: 'ATARIOSA.ROM', description: 'OS 400/800 révision A', optional: true }
+    ]
+  },
+  {
+    id: 'vic20',
+    name: 'Commodore VIC-20',
+    shortName: 'VIC-20',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1980,
+    generation: 'Micro-ordinateur 8-bit pionnier',
+    specs: {
+      cpu: 'MOS 6502 @ 1.02 MHz',
+      gpuOrAudio: 'VIC (176x184, 16 couleurs) + VIA + juste le biper 4 voix logiciel',
+      resolution: '176x184 pixels',
+      media: 'Cassettes et cartouches ROM (5 KB RAM d usine !)',
+      unitsSold: '1 million (le 1er à dépasser le million !)'
+    },
+    extensions: ['.d64', '.t64', '.prg', '.tap', '.zip'],
+    libretroSystemName: 'Commodore_-_VIC-20',
+    defaultCoreLinux: 'vice_xvic_libretro.so',
+    defaultCoreWindows: 'vice_xvic_libretro.dll',
+    subfolder: 'vic20',
+    icon: 'Cpu',
+    themeColor: '#e8e8e8',
+    logoUrl: './logos/consoles/vic20.png',
+    biosList: []
+  },
+  {
+    id: 'c128',
+    name: 'Commodore 128',
+    shortName: 'C128',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1985,
+    generation: 'Micro-ordinateur 8-bit (double CPU)',
+    specs: {
+      cpu: 'MOS 8502 @ 1-2 MHz + Zilog Z80 @ 4 MHz (CP/M !)',
+      gpuOrAudio: 'VDC 80 colonnes + VIC-II (compatible C64)',
+      resolution: '640x200 (VDC 80 col) + 320x200 VIC-II',
+      media: 'Cassettes, disquettes 1571 et cartouches',
+      unitsSold: '4 millions (dernier 8-bit Commodore)'
+    },
+    extensions: ['.d64', '.d71', '.t64', '.prg', '.zip'],
+    libretroSystemName: 'Commodore_-_128',
+    defaultCoreLinux: 'vice_x128_libretro.so',
+    defaultCoreWindows: 'vice_x128_libretro.dll',
+    subfolder: 'c128',
+    icon: 'Cpu',
+    themeColor: '#b8a88a',
+    logoUrl: './logos/consoles/c128.png',
+    biosList: []
+  },
+  {
+    id: 'plus4',
+    name: 'Commodore Plus/4',
+    shortName: 'Plus/4',
+    companyId: 'commodore',
+    manufacturer: 'Commodore',
+    releaseYear: 1984,
+    generation: 'Micro-ordinateur 8-bit bureautique',
+    specs: {
+      cpu: 'MOS 7501 (6502 compatible) @ 1.76 MHz',
+      gpuOrAudio: 'TED (121 couleurs, la palette la plus riche 8-bit !) + 2 voix',
+      resolution: '320x200 à 640x200',
+      media: 'Cassettes et cartouches (4 logiciels bureautiques intégrés)',
+      unitsSold: '~1 million (surtout en Europe de l Est)'
+    },
+    extensions: ['.d64', '.t64', '.prg', '.tap', '.zip'],
+    libretroSystemName: 'Commodore_-_Plus4',
+    defaultCoreLinux: 'vice_xplus4_libretro.so',
+    defaultCoreWindows: 'vice_xplus4_libretro.dll',
+    subfolder: 'plus4',
+    icon: 'Cpu',
+    themeColor: '#8f8f8f',
+    logoUrl: './logos/consoles/plus4.png',
+    biosList: []
+  },
+  {
+    id: 'thomson',
+    name: 'Thomson MO/TO',
+    shortName: 'Thomson',
+    companyId: 'multiple',
+    manufacturer: 'Thomson',
+    releaseYear: 1984,
+    generation: 'Micro-ordinateur 8-bit français',
+    specs: {
+      cpu: 'Motorola 6803 (MO5) / 6809 (TO7-70, MO6) @ 1-2 MHz',
+      gpuOrAudio: 'EF9369 (MO5 : 320x200, 16 couleurs parmi 4096 !) + SN76489',
+      resolution: '320x200 pixels',
+      media: 'Cassettes et disquettes 3.5" (le « plan informatique pour tous » français)',
+      unitsSold: 'des millions en France (écoles + foyers via le plan IPT)'
+    },
+    extensions: ['.fd', '.sap', '.k7', '.m5', '.m7', '.zip'],
+    libretroSystemName: 'Thomson_-_MO5',
+    defaultCoreLinux: 'theodore_libretro.so',
+    defaultCoreWindows: 'theodore_libretro.dll',
+    subfolder: 'thomson',
+    icon: 'Cpu',
+    themeColor: '#2e7d32',
+    logoUrl: './logos/consoles/thomson.png',
+    biosList: [
+      { filename: 'MO5.ROM', description: 'BIOS Thomson MO5 (obligatoire)', optional: true }
+    ]
+  },
+  {
+    id: 'neogeocd',
+    name: 'SNK Neo Geo CD',
+    shortName: 'Neo Geo CD',
+    companyId: 'snk',
+    manufacturer: 'SNK',
+    releaseYear: 1994,
+    generation: '5e génération (CD)',
+    specs: {
+      cpu: 'Motorola 68000 @ 12 MHz + Z80 (identique à la Neo Geo cartouche)',
+      gpuOrAudio: 'Même chipset arcade : 4096 couleurs, 380 sprites + PCM 7 canaux',
+      resolution: '320x224 pixels',
+      media: 'CD-ROM (les jeux arcade à prix CD !)',
+      unitsSold: '~1 million (chargements longs...)'
+    },
+    extensions: ['.chd', '.cue', '.bin', '.iso', '.zip'],
+    libretroSystemName: 'SNK_-_Neo_Geo_CD',
+    defaultCoreLinux: 'neocd_libretro.so',
+    defaultCoreWindows: 'neocd_libretro.dll',
+    subfolder: 'neogeocd',
+    icon: 'Disc3',
+    themeColor: '#f5c518',
+    logoUrl: './logos/consoles/neogeocd.png',
+    biosList: [
+      { filename: 'neocd.bin', description: 'BIOS Neo Geo CD (top-loading ou front-loading)', md5: 'f39572af7584cb5b3f2ae2665ebef6d5', optional: false }
+    ]
+  },
+  {
+    id: 'pc8000',
+    name: 'NEC PC-8001',
+    shortName: 'PC-8001',
+    companyId: 'nec',
+    manufacturer: 'NEC',
+    releaseYear: 1979,
+    generation: 'Micro-ordinateur 8-bit japonais pionnier',
+    specs: {
+      cpu: 'NEC μPD780 (Z80 compatible) @ 4 MHz',
+      gpuOrAudio: 'μPD3301 (640x200) + buzzer puis AY-3-8910',
+      resolution: '640x200 pixels',
+      media: 'Cassettes et disquettes 5.25"',
+      unitsSold: 'le premier succès NEC (base du PC-88)'
+    },
+    extensions: ['.d88', '.t88', '.cmt', '.zip'],
+    libretroSystemName: 'NEC_-_PC-8000_Series',
+    defaultCoreLinux: 'yaba sanshiro2_libretro.so',
+    defaultCoreWindows: 'quasi88_libretro.dll',
+    subfolder: 'pc8000',
+    icon: 'Cpu',
+    themeColor: '#5c3d8f',
+    logoUrl: './logos/consoles/pc8000.png',
+    biosList: [
+      { filename: 'n80.rom', description: 'BIOS N80-BASIC (recommandé)', optional: true }
+    ]
+  },
+  {
+    id: 'gx4000',
+    name: 'Amstrad GX4000',
+    shortName: 'GX4000',
+    companyId: 'amstrad',
+    manufacturer: 'Amstrad',
+    releaseYear: 1990,
+    generation: '4e génération (8-bit cartouche)',
+    specs: {
+      cpu: 'Zilog Z80A @ 4 MHz (le cœur de l Amstrad CPC plus)',
+      gpuOrAudio: 'CRTC ASIC (6128 plus) : 4096 couleurs, sprites hardware + DMA audio',
+      resolution: '320x200 à 640x200',
+      media: 'Cartouches ROM (+ ports CPC pour clavier)',
+      unitsSold: 'échec (~15 000 en Europe, tuée par la Mega Drive/SM)'
+    },
+    extensions: ['.cpt', '.dsk', '.zip'],
+    libretroSystemName: 'Amstrad_-_GX4000',
+    defaultCoreLinux: 'cap32_libretro.so',
+    defaultCoreWindows: 'cap32_libretro.dll',
+    subfolder: 'gx4000',
+    icon: 'Gamepad2',
+    themeColor: '#5c2d91',
+    logoUrl: './logos/consoles/gx4000.png',
+    biosList: []
   }
 ];
 

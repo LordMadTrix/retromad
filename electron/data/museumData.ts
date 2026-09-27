@@ -2325,5 +2325,255 @@ export const MUSEUM_DATA: Record<string, MuseumExhibition> = {
     rivalry: "Sans vraie rivale : la Naomi de Sega (3D) allait bientôt remplacer le 2D arcade. Le CPS-3 fut le chant du cygne 2D.",
     curatorNote: "6 jeux, aucun compromis : le CPS-3 est la carte la plus parfaite jamais produite par Capcom — et l'émulation de sa puce de cryptage fut un défi de 20 ans pour MAME.",
   },
+
+  x68000: {
+    tagline: "La tour légendaire — ports d'arcade japonais parfaits.",
+    history: "Le Sharp X68000 (1987) est LA machine des puristes : une tour avec deux lecteurs de disquettes, des capacités graphiques 65 536 couleurs et des ports d'arcade (Gradius II, Castlevania, Final Fight, Parodius) considérés comme plus fidèles que sur les consoles de l'époque. Sa scène démos et shoot'em up reste légendaire.",
+    innovations: [
+      "Design iconique : tour horizontale avec écran et clavier coordonnés",
+      "Ports d'arcade quasi identiques (Capcom et Konami publiaient dessus !)",
+      "65 536 couleurs dès 1987, quand les PC affichaient 16 couleurs",
+    ],
+    anecdotes: [
+      "Castlevania: Rondo of Blood est d'abord apparu sur... PC Engine CD, mais Akumajou Dracula (1988) sur X68000 est un culte absolu.",
+      "Le clavier XX (pièce maîtresse) est encore recherché des collectionneurs de claviers mécaniques.",
+    ],
+    iconicGames: ['Gradius II', 'Castlevania (X68000)', 'Final Fight', 'Parodius', 'R-Type'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68000 @ 10 MHz',
+      ram: '1 MB à 12 MB (expansions)',
+      soundChip: 'YM2151 FM + OKI MSM6258 ADPCM',
+      videoChip: 'Custom Sharp, 640x512, 65536 couleurs',
+      colors: '65 536 (16 parmi palette en simultané selon modes)',
+      controllers: 'Souris + joystick + clavier mécanique légendaire',
+    },
+    rivalry: "Face au PC-98 de NEC : Sharp gagnait sur le jeu et la culture, NEC sur la bureautique.",
+    curatorNote: "L'émulation PX68K a enfin rattrapé la qualité des ports : le X68000 est une machine à explorer absolument pour les amateurs de shoot'em up.",
+  },
+
+  x1: {
+    tagline: "Le micro Taito — berceau des ports japonais 8-bit.",
+    history: "Le Sharp X1 (1982) est le premier grand micro japonais de jeu : Taito, Enix et Nihon Falcom y ont publié leurs premiers titres. Sa particularité technique : le générateur vidéo est programmable par software (CRTC), offrant des effets graphiques uniques pour l'époque.",
+    innovations: [
+      "CRTC entièrement programmable par logiciel (vblanks personnalisées)",
+      "Berceau des premiers RPG japonais et des ports Taito",
+      "640x400 dès 1982, l'écran haute résolution japonais",
+    ],
+    anecdotes: [
+      "Xanadu Scenario II (1985) s'est vendu à 400 000 exemplaires — un record absolu pour un RPG japonais 8-bit.",
+      "Le X1 Twin (avec lecteur cassette intégré) était vendu avec des magazines de jeux.",
+    ],
+    iconicGames: ['Xanadu Scenario II', 'Dragon Slayer', 'Frontier (Taito)', 'The Black Onyx'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Zilog Z80A @ 4 MHz',
+      ram: '64 KB',
+      soundChip: 'AY-3-8910 PSG 3 voix',
+      videoChip: 'CRTC programmable, 640x200 à 640x400',
+      colors: '8 couleurs simultanés (16 palette)',
+      controllers: 'Clavier + joystick',
+    },
+    rivalry: "Face au PC-8801 de NEC : Sharp gagnait sur le graphisme souple, NEC sur la base installée.",
+    curatorNote: "L'ancêtre culturel du jeu japonais sur ordinateur : comprendre le X1, c'est comprendre les origines de Falcom et Enix.",
+  },
+
+  atari8bit: {
+    tagline: "La famille qui a rendu Atari roi du micro avant le krach.",
+    history: "L'Atari 400/800 (1979) puis 800XL/130XE ont dominé le micro américain du début des années 80 : processeurs graphiques ANTIC/GTIA dédiés (256 couleurs !) et puce sonore POKEY si culte qu'elle est encore utilisée dans la musique chiptune. 4 millions d'exemplaires ont fait d'Atari le leader avant le krach de 1984.",
+    innovations: [
+      "Premiers coprocesseurs graphiques grand public (ANTIC + GTIA)",
+      "POKEY : 4 voix de synthèse + gestion E/S — une puce culte du chiptune",
+      "256 couleurs dès 1979 (le C64 n'en avait que 16 !)",
+    ],
+    anecdotes: [
+      "Star Raiders (1979) était si populaire qu'Atari vendait un clavier dédié (Video Touch Pad) — le premier accessoire gaming.",
+      "La communauté demeure active : des jeux Atari 8-bit sortent encore aujourd'hui (2026).",
+    ],
+    iconicGames: ['Star Raiders', 'Ballblazer', 'Rescue on Fractalus', 'M.U.L.E.', 'Archon'],
+    hardwareHighlights: {
+      cpuArchitecture: 'MOS 6502C @ 1.79 MHz',
+      ram: '16/48/64 KB à 128 KB (130XE)',
+      soundChip: 'POKEY (4 voix, 8-bit)',
+      videoChip: 'ANTIC + GTIA, 320x192 à 640x400',
+      colors: '256 couleurs (16 simultanées selon modes)',
+      controllers: '4 ports joystick + clavier membrane (400) ou complet (800)',
+    },
+    rivalry: "Guerre Attri vs Commodore : le VIC-20 et le C64 ont cassé les prix et pris le marché mondial.",
+    curatorNote: "Les machines les plus avancées de leur génération — sans le krach de 1984, l'informatique familiale américaine aurait été Atari plutôt que Commodore.",
+  },
+
+  vic20: {
+    tagline: "Le premier million — l'ordinateur amical de Commodore.",
+    history: "Le VIC-20 (1980) est le premier ordinateur de l'histoire à dépasser le million d'exemplaires vendus. Vendu 299 $ avec le slogan « The Friendly Computer » (et la pub de William Shatner !), il a introduit des millions de familles à l'informatique avant le C64 plus puissant.",
+    innovations: [
+      "Premier ordinateur à dépasser 1 million de ventes (1982)",
+      "Prix sous la barre des 300 $ : la démocratisation américaine",
+      "5 KB de RAM (3,5 utilisables) : le défi de programmation ultime",
+    ],
+    anecdotes: [
+      "William Shatner (Capitaine Kirk) a fait la publicité américaine du VIC-20 — une première célébrité pour l'informatique.",
+      "Les cartouches de jeux (Q*bert, Gorf...) se branchaient directement à l'arrière — l'ancêtre du plug & play.",
+    ],
+    iconicGames: ['Q*bert', 'Gorf', 'Radar Rat Race', 'Jelly Monsters', 'Sargon II'],
+    hardwareHighlights: {
+      cpuArchitecture: 'MOS 6502 @ 1.02 MHz',
+      ram: '5 KB (extensible à 40 KB)',
+      soundChip: 'VIC audio (4 voix logicielles + bruit)',
+      videoChip: 'VIC 6560, 176x184',
+      colors: '16 couleurs (8 simultanées)',
+      controllers: 'Clavier + joystick ATARI port',
+    },
+    rivalry: "Face au ZX81 de Sinclair : Commodore gagnait sur la couleur et la solidité, Sinclair sur le prix.",
+    curatorNote: "Le premier million : le VIC-20 a prouvé qu'un marché de masse existait pour l'ordinateur personnel — Commodore a construit le C64 sur cette preuve.",
+  },
+
+  c128: {
+    tagline: "Le double processeur qui pouvait tout faire.",
+    history: "Le Commodore 128 (1985) est le micro 8-bit ultime : un MOS 8502 pour le mode C128, un Zilog Z80 pour le CP/M professionnel, et un mode C64 100% compatible. Le tout avec un clavier génial et 128 KB de RAM. Sa complexité a rebuté : les éditeurs ont préféré continuer à éditer pour C64.",
+    innovations: [
+      "Trois ordinateurs en un : C128 / C64 (compatible) / CP/M",
+      "VDC 80 colonnes RGBI pour la bureautique sérieuse",
+      "128 KB de RAM : le maximum de l'ère 8-bit",
+    ],
+    anecdotes: [
+      "GEOS (l'OS graphique) tournait sur C128 avec 80 colonnes — une interface pré-Windows inédite.",
+      "Le mode C64 était si parfait que beaucoup d'utilisateurs ne connaissaient jamais le mode C128 !",
+    ],
+    iconicGames: ['Jeux C64 compatibles', 'GEOS', 'MIDI Studio', 'CP/M Pro'],
+    hardwareHighlights: {
+      cpuArchitecture: 'MOS 8502 @ 1-2 MHz + Z80 @ 4 MHz',
+      ram: '128 KB (+ 64 KB VRAM VDC)',
+      soundChip: 'SID 6581 (le même que le C64 !)',
+      videoChip: 'VIC-II (mode C64) + VDC 8563 (80 colonnes)',
+      colors: '16 couleurs RGBI (VDC)',
+      controllers: '2 ports joystick + clavier QWERTY étendu',
+    },
+    rivalry: "Face à l'Amiga 1000 (Commodore interne !) et aux PC : le C128 a été éclipsé dès sa sortie par la révolution 16-bit.",
+    curatorNote: "Le dernier grand 8-bit : un concentré de technologie qui est arrivé juste avant que le monde ne passe au 16-bit.",
+  },
+
+  plus4: {
+    tagline: "La palette 8-bit la plus riche — 121 couleurs.",
+    history: "Le Commodore Plus/4 (1984) visait la bureautique avec 4 logiciels intégrés en ROM (traitement de texte, tableur, base de données, graphiques) — d'où son nom. Sa puce TED affichait 121 couleurs, la palette 8-bit la plus riche de l'époque. Un succès en Europe de l'Est (Hongrie !) où il a formé une génération de développeurs.",
+    innovations: [
+      "Puce TED intégrée : 121 couleurs (le double du C64 !)",
+      "Quatre logiciels bureautiques en ROM, sans disquette",
+      "Prix agressif pour le marché bureautique familial",
+    ],
+    anecdotes: [
+      "La scène hongroise du Plus/4 est restée active 40 ans : des jeux inédits sortent encore en 2026.",
+      "Son frère jumeau, le Commodore 16, était la version jeu sans bureautique — moins cher mais moins doté.",
+    ],
+    iconicGames: ['Escape from Doomworld', 'Plus/4 demos', ' Boulder Dash conversion', 'Flappy'],
+    hardwareHighlights: {
+      cpuArchitecture: 'MOS 7501 @ 1.76 MHz',
+      ram: '64 KB (dont 60 utilisables)',
+      soundChip: 'TED (2 voix, moins riche que le SID)',
+      videoChip: 'TED 7360, 320x200',
+      colors: '121 couleurs (la palette 8-bit la plus riche !)',
+      controllers: '2 ports joystick + clavier',
+    },
+    rivalry: "Face au C64 (frère interne) : plus de couleurs mais un son inférieur et une bibliothèque plus petite.",
+    curatorNote: "Un pari bureautique raté aux États-Unis mais devenu culte en Hongrie et Europe de l'Est : la preuve que le succès d'un micro dépend autant de sa communauté que de sa technique.",
+  },
+
+  thomson: {
+    tagline: "L'ordinateur français — le plan IPT qui a équipé les écoles.",
+    history: "Les Thomson MO5, MO6, TO7 et TO8 (1984) sont les micros de la génération française : le « Plan Informatique pour Tous » de 1985 a équipé les écoles françaises de milliers de machines MO5. Leur palette 4096 couleurs était révolutionnaire et leur BASICA en français (Avec des mots français !) formait les enfants à coder.",
+    innovations: [
+      "Le plan national français : 120 000 écoles équipées en MO5 (1985)",
+      "Palette de 4096 couleurs en 1984 (16 affichables)",
+      "BASIC en français : PRINT = AFFICHE, INPUT = DEMANDE",
+    ],
+    anecdotes: [
+      "Les enfants français des années 80 ont appris à coder sur MO5 en écrivant AFFICHE « BONJOUR » — une génération de développeurs français en garde la nostalgie.",
+      "Le format disquette SAP était propriétaire : les jeux Thomson restaient entre Thomson.",
+    ],
+    iconicGames: ['Subway', 'Blue Angel 69', 'Packy', 'Coktel Vision adventures'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 6803 (MO5) / 6809 (TO8) @ 1-2 MHz',
+      ram: '64 KB à 256 KB',
+      soundChip: 'SN76489 (3 voix + bruit)',
+      videoChip: 'EF9369 (MO5 : 320x200, 16 parmi 4096)',
+      colors: '4096 palette (16 simultanées)',
+      controllers: 'Clavier AZERTY + joystick',
+    },
+    rivalry: "Face au TO et au C64 importés : Thomson a gagné le marché scolaire français grâce à l'État, perdu le marché domestique face au CPC et C64.",
+    curatorNote: "L'exception française : sans le plan IPT, l'écosystème de développeurs français (Coktel, Infogrames, Delphine) n'aurait pas la même histoire.",
+  },
+
+  neogeocd: {
+    tagline: "La Neo Geo arcade à prix CD — et ses chargements légendaires.",
+    history: "La Neo Geo CD (1994) promettait les jeux arcade SNK à 50 $ au lieu de 200 $ : même chipset, même puissance, sur CD-ROM. Le prix à payer : des chargements de 30 secondes à 1 minute (un seul lecteur 1x !). 1 million d'exemplaires, une bibliothèque 2D parfaite et un statut culte chez les collectionneurs.",
+    innovations: [
+      "La puissance Neo Geo MVS arcade en CD-ROM domestique",
+      "Zoom sprites hardware : le 2D le plus puissant du marché 1994",
+      "Une bibliothèque 2D qui n'a jamais connu la 3D",
+    ],
+    anecdotes: [
+      "Le chargement de Samurai Shodown II durait presque une minute — mais le jeu chargeait une seule fois par session.",
+      "Le modèle Top Loading (lecteur sur le dessus) est plus fiable et recherché que le Front Loading.",
+    ],
+    iconicGames: ['The Last Blade 2', 'Samurai Shodown II', 'King of Fighters 98', 'Metal Slug', 'Pulstar'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Motorola 68000 @ 12 MHz + Z80 @ 4 MHz',
+      ram: '7 MB (64 MB jeu de données)',
+      soundChip: 'YM2610 (15 canaux FM + ADPCM) + PCM CD',
+      videoChip: 'Neo Geo MVS 320x224, 4096 couleurs, 380 sprites',
+      colors: '4096 (380 simultanés)',
+      controllers: 'Manette Neo Geo CD (le pad culte) + stick arcade',
+    },
+    rivalry: "Face à la PlayStation 3D (1994-95) : la Neo Geo CD défendait la 2D parfaite contre la vague 3D montante.",
+    curatorNote: "L'émulateur Neo CD (libretro) rend enfin justice à la machine : chargements quasi instantanés, la Neo Geo CD est aujourd'hui la meilleure façon de jouer aux classiques SNK.",
+  },
+
+  pc8000: {
+    tagline: "Le premier NEC — l'ancêtre du PC-88.",
+    history: "Le PC-8001 (1979) est le premier grand succès de NEC : 250 000 exemplaires, une norme de facto japonaise. Sa bibliothèque de jeux (les premiers Ys, les débuts de Koei) a fondé l'école japonaise du jeu sur ordinateur avant que le PC-8801 ne prenne le relais.",
+    innovations: [
+      "Le premier micro japonais produit en grande série (1979)",
+      "L'ancêtre direct du PC-88 : la lignée NEC dominera le Japon 20 ans",
+      "Standard N-BASIC adopté par toute l'industrie japonaise",
+    ],
+    anecdotes: [
+      "Koei a débuté en éditant des logiciels de gestion avant de publier ses premiers jeux sur PC-8001.",
+      "Le MK- SR (disquette) était un périphérique externe aussi cher que la machine elle-même.",
+    ],
+    iconicGames: ['The Black Onyx (version PC-8001)', 'Koei early titles', 'N-BASIC games'],
+    hardwareHighlights: {
+      cpuArchitecture: 'NEC μPD780 (Z80 compatible) @ 4 MHz',
+      ram: '16 à 64 KB',
+      soundChip: 'Buzzer (puis AY-3-8910 sur MK- II)',
+      videoChip: 'μPD3301, 640x200',
+      colors: '8 couleurs',
+      controllers: 'Clavier + joystick',
+    },
+    rivalry: "Face au PC-8801 (son petit frère) : le PC-8001 a ouvert la voie, le 88 a dominé.",
+    curatorNote: "L'origine de la dynastie NEC : 20 ans de domination japonaise ont commencé avec cette machine sobre et fiable.",
+  },
+
+  gx4000: {
+    tagline: "Le pari console d'Amstrad — écrasé par la Mega Drive.",
+    history: "La GX4000 (1990) est la tentative d'Amstrad de se lancer dans les consoles : le cœur d'un CPC 6128 plus, des cartouches colorées, deux pads inclus. Sortie au pire moment (contre la Mega Drive et la Super Nintendo), elle a vendu environ 15 000 exemplaires en Europe — un échec commercial total mais un objet culte aujourd'hui.",
+    innovations: [
+      "Puce ASIC avec sprites hardware + DMA audio (évolution du CPC+)",
+      "4096 couleurs : plus que les consoles concurrentes",
+      "Compatible avec les jeux disquette CPC (port d'extension)",
+    ],
+    anecdotes: [
+      "Environ 30 jeux seulement sont sortis — dont Burning Rubber, le jeu de course packagé avec la console.",
+      "Les cartouches GX4000 sont aujourd'hui des pièces de collection introuvables complètes.",
+    ],
+    iconicGames: ['Burning Rubber', 'Pang', 'The Echo', 'Plotting', 'Capitan Trueno'],
+    hardwareHighlights: {
+      cpuArchitecture: 'Zilog Z80A @ 4 MHz',
+      ram: '64 KB (+ 16 KB ASIC vidéo)',
+      soundChip: 'AY-3-8912 PSG 3 voix + DMA audio 8-bit',
+      videoChip: 'CRTC + ASIC, 320x200',
+      colors: '4096 palette (32 simultanées)',
+      controllers: "2 pads inclus (analogiques rares pour l'époque)",
+    },
+    rivalry: "Face à la Mega Drive et la Super Nintendo en 1990 : 8-bit contre 16-bit — le match était perdu d'avance.",
+    curatorNote: "Le chant du cygne d'Amstrad : un dernier cri 8-bit lancé dans la bataille 16-bit. Sa rareté en fait le Graal des collectionneurs européens.",
+  },
 };
 
