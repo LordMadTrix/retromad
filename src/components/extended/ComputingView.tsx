@@ -2,10 +2,12 @@ import React, { useMemo, useState } from 'react';
 import {
   Monitor, Cpu, Terminal, Disc3, Mouse, Rainbow, AppWindow,
   Grid2x2, Bird, LayoutGrid, MonitorSmartphone, MonitorCog,
-  ChevronRight, Lightbulb, HardDrive, X, History, Package
+  ChevronRight, Lightbulb, HardDrive, X, History,
+  Gamepad2, Landmark
 } from 'lucide-react';
 import { System, Game } from '../../../electron/types';
-import { OS_TIMELINE, COMPUTING_ERAS, COMPUTING_SYSTEM_IDS, OsEra } from '../../data/computingData';
+import { OS_TIMELINE, COMPUTING_SYSTEM_IDS, OsEra } from '../../data/computingData';
+import { ConsoleLogo } from '../ConsoleLogo';
 
 /** Icônes lucide référencées par nom dans les données. */
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -28,6 +30,7 @@ export const ComputingView: React.FC<ComputingViewProps> = ({
   onOpenSystemExhibition,
 }) => {
   const [selectedEra, setSelectedEra] = useState<OsEra | null>(null);
+  const [isHovered, setIsHovered] = useState<string | null>(null);
 
   /** Machines informatiques réellement présentes dans les données de l'app. */
   const machines = useMemo(
@@ -167,82 +170,103 @@ export const ComputingView: React.FC<ComputingViewProps> = ({
               Aucun système informatique détecté dans les données.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 max-w-6xl">
               {machines.map((sys) => {
                 const count = gameCount[sys.id] || 0;
-                const era = COMPUTING_ERAS.find((e) => e.systemIds.includes(sys.id));
                 return (
                   <article
                     key={sys.id}
-                    className="group relative rounded-2xl border border-slate-800 bg-slate-900/70 hover:bg-slate-800/70 transition-colors overflow-hidden"
+                    onClick={() => count > 0 && onOpenGames(sys.id)}
+                    onMouseEnter={() => setIsHovered(sys.id)}
+                    onMouseLeave={() => setIsHovered(null)}
+                    style={{
+                      borderColor: isHovered === sys.id ? sys.themeColor : 'rgba(51, 65, 85, 0.6)',
+                      boxShadow: isHovered === sys.id ? `0 0 25px ${sys.themeColor}55` : undefined,
+                    }}
+                    className={`group relative rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 min-h-[220px] flex flex-col items-center justify-between text-center transition-[transform,background-color,border-color,opacity,box-shadow] duration-300 overflow-hidden ${
+                      isHovered === sys.id
+                        ? 'bg-slate-900/95 border-2 z-10 scale-102 sm:scale-105'
+                        : 'bg-slate-900/60 hover:bg-slate-900/80 border hover:scale-102 opacity-90 hover:opacity-100 cursor-pointer'
+                    }`}
                   >
-                    {/* Bande de couleur de la machine */}
+                    {/* Halo lumineux d'arrière-plan de la machine (dégradé radial, sans blur) */}
                     <div
-                      className="absolute top-0 left-0 right-0 h-1"
-                      style={{ backgroundColor: sys.themeColor }}
+                      className={`absolute inset-0 rounded-3xl opacity-15 group-hover:opacity-30 pointer-events-none`}
+                      style={{
+                        background: `radial-gradient(ellipse at 50% 30%, ${sys.themeColor}66 0%, transparent 70%)`,
+                      }}
                     />
-                    <div className="p-4 pt-5 flex flex-col gap-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h4 className="font-bold text-white text-sm leading-tight">
-                            {sys.name}
-                          </h4>
-                          <p className="text-[11px] text-slate-400 mt-0.5">
-                            {sys.manufacturer} · {sys.releaseYear}
-                          </p>
-                        </div>
-                        <Cpu className="w-5 h-5 shrink-0" style={{ color: sys.themeColor }} />
-                      </div>
 
-                      <p className="text-[11px] text-slate-400 line-clamp-2 min-h-[2.2em]">
-                        {sys.specs.cpu}
-                      </p>
+                    {/* Vrai Logo Haute Définition de la Machine EN GRAND */}
+                    <div className="relative z-10 w-full h-14 sm:h-18 flex items-center justify-center my-1 p-1 transition-transform duration-300 group-hover:scale-110">
+                      <ConsoleLogo system={sys} size="xl" />
+                    </div>
 
-                      <div className="flex items-center justify-between mt-auto pt-2">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono border ${
-                            count > 0
-                              ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
-                              : 'border-slate-700 text-slate-500'
-                          }`}
-                        >
-                          <Package className="w-3 h-3" />
-                          {count > 0 ? `${count} jeu${count > 1 ? 'x' : ''}` : 'Aucun jeu'}
-                        </span>
+                    {/* Titre & Année */}
+                    <div className="relative z-10">
+                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                        {sys.name}
+                      </h3>
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono mt-0.5 block">
+                        {sys.releaseYear} • {sys.generation}
+                      </span>
+                    </div>
 
-                        <div className="flex items-center gap-1">
-                          {onOpenSystemExhibition && (
-                            <button
-                              type="button"
-                              onClick={() => onOpenSystemExhibition(sys)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-amber-300 hover:bg-slate-800"
-                              title="Découvrir l'histoire de cette machine"
-                            >
-                              <Lightbulb className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => onOpenGames(sys.id)}
-                            disabled={count === 0}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                              count > 0
-                                ? 'text-white hover:opacity-90'
-                                : 'text-slate-600 cursor-not-allowed'
-                            }`}
-                            style={count > 0 ? { backgroundColor: sys.themeColor } : undefined}
-                          >
-                            Voir
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
+                    {/* Badge ROMs installées */}
+                    <div className="relative z-10 my-2 sm:my-3">
+                      <span
+                        style={{
+                          backgroundColor: count > 0 ? `${sys.themeColor}25` : undefined,
+                          borderColor: count > 0 ? `${sys.themeColor}50` : undefined,
+                          color: count > 0 ? sys.themeColor : '#94a3b8',
+                        }}
+                        className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs font-black flex items-center space-x-1.5"
+                      >
+                        <Gamepad2 className="w-3.5 h-3.5" />
+                        <span>{count} JEU{count > 1 ? 'X' : ''} DISPONIBLE{count > 1 ? 'S' : ''}</span>
+                      </span>
+                    </div>
 
-                      {era && (
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                          {era.label} · {era.years}
-                        </p>
-                      )}
+                    {/* Spécification clé */}
+                    <div className="relative z-10 text-[10px] text-slate-400 font-mono line-clamp-1 px-2">
+                      {sys.specs?.cpu}
+                    </div>
+
+                    {/* Boutons d'action (identiques aux consoles) */}
+                    <div className="relative z-10 w-full mt-3 pt-2.5 border-t border-slate-800/80 space-y-1.5 sm:space-y-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (count > 0) onOpenGames(sys.id);
+                        }}
+                        disabled={count === 0}
+                        style={{
+                          backgroundColor: isHovered === sys.id ? sys.themeColor : undefined,
+                          color: isHovered === sys.id ? '#000000' : '#ffffff',
+                        }}
+                        className={`w-full py-2 sm:py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow flex items-center justify-center space-x-2 ${
+                          isHovered === sys.id
+                            ? 'shadow-neon font-black'
+                            : 'bg-slate-800 group-hover:bg-slate-700 text-slate-300'
+                        } ${count === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <span>Voir les ROMs</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenSystemExhibition?.(sys);
+                        }}
+                        className="w-full py-1.5 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-cyan-950 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-400 text-xs font-bold transition flex items-center justify-center space-x-2 shadow"
+                        title="Découvrir l'histoire complète, l'architecture hardware et les secrets de cette machine"
+                      >
+                        <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>🏛️ Exposition Musée</span>
+                      </button>
                     </div>
                   </article>
                 );
