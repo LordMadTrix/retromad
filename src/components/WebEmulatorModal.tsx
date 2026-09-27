@@ -64,6 +64,9 @@ const EJS_CORE_BY_SYSTEM: Record<string, string> = {
   pcfx: 'pcfx',
   appleii: 'apple2',
   dos: 'dos',
+  msdos: 'dos',
+  amstradcpc: 'cap32',
+  zx81: 'zx81',
 };
 
 interface WebEmulatorModalProps {
