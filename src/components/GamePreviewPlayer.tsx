@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Game } from '../types';
-import { EJS_CORE_BY_SYSTEM } from './WebEmulatorModal';
+import { EJS_CORE_BY_SYSTEM } from '../constants/emulatorjs';
 
 interface GamePreviewPlayerProps {
   game: Game;

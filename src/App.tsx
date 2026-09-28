@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { System, Company, Game, AppSettings, BiosStatus, EmulatorProfile } from './types';
 import { SYSTEMS as DEFAULT_SYSTEMS } from '../electron/data/systems';
 import { COMPANIES as DEFAULT_COMPANIES } from '../electron/data/companies';
@@ -6,26 +6,18 @@ import { BUILTIN_EMULATORS } from '../electron/data/emulators';
 import { Navigation, NavTab } from './components/Navigation';
 import { SystemSelector } from './components/SystemSelector';
 import { GameGrid } from './components/GameGrid';
-import { GameDetailModal } from './components/GameDetailModal';
 import { CompanyView } from './components/CompanyView';
 import { BiosManager } from './components/BiosManager';
-import { AdminHubModal } from './components/AdminHubModal';
-import { GameEditModal } from './components/GameEditModal';
-import { SystemEditModal } from './components/SystemEditModal';
-import { CompanyEditModal } from './components/CompanyEditModal';
-import { ScraperModal } from './components/ScraperModal';
-import { ExtensionsDownloaderModal } from './components/ExtensionsDownloaderModal';
-import { KioskPinModal } from './components/KioskPinModal';
 import { AdminLockScreen } from './components/AdminLockScreen';
 import { KioskArcadeView } from './components/KioskArcadeView';
-import { ConsoleExhibitionModal } from './components/ConsoleExhibitionModal';
 import { ComputingView } from './components/extended/ComputingView';
-import { CompanyExhibitionModal } from './components/CompanyExhibitionModal';
-import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { KioskAttractMode } from './components/KioskAttractMode';
 import { GamepadHint } from './components/GamepadHint';
+import { RetroJukeboxFloatingPlayer } from './components/retro/RetroJukeboxFloatingPlayer';
 import { useGamepad } from './hooks/useGamepad';
 import { useAudio } from './hooks/useAudio';
+import { syncNewRoms } from './services/romScanner';
+import type { CrtShaderProfileId } from './components/retro/RetroShaderProfilesModal';
 import {
   RetroAchievement,
   GameCheat,
@@ -44,15 +36,6 @@ import {
   INITIAL_DAILY_CHALLENGES,
 } from './data/retroFeaturesData';
 import { useRetroJukebox } from './hooks/useRetroJukebox';
-import { RetroAchievementsModal } from './components/retro/RetroAchievementsModal';
-import { RetroCheatsModal } from './components/retro/RetroCheatsModal';
-import { RetroSaveStatesModal } from './components/retro/RetroSaveStatesModal';
-import { RetroJukeboxModal } from './components/retro/RetroJukeboxModal';
-import { RetroJukeboxFloatingPlayer } from './components/retro/RetroJukeboxFloatingPlayer';
-import { ArcadeTournamentModal } from './components/retro/ArcadeTournamentModal';
-import { RetroManualsViewerModal } from './components/retro/RetroManualsViewerModal';
-import { BezelStudioModal } from './components/retro/BezelStudioModal';
-import { RetroRouletteDailyChallengeModal } from './components/retro/RetroRouletteDailyChallengeModal';
 import {
   GamePlayStats,
   PlaySession,
@@ -69,28 +52,6 @@ import {
   INITIAL_HANDHELD_CONFIG,
   HISTORICAL_MILESTONES,
 } from './data/extendedFeaturesData';
-import { RetroAnalyticsModal } from './components/extended/RetroAnalyticsModal';
-import { GamepadTesterModal } from './components/extended/GamepadTesterModal';
-import { MultiProfileModal } from './components/extended/MultiProfileModal';
-import { HistoryTimelineModal } from './components/extended/HistoryTimelineModal';
-import { PrintStudioModal } from './components/extended/PrintStudioModal';
-import { NomadBackupModal } from './components/extended/NomadBackupModal';
-import { HandheldOverlaysModal } from './components/extended/HandheldOverlaysModal';
-import { ArcadePartyModal } from './components/extended/ArcadePartyModal';
-import { MusicManagerModal } from './components/extended/MusicManagerModal';
-import { CentralizedStorageModal } from './components/extended/CentralizedStorageModal';
-import { CommunityThemeStudioModal } from './components/extended/CommunityThemeStudioModal';
-import { RetroAttractModeModal } from './components/retro/RetroAttractModeModal';
-import { RetroPasswordNotebookModal } from './components/retro/RetroPasswordNotebookModal';
-import { LanNetworkManagerModal } from './components/extended/LanNetworkManagerModal';
-import { ProjectorKioskManagerModal } from './components/retro/ProjectorKioskManagerModal';
-import { RetroManualPdfGuideModal } from './components/manual/RetroManualPdfGuideModal';
-import { RetroShaderProfilesModal, CrtShaderProfileId } from './components/retro/RetroShaderProfilesModal';
-import { ArcadeSpeedrunModal } from './components/retro/ArcadeSpeedrunModal';
-import { VirtualCartridgeShelfModal } from './components/retro/VirtualCartridgeShelfModal';
-import { SaveStateSyncModal } from './components/extended/SaveStateSyncModal';
-import { QuickStartOnboardingModal } from './components/QuickStartOnboardingModal';
-import { WebEmulatorModal } from './components/WebEmulatorModal';
 import { useAutoPerformance } from './hooks/useAutoPerformance';
 import {
   INITIAL_CENTRALIZED_ROMS,
@@ -100,7 +61,50 @@ import {
   INITIAL_CENTRALIZED_SAVES,
 } from './data/centralizedStorageData';
 import { CentralizedRomItem, CentralizedThemeItem } from './types/extendedFeatures';
-import { RomScannerModal } from './components/RomScannerModal';
+
+// Modales chargées à la demande (Code-Splitting / Lazy-Loading)
+const GameDetailModal = React.lazy(() => import('./components/GameDetailModal').then((m) => ({ default: m.GameDetailModal })));
+const AdminHubModal = React.lazy(() => import('./components/AdminHubModal').then((m) => ({ default: m.AdminHubModal })));
+const GameEditModal = React.lazy(() => import('./components/GameEditModal').then((m) => ({ default: m.GameEditModal })));
+const SystemEditModal = React.lazy(() => import('./components/SystemEditModal').then((m) => ({ default: m.SystemEditModal })));
+const CompanyEditModal = React.lazy(() => import('./components/CompanyEditModal').then((m) => ({ default: m.CompanyEditModal })));
+const ScraperModal = React.lazy(() => import('./components/ScraperModal').then((m) => ({ default: m.ScraperModal })));
+const ExtensionsDownloaderModal = React.lazy(() => import('./components/ExtensionsDownloaderModal').then((m) => ({ default: m.ExtensionsDownloaderModal })));
+const KioskPinModal = React.lazy(() => import('./components/KioskPinModal').then((m) => ({ default: m.KioskPinModal })));
+const ConsoleExhibitionModal = React.lazy(() => import('./components/ConsoleExhibitionModal').then((m) => ({ default: m.ConsoleExhibitionModal })));
+const CompanyExhibitionModal = React.lazy(() => import('./components/CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal })));
+const GlobalSearchModal = React.lazy(() => import('./components/GlobalSearchModal').then((m) => ({ default: m.GlobalSearchModal })));
+const RomScannerModal = React.lazy(() => import('./components/RomScannerModal').then((m) => ({ default: m.RomScannerModal })));
+const QuickStartOnboardingModal = React.lazy(() => import('./components/QuickStartOnboardingModal').then((m) => ({ default: m.QuickStartOnboardingModal })));
+const WebEmulatorModal = React.lazy(() => import('./components/WebEmulatorModal').then((m) => ({ default: m.WebEmulatorModal })));
+const RetroAchievementsModal = React.lazy(() => import('./components/retro/RetroAchievementsModal').then((m) => ({ default: m.RetroAchievementsModal })));
+const RetroCheatsModal = React.lazy(() => import('./components/retro/RetroCheatsModal').then((m) => ({ default: m.RetroCheatsModal })));
+const RetroSaveStatesModal = React.lazy(() => import('./components/retro/RetroSaveStatesModal').then((m) => ({ default: m.RetroSaveStatesModal })));
+const RetroJukeboxModal = React.lazy(() => import('./components/retro/RetroJukeboxModal').then((m) => ({ default: m.RetroJukeboxModal })));
+const ArcadeTournamentModal = React.lazy(() => import('./components/retro/ArcadeTournamentModal').then((m) => ({ default: m.ArcadeTournamentModal })));
+const RetroManualsViewerModal = React.lazy(() => import('./components/retro/RetroManualsViewerModal').then((m) => ({ default: m.RetroManualsViewerModal })));
+const BezelStudioModal = React.lazy(() => import('./components/retro/BezelStudioModal').then((m) => ({ default: m.BezelStudioModal })));
+const RetroRouletteDailyChallengeModal = React.lazy(() => import('./components/retro/RetroRouletteDailyChallengeModal').then((m) => ({ default: m.RetroRouletteDailyChallengeModal })));
+const RetroAnalyticsModal = React.lazy(() => import('./components/extended/RetroAnalyticsModal').then((m) => ({ default: m.RetroAnalyticsModal })));
+const GamepadTesterModal = React.lazy(() => import('./components/extended/GamepadTesterModal').then((m) => ({ default: m.GamepadTesterModal })));
+const MultiProfileModal = React.lazy(() => import('./components/extended/MultiProfileModal').then((m) => ({ default: m.MultiProfileModal })));
+const HistoryTimelineModal = React.lazy(() => import('./components/extended/HistoryTimelineModal').then((m) => ({ default: m.HistoryTimelineModal })));
+const PrintStudioModal = React.lazy(() => import('./components/extended/PrintStudioModal').then((m) => ({ default: m.PrintStudioModal })));
+const NomadBackupModal = React.lazy(() => import('./components/extended/NomadBackupModal').then((m) => ({ default: m.NomadBackupModal })));
+const HandheldOverlaysModal = React.lazy(() => import('./components/extended/HandheldOverlaysModal').then((m) => ({ default: m.HandheldOverlaysModal })));
+const ArcadePartyModal = React.lazy(() => import('./components/extended/ArcadePartyModal').then((m) => ({ default: m.ArcadePartyModal })));
+const MusicManagerModal = React.lazy(() => import('./components/extended/MusicManagerModal').then((m) => ({ default: m.MusicManagerModal })));
+const CentralizedStorageModal = React.lazy(() => import('./components/extended/CentralizedStorageModal').then((m) => ({ default: m.CentralizedStorageModal })));
+const CommunityThemeStudioModal = React.lazy(() => import('./components/extended/CommunityThemeStudioModal').then((m) => ({ default: m.CommunityThemeStudioModal })));
+const RetroAttractModeModal = React.lazy(() => import('./components/retro/RetroAttractModeModal').then((m) => ({ default: m.RetroAttractModeModal })));
+const RetroPasswordNotebookModal = React.lazy(() => import('./components/retro/RetroPasswordNotebookModal').then((m) => ({ default: m.RetroPasswordNotebookModal })));
+const LanNetworkManagerModal = React.lazy(() => import('./components/extended/LanNetworkManagerModal').then((m) => ({ default: m.LanNetworkManagerModal })));
+const ProjectorKioskManagerModal = React.lazy(() => import('./components/retro/ProjectorKioskManagerModal').then((m) => ({ default: m.ProjectorKioskManagerModal })));
+const RetroManualPdfGuideModal = React.lazy(() => import('./components/manual/RetroManualPdfGuideModal').then((m) => ({ default: m.RetroManualPdfGuideModal })));
+const RetroShaderProfilesModal = React.lazy(() => import('./components/retro/RetroShaderProfilesModal').then((m) => ({ default: m.RetroShaderProfilesModal })));
+const ArcadeSpeedrunModal = React.lazy(() => import('./components/retro/ArcadeSpeedrunModal').then((m) => ({ default: m.ArcadeSpeedrunModal })));
+const VirtualCartridgeShelfModal = React.lazy(() => import('./components/retro/VirtualCartridgeShelfModal').then((m) => ({ default: m.VirtualCartridgeShelfModal })));
+const SaveStateSyncModal = React.lazy(() => import('./components/extended/SaveStateSyncModal').then((m) => ({ default: m.SaveStateSyncModal })));
 import {
   getStoredGames,
   saveStoredGames,
@@ -591,7 +595,6 @@ export const App: React.FC = () => {
             // Synchronisation incrémentale : intègre automatiquement les ROMs
             // ajoutées sur le disque depuis le dernier scan (mode web/dev).
             try {
-              const { syncNewRoms } = await import('./services/romScanner');
               const { newGames } = await syncNewRoms(filtered);
               if (newGames.length > 0) {
                 const merged = [...newGames, ...filtered];
@@ -1053,6 +1056,26 @@ export const App: React.FC = () => {
     }
     handleLaunchGame(target);
   };
+
+  const handleSelectGame = useCallback((g: Game) => {
+    playSelect();
+    const idx = visibleGames.findIndex((item) => item.id === g.id);
+    if (idx >= 0) setFocusedGameIndex(idx);
+  }, [playSelect, visibleGames]);
+
+  const handleViewDetails = useCallback((g: Game) => {
+    playSelect();
+    setSelectedGame(g);
+  }, [playSelect]);
+
+  const handleScanPrompt = useCallback(() => {
+    playSelect();
+    setIsRomScannerOpen(true);
+  }, [playSelect]);
+
+  const handleSelectGenreCallback = useCallback((genre: string) => {
+    setSelectedGenre(genre);
+  }, []);
 
   // Handlers pour les 8 fonctionnalités Rétro
   const handleToggleUnlockAchievement = (achievementId: string) => {
@@ -1577,27 +1600,15 @@ export const App: React.FC = () => {
                 systems={systems}
                 selectedSystemId={selectedSystemId}
                 selectedGameId={visibleGames[focusedGameIndex]?.id || null}
-                onSelectGame={(g) => {
-                  playSelect();
-                  const idx = visibleGames.findIndex((item) => item.id === g.id);
-                  if (idx >= 0) setFocusedGameIndex(idx);
-                }}
+                onSelectGame={handleSelectGame}
                 onLaunchGame={handleLaunchGame}
                 onToggleFavorite={handleToggleFavorite}
-                onViewDetails={(g) => {
-                  playSelect();
-                  setSelectedGame(g);
-                }}
-                onScanPrompt={() => {
-                  playSelect();
-                  setIsRomScannerOpen(true);
-                }}
+                onViewDetails={handleViewDetails}
+                onScanPrompt={handleScanPrompt}
                 onAddGames={handleAddGames}
                 onPlayDice={playDice}
                 selectedGenre={selectedGenre}
-                onSelectGenre={(genre) => {
-                  setSelectedGenre(genre);
-                }}
+                onSelectGenre={handleSelectGenreCallback}
               />
             </div>
           )}
@@ -1656,59 +1667,63 @@ export const App: React.FC = () => {
           )}
 
           {currentTab === 'settings' && (
-            <AdminHubModal
-              isOpen={currentTab === 'settings'}
-              onClose={() => setCurrentTab('games')}
-              settings={settings}
-              onSaveSettings={handleSaveSettings}
-              games={games}
-              onSaveGames={handleSaveGames}
-              systems={systems}
-              onSaveSystems={handleSaveSystems}
-              companies={companies}
-              onSaveCompanies={handleSaveCompanies}
-              emulators={emulators}
-              onSaveEmulators={handleSaveEmulators}
-              onSelectDirectory={async () => {
-                if (window.api) return window.api.selectDirectory();
-                return null;
-              }}
-              onOpenExtensions={() => {
-                playSelect();
-                setIsExtensionsModalOpen(true);
-              }}
-              onDetectEmulators={async () => {
-                if (window.api?.detectEmulators) return window.api.detectEmulators();
-                return emulators;
-              }}
-              onResetDefaults={handleResetDefaults}
-              onOpenSystemExhibition={(sys) => {
-                setCurrentTab('games');
-                setExhibitionSystem(sys);
-              }}
-              onOpenCompanyExhibition={(comp) => {
-                setCurrentTab('companies');
-                setExhibitionCompany(comp);
-              }}
-              onScanRoms={handleScanRoms}
-              isScanningRoms={isScanning}
-              onStartScrapeBatch={handleStartScrapeBatch}
-              onScrapeGame={handleScrapeSingleGame}
-              isScrapingBatch={isScrapingBatch}
-              scrapeProgress={scrapeState}
-              onLaunchGame={handleLaunchGame}
-              onToggleFavorite={handleToggleFavorite}
-              biosStatuses={biosStatuses}
-              isCheckingBios={isCheckingBios}
-              onCheckBios={handleRefreshBios}
-              onCreateRomsFolders={window.api?.createRomsFolders}
-            />
+            <Suspense fallback={null}>
+              <AdminHubModal
+                isOpen={currentTab === 'settings'}
+                onClose={() => setCurrentTab('games')}
+                settings={settings}
+                onSaveSettings={handleSaveSettings}
+                games={games}
+                onSaveGames={handleSaveGames}
+                systems={systems}
+                onSaveSystems={handleSaveSystems}
+                companies={companies}
+                onSaveCompanies={handleSaveCompanies}
+                emulators={emulators}
+                onSaveEmulators={handleSaveEmulators}
+                onSelectDirectory={async () => {
+                  if (window.api) return window.api.selectDirectory();
+                  return null;
+                }}
+                onOpenExtensions={() => {
+                  playSelect();
+                  setIsExtensionsModalOpen(true);
+                }}
+                onDetectEmulators={async () => {
+                  if (window.api?.detectEmulators) return window.api.detectEmulators();
+                  return emulators;
+                }}
+                onResetDefaults={handleResetDefaults}
+                onOpenSystemExhibition={(sys) => {
+                  setCurrentTab('games');
+                  setExhibitionSystem(sys);
+                }}
+                onOpenCompanyExhibition={(comp) => {
+                  setCurrentTab('companies');
+                  setExhibitionCompany(comp);
+                }}
+                onScanRoms={handleScanRoms}
+                isScanningRoms={isScanning}
+                onStartScrapeBatch={handleStartScrapeBatch}
+                onScrapeGame={handleScrapeSingleGame}
+                isScrapingBatch={isScrapingBatch}
+                scrapeProgress={scrapeState}
+                onLaunchGame={handleLaunchGame}
+                onToggleFavorite={handleToggleFavorite}
+                biosStatuses={biosStatuses}
+                isCheckingBios={isCheckingBios}
+                onCheckBios={handleRefreshBios}
+                onCreateRomsFolders={window.api?.createRomsFolders}
+              />
+            </Suspense>
           )}
         </>
       )}
 
-      {/* Modale Fiche Détails du Jeu */}
-      <GameDetailModal
+      {/* Modales en Suspense (chargées à la demande) */}
+      <Suspense fallback={null}>
+        {/* Modale Fiche Détails du Jeu */}
+        <GameDetailModal
         game={selectedGame}
         system={systems.find((s) => s.id === selectedGame?.systemId)}
         emulators={emulators}
@@ -2489,6 +2504,7 @@ export const App: React.FC = () => {
           }}
         />
       )}
+      </Suspense>
     </div>
   );
 };

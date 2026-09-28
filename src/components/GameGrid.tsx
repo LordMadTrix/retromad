@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Game, System } from '../types';
 import { GameCard } from './GameCard';
 import { Search, SlidersHorizontal, FolderPlus, Dices, X, Upload, Tag } from 'lucide-react';
@@ -43,10 +43,10 @@ export const GameGrid: React.FC<GameGridProps> = ({
   const [collection, setCollection] = useState<Collection>('all');
   const [internalGenre, setInternalGenre] = useState<string>('all');
   const selectedGenre = selectedGenreProp !== undefined ? selectedGenreProp : internalGenre;
-  const setSelectedGenre = (g: string) => {
+  const setSelectedGenre = useCallback((g: string) => {
     setInternalGenre(g);
     onSelectGenreProp?.(g);
-  };
+  }, [onSelectGenreProp]);
   const [sortBy, setSortBy] = useState<'alpha' | 'recent' | 'played'>('alpha');
   const [isDragOver, setIsDragOver] = useState(false);
 

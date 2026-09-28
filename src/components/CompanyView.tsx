@@ -3,8 +3,9 @@ import { Company, System } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
 import { CompanyBackgroundVideo, CompanyTvWidget } from './CompanyBackgroundVideo';
-import { CompanyExhibitionModal } from './CompanyExhibitionModal';
 import { Landmark, Calendar, MapPin, ChevronRight, Cpu, Tv, HardDrive, Sparkles, Pencil } from 'lucide-react';
+
+const CompanyExhibitionModal = React.lazy(() => import('./CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal })));
 
 interface CompanyViewProps {
   companies: Company[];
@@ -258,22 +259,26 @@ export const CompanyView: React.FC<CompanyViewProps> = ({
       </div>
 
       {/* Modale Dédiée Musée Virtuel de la Firme */}
-      <CompanyExhibitionModal
-        company={selectedCompany}
-        systems={companySystems}
-        isOpen={isFirmMuseumOpen}
-        onClose={() => setIsFirmMuseumOpen(false)}
-        onOpenSystemExhibition={(sys) => {
-          setIsFirmMuseumOpen(false);
-          if (onOpenExhibition) {
-            onOpenExhibition(sys);
-          }
-        }}
-        onExploreGames={(sysId) => {
-          setIsFirmMuseumOpen(false);
-          onSelectSystemFilter(sysId);
-        }}
-      />
+      {isFirmMuseumOpen && (
+        <React.Suspense fallback={null}>
+          <CompanyExhibitionModal
+            company={selectedCompany}
+            systems={companySystems}
+            isOpen={isFirmMuseumOpen}
+            onClose={() => setIsFirmMuseumOpen(false)}
+            onOpenSystemExhibition={(sys) => {
+              setIsFirmMuseumOpen(false);
+              if (onOpenExhibition) {
+                onOpenExhibition(sys);
+              }
+            }}
+            onExploreGames={(sysId) => {
+              setIsFirmMuseumOpen(false);
+              onSelectSystemFilter(sysId);
+            }}
+          />
+        </React.Suspense>
+      )}
       </div>
     </div>
   );

@@ -2,9 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Game, System, Company, EmulatorProfile } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
-import { ConsoleExhibitionModal } from './ConsoleExhibitionModal';
-import { CompanyExhibitionModal } from './CompanyExhibitionModal';
 import { CompanyBackgroundVideo } from './CompanyBackgroundVideo';
+
+const ConsoleExhibitionModal = React.lazy(() => import('./ConsoleExhibitionModal').then((m) => ({ default: m.ConsoleExhibitionModal })));
+const CompanyExhibitionModal = React.lazy(() => import('./CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal })));
 import {
   Play,
   Heart,
@@ -2132,45 +2133,51 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
       </footer>
 
       {/* MODALE D'EXPOSITION PERMANENTE & MUSÉE DU RETROGAMING */}
-      <ConsoleExhibitionModal
-        system={exhibitionSystem}
-        isOpen={!!exhibitionSystem}
-        onClose={() => setExhibitionSystem(null)}
-        onPlayGames={(sys) => {
-          setExhibitionSystem(null);
-          handleSelectConsole(sys);
-        }}
-        onOpenCompanyMuseum={(companyId) => {
-          playSelect();
-          const comp = companies.find((c) => c.id === companyId);
-          if (comp) {
-            setExhibitionSystem(null);
-            setExhibitionCompany(comp);
-          }
-        }}
-      />
+      <React.Suspense fallback={null}>
+        {exhibitionSystem && (
+          <ConsoleExhibitionModal
+            system={exhibitionSystem}
+            isOpen={!!exhibitionSystem}
+            onClose={() => setExhibitionSystem(null)}
+            onPlayGames={(sys) => {
+              setExhibitionSystem(null);
+              handleSelectConsole(sys);
+            }}
+            onOpenCompanyMuseum={(companyId) => {
+              playSelect();
+              const comp = companies.find((c) => c.id === companyId);
+              if (comp) {
+                setExhibitionSystem(null);
+                setExhibitionCompany(comp);
+              }
+            }}
+          />
+        )}
 
-      {/* MODALE DU GRAND MUSÉE VIRTUEL DE LA FIRME DANS LE MODE KIOSK */}
-      <CompanyExhibitionModal
-        company={exhibitionCompany}
-        systems={systems.filter((s) => s.companyId === exhibitionCompany?.id)}
-        isOpen={!!exhibitionCompany}
-        onClose={() => {
-          playBack();
-          setExhibitionCompany(null);
-        }}
-        onOpenSystemExhibition={(sys) => {
-          setExhibitionCompany(null);
-          setExhibitionSystem(sys);
-        }}
-        onExploreGames={(sysId) => {
-          setExhibitionCompany(null);
-          const targetSystem = systems.find((s) => s.id === sysId);
-          if (targetSystem) {
-            handleSelectConsole(targetSystem);
-          }
-        }}
-      />
+        {/* MODALE DU GRAND MUSÉE VIRTUEL DE LA FIRME DANS LE MODE KIOSK */}
+        {exhibitionCompany && (
+          <CompanyExhibitionModal
+            company={exhibitionCompany}
+            systems={systems.filter((s) => s.companyId === exhibitionCompany?.id)}
+            isOpen={!!exhibitionCompany}
+            onClose={() => {
+              playBack();
+              setExhibitionCompany(null);
+            }}
+            onOpenSystemExhibition={(sys) => {
+              setExhibitionCompany(null);
+              setExhibitionSystem(sys);
+            }}
+            onExploreGames={(sysId) => {
+              setExhibitionCompany(null);
+              const targetSystem = systems.find((s) => s.id === sysId);
+              if (targetSystem) {
+                handleSelectConsole(targetSystem);
+              }
+            }}
+          />
+        )}
+      </React.Suspense>
     </div>
   );
 };

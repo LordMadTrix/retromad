@@ -14,7 +14,7 @@ interface GameCardProps {
   onFilterByGenre?: (genre: string) => void;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({
+export const GameCard: React.FC<GameCardProps> = React.memo(({
   game,
   system,
   isSelected,
@@ -315,4 +315,6 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
     </div>
   );
-};
+});
+
+GameCard.displayName = 'GameCard';
