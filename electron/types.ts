@@ -191,6 +191,12 @@ export interface AppSettings {
   kioskPin: string;
   kioskFullscreen: boolean;
   kioskOnlyFavorites: boolean;
+  // Personnalisation du Kiosque (réglée dans Centre Admin → Kiosque)
+  kioskWidgets?: Record<string, boolean>; // widget id -> visible (music, videos, roulette…)
+  kioskHiddenCompanies?: string[]; // firmes masquées de la borne
+  kioskHiddenSystems?: string[]; // machines masquées de la borne
+  kioskCompanyOrder?: string[]; // ordre d'affichage des firmes (glisser-déposer)
+  kioskFeaturedGames?: string[]; // jeux épinglés en vedette sur l'accueil
   systemLaunchers?: Record<string, string>; // systemId -> emulatorId
 }
 

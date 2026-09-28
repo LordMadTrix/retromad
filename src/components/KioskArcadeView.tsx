@@ -30,6 +30,11 @@ import {
   Maximize2,
   Monitor,
   X,
+  Star,
+  GripVertical,
+  Disc3,
+  Trophy,
+  Swords,
 } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
@@ -57,6 +62,20 @@ interface KioskArcadeViewProps {
   backgroundVideos?: boolean;
   neonGlows?: boolean;
   animations?: boolean;
+  /** Personnalisation Kiosque (Centre Admin → Kiosque) */
+  kioskWidgets?: Record<string, boolean>;
+  hiddenCompanyIds?: string[];
+  hiddenSystemIds?: string[];
+  companyOrder?: string[];
+  featuredGameIds?: string[];
+  /** Réordonner les firmes (actif seulement si la régie admin est déverrouillée) */
+  onReorderCompanies?: (orderedIds: string[]) => void;
+  /** Widgets ludiques supplémentaires de la borne (on/off via kioskWidgets) */
+  onOpenJukebox?: () => void;
+  onOpenRoulette?: () => void;
+  onOpenAchievements?: () => void;
+  onOpenTournament?: () => void;
+  onOpenManuals?: () => void;
 }
 
 type KioskStep = 'companies' | 'consoles' | 'games';
@@ -276,6 +295,17 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   backgroundVideos = true,
   neonGlows = true,
   animations = true,
+  kioskWidgets = {},
+  hiddenCompanyIds = [],
+  hiddenSystemIds = [],
+  companyOrder = [],
+  featuredGameIds = [],
+  onReorderCompanies,
+  onOpenJukebox,
+  onOpenRoulette,
+  onOpenAchievements,
+  onOpenTournament,
+  onOpenManuals,
 }) => {
   // Navigation hiérarchique Kiosk à 3 niveaux : Firmes -> Consoles -> ROMs
   const [step, setStep] = useState<KioskStep>('companies');
@@ -299,16 +329,54 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
   const { playMove, playSelect, playLaunch, playBack, playCoin, playFavorite, playDice } = useAudio(soundEnabled, soundVolume);
 
-  // Firmes filtrées par cadre (PC / Consoles)
+  // Widget actif ? Défaut : tout visible (les réglages n'écrasent que ce qui est défini)
+  const isWidgetOn = useCallback(
+    (id: string) => kioskWidgets[id] !== false,
+    [kioskWidgets]
+  );
+
+  // ── Glisser-déposer des firmes (réordonnancement mémorisé dans les réglages) ──
+  // Le composant reçoit onReorderCompanies (optionnel) : présent uniquement
+  // quand la régie admin est déverrouillée — les joueurs ne déplacent rien.
+  const [dragCompanyId, setDragCompanyId] = useState<string | null>(null);
+  const [dragOverCompanyId, setDragOverCompanyId] = useState<string | null>(null);
+
+  // Firmes filtrées : masquage personnalisé + cadre (PC / Consoles) + ordre glisser-déposer
   const visibleCompanies = useMemo(() => {
-    if (category === 'all') return companies;
-    return companies.filter((c) => companyMatchesCategory(c.id, systems, category));
-  }, [companies, systems, category]);
+    const hidden = new Set(hiddenCompanyIds);
+    const filtered = companies.filter((c) => !hidden.has(c.id));
+    const ordered = companyOrder.length
+      ? [...filtered].sort((a, b) => {
+          const ia = companyOrder.indexOf(a.id);
+          const ib = companyOrder.indexOf(b.id);
+          return (ia === -1 ? Infinity : ia) - (ib === -1 ? Infinity : ib);
+        })
+      : filtered;
+    if (category === 'all') return ordered;
+    return ordered.filter((c) => companyMatchesCategory(c.id, systems, category));
+  }, [companies, systems, category, hiddenCompanyIds, companyOrder]);
 
   // Garantir un index valide quand le filtre change
   useEffect(() => {
     setCompanyIndex((prev) => (prev >= visibleCompanies.length ? 0 : prev));
   }, [visibleCompanies.length]);
+
+  // Dépôt d'une firme glissée : recalcule l'ordre et le persiste via les réglages
+  const handleDropCompany = useCallback(
+    (targetId: string) => {
+      setDragOverCompanyId(null);
+      if (!dragCompanyId || dragCompanyId === targetId || !onReorderCompanies) return;
+      const ids = visibleCompanies.map((c) => c.id);
+      const from = ids.indexOf(dragCompanyId);
+      const to = ids.indexOf(targetId);
+      if (from === -1 || to === -1) return;
+      ids.splice(to, 0, ids.splice(from, 1)[0]);
+      onReorderCompanies(ids);
+      setDragCompanyId(null);
+      playSelect();
+    },
+    [dragCompanyId, onReorderCompanies, visibleCompanies, playSelect]
+  );
 
   const switchCategory = useCallback((next: KioskCategory) => {
     setCategory((prev) => {
@@ -329,15 +397,17 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
   // Machines de la firme sélectionnée : d'abord les PC/micros, puis les consoles
   // (affichage groupé « PC & Micro-ordinateurs » / « Consoles » au niveau 2)
+  // + masquage personnalisé des machines (Centre Admin → Kiosque)
   const companySystems = useMemo(() => {
     if (!selectedCompany) return [];
-    const all = systems.filter((s) => s.companyId === selectedCompany.id);
+    const hidden = new Set(hiddenSystemIds);
+    const all = systems.filter((s) => s.companyId === selectedCompany.id && !hidden.has(s.id));
     const pcs = all.filter((s) => KIOSK_COMPUTING_IDS.has(s.id));
     const consoles = all.filter((s) => !KIOSK_COMPUTING_IDS.has(s.id));
     if (category === 'computing') return pcs;
     if (category === 'consoles') return consoles;
     return [...pcs, ...consoles];
-  }, [systems, selectedCompany, category]);
+  }, [systems, selectedCompany, category, hiddenSystemIds]);
 
   // Sous-listes pour l'affichage groupé du niveau 2
   const companyPcSystems = useMemo(
@@ -369,6 +439,13 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
   }, [games, selectedSystem, kioskFavoritesOnly]);
 
   const currentGame = consoleGames[gameIndex] || consoleGames[0] || null;
+
+  // Jeux épinglés en vedette (Centre Admin → Kiosque) : carrousel de l'accueil
+  const featuredGames = useMemo(() => {
+    if (featuredGameIds.length === 0) return [];
+    const byId = new Map(games.map((g) => [g.id, g]));
+    return featuredGameIds.map((id) => byId.get(id)).filter((g): g is Game => !!g);
+  }, [featuredGameIds, games]);
 
   // Lettres disponibles pour saut alphabétique rapide
   const availableLetters = useMemo(() => {
@@ -759,7 +836,8 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
         {/* Boutons d'Action & Déverrouillage Admin */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-          {/* Monnayeur Arcade Interactif */}
+          {/* Monnayeur Arcade Interactif (widget désactivable) */}
+          {isWidgetOn('credits') && (
           <button
             onClick={() => playCoin()}
             className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition shadow-sm"
@@ -768,8 +846,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             <span>🪙</span>
             <span>CRÉDITS: 99</span>
           </button>
+          )}
 
-          {/* Bouton Jeu au Hasard */}
+          {/* Bouton Jeu au Hasard (widget désactivable) */}
+          {isWidgetOn('random') && (
           <button
             onClick={handleRandomPickInKiosk}
             className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition shadow-sm hover:text-white"
@@ -778,6 +858,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             <Dices className="w-3.5 h-3.5 text-purple-400" />
             <span className="hidden xl:inline">Hasard</span>
           </button>
+          )}
 
           {/* Filtre Favoris uniquement en mode jeux */}
           {step === 'games' && (
@@ -798,8 +879,63 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </button>
           )}
 
-          {/* Profils Shaders Rétro */}
-          {onOpenShaderProfiles && (
+          {/* Jukebox Chiptune (widget désactivable) */}
+          {onOpenJukebox && isWidgetOn('music') && (
+            <button
+              onClick={onOpenJukebox}
+              className="p-1.5 rounded-xl border border-pink-500/40 bg-pink-950/40 text-pink-300 hover:bg-pink-900/60 transition shadow-sm"
+              title="Jukebox Chiptune 8/16-Bit"
+            >
+              <Disc3 className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Roulette Rétro (widget désactivable) */}
+          {onOpenRoulette && isWidgetOn('roulette') && (
+            <button
+              onClick={onOpenRoulette}
+              className="p-1.5 rounded-xl border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60 transition shadow-sm"
+              title="Roulette Rétro & Défi du Jour"
+            >
+              <Dices className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Succès Rétro (widget désactivable) */}
+          {onOpenAchievements && isWidgetOn('achievements') && (
+            <button
+              onClick={onOpenAchievements}
+              className="p-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 transition shadow-sm"
+              title="RetroAchievements & Succès"
+            >
+              <Trophy className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Tournois Arcade (widget désactivable) */}
+          {onOpenTournament && isWidgetOn('tournament') && (
+            <button
+              onClick={onOpenTournament}
+              className="p-1.5 rounded-xl border border-orange-500/40 bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 transition shadow-sm"
+              title="Tournois Arcade Multijoueur"
+            >
+              <Swords className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Manuels & Notices (widget désactivable) */}
+          {onOpenManuals && isWidgetOn('manuals') && (
+            <button
+              onClick={onOpenManuals}
+              className="p-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 transition shadow-sm"
+              title="Manuels & Notices d'Époque"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Profils Shaders Rétro (widget désactivable) */}
+          {onOpenShaderProfiles && isWidgetOn('shaders') && (
             <button
               onClick={onOpenShaderProfiles}
               className="p-1.5 rounded-xl border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60 transition shadow-sm"
@@ -809,8 +945,8 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </button>
           )}
 
-          {/* Étagère 3D Cartouches */}
-          {onOpenCartridgeShelf && (
+          {/* Étagère 3D Cartouches (widget désactivable) */}
+          {onOpenCartridgeShelf && isWidgetOn('shelf') && (
             <button
               onClick={onOpenCartridgeShelf}
               className="p-1.5 rounded-xl border border-purple-500/40 bg-purple-950/40 text-purple-300 hover:bg-purple-900/60 transition shadow-sm"
@@ -820,8 +956,8 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </button>
           )}
 
-          {/* Chronomètre Speedrun */}
-          {onOpenSpeedrun && (
+          {/* Chronomètre Speedrun (widget désactivable) */}
+          {onOpenSpeedrun && isWidgetOn('speedrun') && (
             <button
               onClick={onOpenSpeedrun}
               className="p-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 transition shadow-sm"
@@ -938,6 +1074,54 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </p>
           </div>
 
+          {/* ── CARROUSEL « MES VEDETTES » : jeux épinglés depuis le Centre Admin ── */}
+          {featuredGames.length > 0 && isWidgetOn('featured') && (
+            <div className="max-w-6xl w-full mx-auto mb-4">
+              <div className="flex items-center justify-center gap-2 mb-1.5">
+                <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-amber-200">Mes vedettes</span>
+              </div>
+              <div className="flex items-stretch justify-center gap-2.5 sm:gap-3 overflow-x-auto custom-scrollbar pb-1.5">
+                {featuredGames.map((g) => {
+                  const sys = systems.find((s) => s.id === g.systemId);
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => onLaunchGame(g)}
+                      onMouseEnter={() => playMove()}
+                      className="group relative shrink-0 w-36 sm:w-44 rounded-2xl border-2 border-amber-500/50 bg-slate-900/85 hover:border-amber-400 hover:shadow-[0_0_25px_rgba(251,191,36,0.35)] transition-all duration-300 overflow-hidden text-left"
+                      title={`Lancer ${g.cleanTitle}${sys ? ` (${sys.name})` : ''}`}
+                    >
+                      <div className="h-20 sm:h-24 w-full overflow-hidden bg-slate-950/80 flex items-center justify-center">
+                        {g.media?.boxart2d ? (
+                          <img
+                            src={resolveMediaUrl(g.media.boxart2d)}
+                            alt={g.cleanTitle}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        ) : (
+                          <Gamepad2 className="w-9 h-9 text-amber-500/60" />
+                        )}
+                      </div>
+                      <div className="p-2">
+                        <div className="text-[11px] font-black text-white truncate">{g.cleanTitle}</div>
+                        <div className="text-[9px] text-amber-300/90 font-bold uppercase tracking-wider truncate">
+                          {sys?.name || g.systemId}
+                        </div>
+                      </div>
+                      <span className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-amber-400 text-slate-900 shadow">
+                        <Play className="w-3 h-3 fill-current" />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* ── LES DEUX CADRES : PC & CONSOLES ── */}
           <div className="flex items-stretch justify-center gap-3 sm:gap-5 max-w-4xl w-full mx-auto mb-4">
             {/* Cadre PC — Informatique */}
@@ -1022,6 +1206,25 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
               return (
                 <div
                   key={company.id}
+                  draggable={!!onReorderCompanies}
+                  onDragStart={(e) => {
+                    setDragCompanyId(company.id);
+                    e.dataTransfer.effectAllowed = 'move';
+                  }}
+                  onDragOver={(e) => {
+                    if (!dragCompanyId) return;
+                    e.preventDefault();
+                    setDragOverCompanyId(company.id);
+                  }}
+                  onDragLeave={() => setDragOverCompanyId((prev) => (prev === company.id ? null : prev))}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    handleDropCompany(company.id);
+                  }}
+                  onDragEnd={() => {
+                    setDragCompanyId(null);
+                    setDragOverCompanyId(null);
+                  }}
                   onClick={() => {
                     setCompanyIndex(idx);
                     handleSelectCompany(company);
@@ -1042,6 +1245,25 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 >
                   {/* Vidéo de fond : uniquement sur la carte focalisée, et seulement si l'effet est activé */}
                   <CompanyBackgroundVideo company={company} mode="card" active={isFocused && backgroundVideos} />
+
+                  {/* Indicateur de dépôt (réorganisation par glisser-déposer, régie uniquement) */}
+                  {dragOverCompanyId === company.id && dragCompanyId && dragCompanyId !== company.id && (
+                    <div className="absolute inset-0 rounded-2xl sm:rounded-3xl border-2 border-dashed border-cyan-300 bg-cyan-400/10 pointer-events-none z-20" />
+                  )}
+
+                  {/* Poignée de déplacement (réorganisation par glisser-déposer, régie uniquement) */}
+                  {onReorderCompanies && (
+                    <span
+                      role="button"
+                      tabIndex={-1}
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      title="Glisser pour déplacer cette firme"
+                      className="absolute top-1.5 left-1.5 z-20 p-1 rounded-lg bg-slate-950/80 border border-slate-600 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+                    >
+                      <GripVertical className="w-3.5 h-3.5" />
+                    </span>
+                  )}
 
                   {/* Halo lumineux d'arrière-plan avec la couleur de la firme
                       (dégradé radial au lieu de blur: rendu GPU en une seule passe) */}

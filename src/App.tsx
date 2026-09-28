@@ -185,6 +185,11 @@ export const App: React.FC = () => {
     kioskPin: '1234',
     kioskFullscreen: true,
     kioskOnlyFavorites: false,
+    kioskWidgets: {},
+    kioskHiddenCompanies: [],
+    kioskHiddenSystems: [],
+    kioskCompanyOrder: [],
+    kioskFeaturedGames: [],
   });
   const [biosStatuses, setBiosStatuses] = useState<BiosStatus[]>([]);
 
@@ -238,7 +243,7 @@ export const App: React.FC = () => {
   });
 
   // Audio Rétro avec Volume, Sons Spéciaux et BGM Chiptune
-  const { playMove, playSelect, playBack, playLaunch, playCoin, playFavorite, playUnlock, playDice, toggleBgm, isBgmActive } = useAudio(
+  const { playMove, playSelect, playBack, playLaunch, playCoin, playFavorite, playUnlock, playDice } = useAudio(
     settings.soundEnabled,
     settings.soundVolume ?? 0.8,
     settings.bgmEnabled ?? false,
@@ -734,16 +739,6 @@ export const App: React.FC = () => {
     };
   }, [resetAttractTimer]);
 
-  // Toggle BGM avec sauvegarde dans les settings
-  const handleToggleBgm = useCallback(async () => {
-    toggleBgm();
-    const newEnabled = !isBgmActive;
-    setSettings((prev) => ({ ...prev, bgmEnabled: newEnabled }));
-    if (window.api) {
-      await window.api.saveSettings({ bgmEnabled: newEnabled });
-    }
-  }, [toggleBgm, isBgmActive]);
-
   // Basculer vers le mode Kiosk
   const handleEnterKiosk = async () => {
     playCoin();
@@ -756,6 +751,17 @@ export const App: React.FC = () => {
     }
     showNotification('Mode Kiosk activé 🔒. Paramètres et modifications verrouillés.', 'info');
   };
+
+  // Réordonnancement des firmes du Kiosque par glisser-déposer (régie déverrouillée)
+  const handleReorderKioskCompanies = useCallback(
+    async (orderedIds: string[]) => {
+      setSettings((prev) => ({ ...prev, kioskCompanyOrder: orderedIds }));
+      if (window.api) {
+        await window.api.saveSettings({ kioskCompanyOrder: orderedIds });
+      }
+    },
+    []
+  );
 
   // Déverrouillage réussi du code PIN (sortie Kiosque OU écran de verrouillage régie)
   const handleUnlockKioskSuccess = async () => {
@@ -1397,6 +1403,23 @@ export const App: React.FC = () => {
             setSelectedGame(g);
           }}
           onUnlockAdmin={() => setIsPinModalOpen(true)}
+          onOpenShaderProfiles={() => {
+            playSelect();
+            setIsShaderProfilesModalOpen(true);
+          }}
+          soundEnabled={settings.soundEnabled}
+          soundVolume={settings.soundVolume ?? 0.8}
+          crtEnabled={!!settings.crtEffect}
+          onToggleCrt={handleToggleCrt}
+          backgroundVideos={effBackgroundVideos}
+          neonGlows={effNeonGlows}
+          animations={effAnimations}
+          kioskWidgets={settings.kioskWidgets ?? {}}
+          hiddenCompanyIds={settings.kioskHiddenCompanies ?? []}
+          hiddenSystemIds={settings.kioskHiddenSystems ?? []}
+          companyOrder={settings.kioskCompanyOrder ?? []}
+          featuredGameIds={settings.kioskFeaturedGames ?? []}
+          onReorderCompanies={isAdminUnlocked ? handleReorderKioskCompanies : undefined}
           onOpenProjectorModal={() => {
             playSelect();
             setIsProjectorModalOpen(true);
@@ -1405,9 +1428,26 @@ export const App: React.FC = () => {
             playSelect();
             setIsUserManualPdfOpen(true);
           }}
-          onOpenShaderProfiles={() => {
+          onOpenJukebox={() => {
             playSelect();
-            setIsShaderProfilesModalOpen(true);
+            setIsJukeboxModalOpen(true);
+          }}
+          onOpenRoulette={() => {
+            playDice();
+            setIsRouletteModalOpen(true);
+          }}
+          onOpenAchievements={() => {
+            playSelect();
+            setIsAchievementsModalOpen(true);
+          }}
+          onOpenTournament={() => {
+            playSelect();
+            setIsTournamentModalOpen(true);
+          }}
+          onOpenManuals={() => {
+            playSelect();
+            setActiveManualGameId(undefined);
+            setIsManualsModalOpen(true);
           }}
           onOpenSpeedrun={() => {
             playSelect();
@@ -1417,13 +1457,6 @@ export const App: React.FC = () => {
             playSelect();
             setIsCartridgeShelfModalOpen(true);
           }}
-          soundEnabled={settings.soundEnabled}
-          soundVolume={settings.soundVolume ?? 0.8}
-          crtEnabled={!!settings.crtEffect}
-          onToggleCrt={handleToggleCrt}
-          backgroundVideos={effBackgroundVideos}
-          neonGlows={effNeonGlows}
-          animations={effAnimations}
         />
       ) : !isAdminUnlocked ? (
         /* RÉGIE VERROUILLÉE : aucun outil d'administration accessible sans PIN.
@@ -1461,13 +1494,6 @@ export const App: React.FC = () => {
             onToggleSound={() => setSettings((s) => ({ ...s, soundEnabled: !s.soundEnabled }))}
             crtEnabled={!!settings.crtEffect}
             onToggleCrt={handleToggleCrt}
-            bgmActive={jukebox.isPlaying || isBgmActive}
-            isJukeboxMuted={jukebox.isMuted}
-            isJukeboxFloatingVisible={isFloatingJukeboxVisible}
-            onToggleBgm={() => {
-              jukebox.togglePlay();
-              handleToggleBgm();
-            }}
             totalGames={visibleGames.length}
             isKioskMode={isKioskMode}
             isAdminUnlocked={isAdminUnlocked}
@@ -1480,90 +1506,9 @@ export const App: React.FC = () => {
               setCurrentTab('games');
             }}
             availableGenres={availableGenres}
-            onOpenRoulette={() => {
-              playDice();
-              setIsRouletteModalOpen(true);
-            }}
-            onOpenAchievements={() => {
-              playSelect();
-              setIsAchievementsModalOpen(true);
-            }}
-            onOpenJukebox={() => {
-              playSelect();
-              setIsJukeboxModalOpen(true);
-            }}
-            onOpenTournament={() => {
-              playSelect();
-              setIsTournamentModalOpen(true);
-            }}
-            onOpenManuals={() => {
-              playSelect();
-              setActiveManualGameId(undefined);
-              setIsManualsModalOpen(true);
-            }}
-            onOpenBezelStudio={() => {
-              playSelect();
-              setIsBezelStudioModalOpen(true);
-            }}
-            onOpenCheats={() => {
-              playSelect();
-              setIsCheatsModalOpen(true);
-            }}
-            onOpenSaveStates={() => {
-              playSelect();
-              setIsSaveStatesModalOpen(true);
-            }}
-            onOpenAnalytics={() => {
-              playSelect();
-              setIsAnalyticsOpen(true);
-            }}
-            onOpenGamepadTester={() => {
-              playSelect();
-              setIsGamepadTesterOpen(true);
-            }}
-            onOpenProfiles={() => {
-              playSelect();
-              setIsProfilesOpen(true);
-            }}
-            onOpenTimeline={() => {
-              playSelect();
-              setIsTimelineOpen(true);
-            }}
-            onOpenPrintStudio={() => {
-              playSelect();
-              setIsPrintStudioOpen(true);
-            }}
-            onOpenNomadBackup={() => {
-              playSelect();
-              setIsNomadBackupOpen(true);
-            }}
-            onOpenHandheldOverlays={() => {
-              playSelect();
-              setIsHandheldOverlaysOpen(true);
-            }}
-            onOpenArcadeParty={() => {
-              playSelect();
-              setIsArcadePartyOpen(true);
-            }}
-            onOpenMusicManager={() => {
-              playSelect();
-              setIsMusicManagerOpen(true);
-            }}
             onOpenCentralizedStorage={() => {
               playSelect();
               setIsCentralizedStorageOpen(true);
-            }}
-            onOpenThemeStudio={() => {
-              playSelect();
-              setIsCommunityThemeStudioOpen(true);
-            }}
-            onOpenAttractMode={() => {
-              playSelect();
-              setIsAttractModeOpen(true);
-            }}
-            onOpenPasswordNotebook={() => {
-              playSelect();
-              setIsPasswordNotebookOpen(true);
             }}
             onOpenLanManager={() => {
               playSelect();
@@ -1581,14 +1526,6 @@ export const App: React.FC = () => {
             onOpenShaderProfiles={() => {
               playSelect();
               setIsShaderProfilesModalOpen(true);
-            }}
-            onOpenSpeedrun={() => {
-              playSelect();
-              setIsSpeedrunModalOpen(true);
-            }}
-            onOpenCartridgeShelf={() => {
-              playSelect();
-              setIsCartridgeShelfModalOpen(true);
             }}
             onOpenSaveStateSync={() => {
               playSelect();
@@ -1644,10 +1581,6 @@ export const App: React.FC = () => {
                 selectedGenre={selectedGenre}
                 onSelectGenre={(genre) => {
                   setSelectedGenre(genre);
-                }}
-                onOpenRoulette={() => {
-                  playDice();
-                  setIsRouletteModalOpen(true);
                 }}
               />
             </div>
@@ -1753,99 +1686,6 @@ export const App: React.FC = () => {
               isCheckingBios={isCheckingBios}
               onCheckBios={handleRefreshBios}
               onCreateRomsFolders={window.api?.createRomsFolders}
-              onOpenRoulette={() => {
-                playDice();
-                setIsRouletteModalOpen(true);
-              }}
-              onOpenAchievements={() => {
-                playSelect();
-                setIsAchievementsModalOpen(true);
-              }}
-              onOpenJukebox={() => {
-                playSelect();
-                setIsJukeboxModalOpen(true);
-              }}
-              onOpenTournament={() => {
-                playSelect();
-                setIsTournamentModalOpen(true);
-              }}
-              onOpenManuals={() => {
-                playSelect();
-                setActiveManualGameId(undefined);
-                setIsManualsModalOpen(true);
-              }}
-              onOpenBezelStudio={() => {
-                playSelect();
-                setIsBezelStudioModalOpen(true);
-              }}
-              onOpenCheats={() => {
-                playSelect();
-                setIsCheatsModalOpen(true);
-              }}
-              onOpenSaveStates={() => {
-                playSelect();
-                setIsSaveStatesModalOpen(true);
-              }}
-              onOpenAnalytics={() => {
-                playSelect();
-                setIsAnalyticsOpen(true);
-              }}
-              onOpenGamepadTester={() => {
-                playSelect();
-                setIsGamepadTesterOpen(true);
-              }}
-              onOpenProfiles={() => {
-                playSelect();
-                setIsProfilesOpen(true);
-              }}
-              onOpenTimeline={() => {
-                playSelect();
-                setIsTimelineOpen(true);
-              }}
-              onOpenPrintStudio={() => {
-                playSelect();
-                setIsPrintStudioOpen(true);
-              }}
-              onOpenNomadBackup={() => {
-                playSelect();
-                setIsNomadBackupOpen(true);
-              }}
-              onOpenHandheldOverlays={() => {
-                playSelect();
-                setIsHandheldOverlaysOpen(true);
-              }}
-              onOpenArcadeParty={() => {
-                playSelect();
-                setIsArcadePartyOpen(true);
-              }}
-              onOpenMusicManager={() => {
-                playSelect();
-                setIsMusicManagerOpen(true);
-              }}
-              onOpenThemeStudio={() => {
-                playSelect();
-                setIsCommunityThemeStudioOpen(true);
-              }}
-              onOpenAttractMode={() => {
-                playSelect();
-                setIsAttractModeOpen(true);
-              }}
-              onOpenPasswordNotebook={() => {
-                playSelect();
-                setIsPasswordNotebookOpen(true);
-              }}
-              onOpenLanManager={() => {
-                playSelect();
-                setIsLanManagerOpen(true);
-              }}
-              onOpenProjectorModal={() => {
-                playSelect();
-                setIsProjectorModalOpen(true);
-              }}
-              onOpenUserManualPdf={() => {
-                playSelect();
-                setIsUserManualPdfOpen(true);
-              }}
             />
           )}
         </>
@@ -1946,43 +1786,6 @@ export const App: React.FC = () => {
           isCheckingBios={isCheckingBios}
           onCheckBios={handleRefreshBios}
           onCreateRomsFolders={window.api?.createRomsFolders}
-          onOpenRoulette={() => {
-            playDice();
-            setIsRouletteModalOpen(true);
-          }}
-          onOpenAchievements={() => {
-            playSelect();
-            setIsAchievementsModalOpen(true);
-          }}
-          onOpenJukebox={() => {
-            playSelect();
-            setIsJukeboxModalOpen(true);
-          }}
-          onOpenTournament={() => {
-            playSelect();
-            setIsTournamentModalOpen(true);
-          }}
-          onOpenManuals={() => {
-            playSelect();
-            setActiveManualGameId(undefined);
-            setIsManualsModalOpen(true);
-          }}
-          onOpenBezelStudio={() => {
-            playSelect();
-            setIsBezelStudioModalOpen(true);
-          }}
-          onOpenCheats={() => {
-            playSelect();
-            setIsCheatsModalOpen(true);
-          }}
-          onOpenSaveStates={() => {
-            playSelect();
-            setIsSaveStatesModalOpen(true);
-          }}
-          onOpenUserManualPdf={() => {
-            playSelect();
-            setIsUserManualPdfOpen(true);
-          }}
         />
       )}
 
@@ -2200,7 +2003,6 @@ export const App: React.FC = () => {
       <RetroJukeboxModal
         isOpen={isJukeboxModalOpen}
         onClose={() => setIsJukeboxModalOpen(false)}
-        onOpenMusicManager={() => setIsMusicManagerOpen(true)}
         jukebox={jukebox}
         isFloatingVisible={isFloatingJukeboxVisible}
         onToggleFloatingVisible={handleToggleFloatingJukebox}
@@ -2472,10 +2274,6 @@ export const App: React.FC = () => {
         onLaunchRom={handleLaunchCentralizedRom}
         onImportRomToLibrary={handleImportRomToLibrary}
         onImportAllRomsToLibrary={handleImportAllRomsToLibrary}
-        onOpenThemeStudio={() => {
-          playSelect();
-          setIsCommunityThemeStudioOpen(true);
-        }}
         onPlaySound={(type) => {
           if (type === 'coin') playCoin();
           if (type === 'fanfare') playUnlock();

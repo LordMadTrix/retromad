@@ -34,7 +34,6 @@ import {
   Copy,
   Sparkles,
   FileJson,
-  Megaphone,
 } from 'lucide-react';
 import { GameEditModal } from './GameEditModal';
 import { SystemEditModal } from './SystemEditModal';
@@ -50,8 +49,7 @@ import { BiosAdminView } from './admin/BiosAdminView';
 import { CoresAdminView } from './admin/CoresAdminView';
 import { BatchGamesToolbar } from './admin/BatchGamesToolbar';
 import { BackupsAdminView } from './admin/BackupsAdminView';
-import { RetroLabAdminView } from './admin/RetroLabAdminView';
-import { PromoCampaignAdminView } from './admin/PromoCampaignAdminView';
+import { KioskCustomizeView } from './admin/KioskCustomizeView';
 
 export type AdminTab =
   | 'games'
@@ -61,8 +59,6 @@ export type AdminTab =
   | 'bios'
   | 'extensions'
   | 'scraper'
-  | 'retrolab'
-  | 'promo'
   | 'storage'
   | 'gamepad'
   | 'kiosk'
@@ -85,6 +81,7 @@ interface AdminHubModalProps {
   onSaveEmulators: (emulators: EmulatorProfile[]) => void;
   onSelectDirectory: () => Promise<string | null>;
   onOpenExtensions?: () => void;
+  onOpenThemeStudio?: () => void;
   onDetectEmulators?: () => Promise<EmulatorProfile[]>;
   onResetDefaults?: () => void;
   onOpenSystemExhibition?: (system: System) => void;
@@ -109,30 +106,7 @@ interface AdminHubModalProps {
   onCheckBios?: () => Promise<void>;
   onCreateRomsFolders?: () => Promise<{ created: number; total: number }>;
   // Callbacks Labo Rétro
-  onOpenRoulette?: () => void;
-  onOpenAchievements?: () => void;
-  onOpenJukebox?: () => void;
-  onOpenTournament?: () => void;
-  onOpenManuals?: () => void;
-  onOpenBezelStudio?: () => void;
-  onOpenCheats?: () => void;
-  onOpenSaveStates?: () => void;
   // 8 Nouveaux modules d'amélioration & Musique
-  onOpenAnalytics?: () => void;
-  onOpenGamepadTester?: () => void;
-  onOpenProfiles?: () => void;
-  onOpenTimeline?: () => void;
-  onOpenPrintStudio?: () => void;
-  onOpenNomadBackup?: () => void;
-  onOpenHandheldOverlays?: () => void;
-  onOpenArcadeParty?: () => void;
-  onOpenMusicManager?: () => void;
-  onOpenThemeStudio?: () => void;
-  onOpenAttractMode?: () => void;
-  onOpenPasswordNotebook?: () => void;
-  onOpenLanManager?: () => void;
-  onOpenProjectorModal?: () => void;
-  onOpenUserManualPdf?: () => void;
 }
 
 export const AdminHubModal: React.FC<AdminHubModalProps> = ({
@@ -150,6 +124,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   onSaveEmulators,
   onSelectDirectory,
   onOpenExtensions,
+  onOpenThemeStudio,
   onDetectEmulators,
   onResetDefaults,
   onOpenSystemExhibition,
@@ -166,29 +141,6 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   isCheckingBios = false,
   onCheckBios,
   onCreateRomsFolders,
-  onOpenRoulette,
-  onOpenAchievements,
-  onOpenJukebox,
-  onOpenTournament,
-  onOpenManuals,
-  onOpenBezelStudio,
-  onOpenCheats,
-  onOpenSaveStates,
-  onOpenAnalytics,
-  onOpenGamepadTester,
-  onOpenProfiles,
-  onOpenTimeline,
-  onOpenPrintStudio,
-  onOpenNomadBackup,
-  onOpenHandheldOverlays,
-  onOpenArcadeParty,
-  onOpenMusicManager,
-  onOpenThemeStudio,
-  onOpenAttractMode,
-  onOpenPasswordNotebook,
-  onOpenLanManager,
-  onOpenProjectorModal,
-  onOpenUserManualPdf,
 }) => {
   if (!isOpen) return null;
 
@@ -786,29 +738,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               <span>Scraper</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('retrolab')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'retrolab'
-                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg shadow-cyan-500/20 font-black'
-                  : 'text-cyan-300 hover:text-white hover:bg-cyan-500/10 border border-cyan-500/30'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-              <span>Labo Rétro (8 Modules)</span>
-            </button>
 
-            <button
-              onClick={() => setActiveTab('promo')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'promo'
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/25 font-black'
-                  : 'text-pink-400 hover:text-white hover:bg-pink-500/10 border border-pink-500/30'
-              }`}
-            >
-              <Megaphone className="w-3.5 h-3.5 text-pink-300" />
-              <span>Publicité & Média</span>
-            </button>
 
             <button
               onClick={() => setActiveTab('gamepad')}
@@ -1803,6 +1733,20 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             {/* ONGLET: MODE KIOSK & SÉCURITÉ */}
             {/* ======================================================== */}
             {activeTab === 'kiosk' && (
+              <>
+              <div className="mb-5">
+                <h2 className="text-base font-black text-white uppercase tracking-wider mb-1">Personnalisation de la borne</h2>
+                <p className="text-[11px] text-slate-400 mb-3">
+                  Widgets, firmes, machines et vedettes : ce que les joueurs voient dans le Kiosque. Sauvegarde immédiate.
+                </p>
+                <KioskCustomizeView
+                  settings={formSettings}
+                  onSaveSettings={onSaveSettings}
+                  companies={companies}
+                  systems={systems}
+                  games={games}
+                />
+              </div>
               <form onSubmit={handleSaveSettingsSubmit} className="max-w-2xl space-y-4">
                 <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-4">
                   <div className="flex items-center justify-between">
@@ -1871,6 +1815,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   <span>Enregistrer les Règles Kiosk</span>
                 </button>
               </form>
+              </>
             )}
 
             {/* ======================================================== */}
@@ -2086,51 +2031,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               />
             )}
 
-            {/* ======================================================== */}
-            {/* LABO RÉTRO & LES 8 MODULES SPÉCIAUX */}
-            {/* ======================================================== */}
-            {activeTab === 'retrolab' && (
-              <RetroLabAdminView
-                onOpenRoulette={onOpenRoulette}
-                onOpenAchievements={onOpenAchievements}
-                onOpenJukebox={onOpenJukebox}
-                onOpenTournament={onOpenTournament}
-                onOpenManuals={onOpenManuals}
-                onOpenBezelStudio={onOpenBezelStudio}
-                onOpenCheats={onOpenCheats}
-                onOpenSaveStates={onOpenSaveStates}
-                onOpenAnalytics={onOpenAnalytics}
-                onOpenGamepadTester={onOpenGamepadTester}
-                onOpenProfiles={onOpenProfiles}
-                onOpenTimeline={onOpenTimeline}
-                onOpenPrintStudio={onOpenPrintStudio}
-                onOpenNomadBackup={onOpenNomadBackup}
-                onOpenHandheldOverlays={onOpenHandheldOverlays}
-                onOpenArcadeParty={onOpenArcadeParty}
-                onOpenMusicManager={onOpenMusicManager}
-                onOpenAttractMode={onOpenAttractMode}
-                onOpenPasswordNotebook={onOpenPasswordNotebook}
-                onOpenLanManager={onOpenLanManager}
-                onOpenProjectorModal={onOpenProjectorModal}
-                onOpenUserManualPdf={onOpenUserManualPdf}
-                totalGames={games.length}
-              />
-            )}
 
-            {/* ======================================================== */}
-            {/* STUDIO PUBLICITAIRE & KIT MÉDIA */}
-            {/* ======================================================== */}
-            {activeTab === 'promo' && (
-              <PromoCampaignAdminView
-                games={games}
-                systems={systems}
-                onPlaySound={(type) => {
-                  if (type === 'coin') playCoin();
-                  if (type === 'fanfare') playUnlock();
-                  if (type === 'powerup') playSelect();
-                }}
-              />
-            )}
 
             {/* ======================================================== */}
             {/* NOUVEL ONGLET: ÉDITEUR BRUT DE DONNÉES JSON */}

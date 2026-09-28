@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Gamepad2, Landmark, Cpu, Settings, Sparkles,
   Volume2, VolumeX, Lock, Unlock, ShieldCheck, DownloadCloud,
-  Tv, Search, ChevronDown, Dices, Trophy,
-  BookOpen, Swords, HardDrive, Code2, Disc3,
-  BarChart3, Users, History, Printer, PackageCheck, Smartphone, Beer, FolderSearch, Palette,
-  Key, Wifi, Projector, FolderPlus, Flame, Timer, Layers, RefreshCw,
+  Tv, Search, ChevronDown, Dices, Trophy, Swords,
+  BookOpen, HardDrive,
+  FolderSearch, Palette,
+  Wifi, Projector, FolderPlus, Flame, Timer, Layers, RefreshCw,
   Rocket, Tag, X
 } from 'lucide-react';
 
@@ -23,8 +23,6 @@ interface NavigationProps {
   onToggleSound: () => void;
   crtEnabled?: boolean;
   onToggleCrt?: () => void;
-  bgmActive?: boolean;
-  onToggleBgm?: () => void;
   totalGames: number;
   isKioskMode: boolean;
   /** Régie admin déverrouillée par PIN : sans elle, tout le menu Administration est masqué */
@@ -37,38 +35,16 @@ interface NavigationProps {
   onSelectGenre?: (genre: string) => void;
   availableGenres?: { genre: string; count: number }[];
   // 8 Features Rétro
-  onOpenRoulette?: () => void;
-  onOpenAchievements?: () => void;
-  onOpenJukebox?: () => void;
-  onOpenTournament?: () => void;
-  onOpenManuals?: () => void;
   onOpenBezelStudio?: () => void;
-  onOpenCheats?: () => void;
-  onOpenSaveStates?: () => void;
-  // Innovations & Gestion
-  onOpenAnalytics?: () => void;
-  onOpenGamepadTester?: () => void;
-  onOpenProfiles?: () => void;
-  onOpenTimeline?: () => void;
-  onOpenPrintStudio?: () => void;
-  onOpenNomadBackup?: () => void;
-  onOpenHandheldOverlays?: () => void;
-  onOpenArcadeParty?: () => void;
-  onOpenMusicManager?: () => void;
-  onOpenCentralizedStorage?: () => void;
   onOpenThemeStudio?: () => void;
-  onOpenAttractMode?: () => void;
-  onOpenPasswordNotebook?: () => void;
+  // Innovations & Gestion
+  onOpenCentralizedStorage?: () => void;
   onOpenLanManager?: () => void;
   onOpenProjectorModal?: () => void;
   isProjectorKioskRunning?: boolean;
-  isJukeboxFloatingVisible?: boolean;
-  isJukeboxMuted?: boolean;
   onOpenUserManualPdf?: () => void;
   // 4 Nouvelles Expériences Majeures
   onOpenShaderProfiles?: () => void;
-  onOpenSpeedrun?: () => void;
-  onOpenCartridgeShelf?: () => void;
   onOpenSaveStateSync?: () => void;
 }
 
@@ -84,8 +60,6 @@ export const Navigation: React.FC<NavigationProps> = ({
   onToggleSound,
   crtEnabled = false,
   onToggleCrt,
-  bgmActive = false,
-  onToggleBgm,
   totalGames,
   isKioskMode,
   isAdminUnlocked = false,
@@ -95,44 +69,19 @@ export const Navigation: React.FC<NavigationProps> = ({
   selectedGenre = 'all',
   onSelectGenre,
   availableGenres = [],
-  onOpenRoulette,
-  onOpenAchievements,
-  onOpenJukebox,
-  onOpenTournament,
-  onOpenManuals,
   onOpenBezelStudio,
-  onOpenCheats,
-  onOpenSaveStates,
-  onOpenAnalytics,
-  onOpenGamepadTester,
-  onOpenProfiles,
-  onOpenTimeline,
-  onOpenPrintStudio,
-  onOpenNomadBackup,
-  onOpenHandheldOverlays,
-  onOpenArcadeParty,
-  onOpenMusicManager,
-  onOpenCentralizedStorage,
   onOpenThemeStudio,
-  onOpenAttractMode,
-  onOpenPasswordNotebook,
+  onOpenCentralizedStorage,
   onOpenLanManager,
   onOpenProjectorModal,
-  isProjectorKioskRunning: _isProjectorKioskRunning,
-  isJukeboxFloatingVisible: _isJukeboxFloatingVisible,
-  isJukeboxMuted,
   onOpenUserManualPdf,
   onOpenShaderProfiles,
-  onOpenSpeedrun,
-  onOpenCartridgeShelf,
   onOpenSaveStateSync,
 }) => {
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [retroLabOpen, setRetroLabOpen] = useState(false);
   const [genreMenuOpen, setGenreMenuOpen] = useState(false);
   const [genreSearch, setGenreSearch] = useState('');
   const adminRef = useRef<HTMLDivElement>(null);
-  const retroLabRef = useRef<HTMLDivElement>(null);
   const genreRef = useRef<HTMLDivElement>(null);
 
   // Fermer les menus déroulants lors d'un clic en dehors
@@ -140,9 +89,6 @@ export const Navigation: React.FC<NavigationProps> = ({
     const handler = (e: MouseEvent) => {
       if (adminRef.current && !adminRef.current.contains(e.target as Node)) {
         setAdminMenuOpen(false);
-      }
-      if (retroLabRef.current && !retroLabRef.current.contains(e.target as Node)) {
-        setRetroLabOpen(false);
       }
       if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
         setGenreMenuOpen(false);
@@ -241,7 +187,6 @@ export const Navigation: React.FC<NavigationProps> = ({
             onClick={() => {
               setGenreMenuOpen((p) => !p);
               setAdminMenuOpen(false);
-              setRetroLabOpen(false);
             }}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm ${
               selectedGenre && selectedGenre !== 'all'
@@ -402,8 +347,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               type="button"
               onClick={() => {
                 setAdminMenuOpen((p) => !p);
-                setRetroLabOpen(false);
-              }}
+                }}
               className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm ${
                 adminMenuOpen || currentTab === 'settings' || currentTab === 'bios'
                   ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_10px_rgba(0,242,254,0.3)]'
@@ -602,247 +546,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           </div>
         )}
 
-        {/* ── MENU DÉROULANT : LABO RÉTRO (Toutes les features ludiques) ── */}
-        <div className="relative shrink-0" ref={retroLabRef}>
-          <button
-            type="button"
-            onClick={() => {
-              setRetroLabOpen((p) => !p);
-              setAdminMenuOpen(false);
-            }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm ${
-              retroLabOpen
-                ? 'bg-purple-600/30 border-purple-400 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
-                : 'bg-gradient-to-r from-purple-950/60 to-indigo-950/60 border-purple-500/40 text-purple-200 hover:text-white hover:border-purple-400'
-            }`}
-            title="Fonctionnalités ludiques, musique et bonus"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            <span className="hidden md:inline">Labo Rétro</span>
-            <span className="md:hidden">Labo</span>
-            <ChevronDown className={`w-3 h-3 transition-transform ${retroLabOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {retroLabOpen && (
-            <div className="absolute left-0 top-full mt-2 w-72 max-h-[82vh] overflow-y-auto bg-[#091228]/98 border border-purple-500/40 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.85)] backdrop-blur-2xl z-50 py-2 animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-3.5 py-1 text-[10px] font-black text-amber-400 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
-                <span>EXPÉRIENCES ARCADE</span>
-                <span className="font-mono text-amber-400/80">★ EXCLUSIF</span>
-              </div>
-
-              <MenuAction
-                icon={<Layers className="w-4 h-4 text-purple-400" />}
-                label="Étagère 3D Cartouches Physiques"
-                badge="3D"
-                badgeColor="bg-purple-500/30 text-purple-300"
-                onClick={() => {
-                  onOpenCartridgeShelf?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-purple-200 hover:bg-purple-500/15 font-bold"
-              />
-
-              <MenuAction
-                icon={<Timer className="w-4 h-4 text-amber-400" />}
-                label="Chronomètre Speedrun Arcade Pro"
-                badge="Chrono"
-                badgeColor="bg-amber-500/30 text-amber-300"
-                onClick={() => {
-                  onOpenSpeedrun?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-amber-200 hover:bg-amber-500/15 font-bold"
-              />
-
-              <MenuAction
-                icon={<Sparkles className="w-4 h-4 text-pink-400 animate-pulse" />}
-                label="Borne d'Arcade (Attract Mode 3D)"
-                onClick={() => {
-                  onOpenAttractMode?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-pink-200 hover:bg-pink-500/15 font-bold"
-              />
-
-              <MenuAction
-                icon={<Disc3 className="w-4 h-4 text-pink-400" />}
-                label="Jukebox Chiptune 8/16-Bit"
-                badge={bgmActive ? 'ON' : undefined}
-                badgeColor="bg-pink-500/30 text-pink-300"
-                onClick={() => {
-                  onOpenJukebox?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-pink-200 hover:bg-pink-500/15"
-              />
-
-              <MenuAction
-                icon={<Dices className="w-4 h-4 text-cyan-400" />}
-                label="Roulette Rétro & Défi du Jour"
-                onClick={() => {
-                  onOpenRoulette?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-cyan-200 hover:bg-cyan-500/15"
-              />
-
-              <MenuAction
-                icon={<Trophy className="w-4 h-4 text-amber-400" />}
-                label="RetroAchievements & Succès"
-                onClick={() => {
-                  onOpenAchievements?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-amber-200 hover:bg-amber-500/15"
-              />
-
-              <MenuAction
-                icon={<Key className="w-4 h-4 text-yellow-400" />}
-                label="Carnet de Passwords & Fiches"
-                onClick={() => {
-                  onOpenPasswordNotebook?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-yellow-200 hover:bg-yellow-500/15"
-              />
-
-              <MenuAction
-                icon={<Beer className="w-4 h-4 text-amber-400" />}
-                label="Mode Soirée & Bar Arcade"
-                onClick={() => {
-                  onOpenArcadeParty?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-amber-200 hover:bg-amber-500/15"
-              />
-
-              <div className="px-3.5 py-1 text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
-                <span>OUTILS & GAMEPLAY</span>
-                <span className="font-mono text-cyan-400/80">INNOVATION</span>
-              </div>
-
-              <MenuAction
-                icon={<Gamepad2 className="w-4 h-4 text-purple-400" />}
-                label="Testeur de Manette & Sticks"
-                onClick={() => {
-                  onOpenGamepadTester?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-purple-200 hover:bg-purple-500/15"
-              />
-
-              <MenuAction
-                icon={<BarChart3 className="w-4 h-4 text-cyan-400" />}
-                label="Rétro Analytics & Journal"
-                onClick={() => {
-                  onOpenAnalytics?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-cyan-200 hover:bg-cyan-500/15"
-              />
-
-              <MenuAction
-                icon={<HardDrive className="w-4 h-4 text-teal-400" />}
-                label="Save States & Cartes Mémoires"
-                onClick={() => {
-                  onOpenSaveStates?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-teal-200 hover:bg-teal-500/15"
-              />
-
-              <MenuAction
-                icon={<Code2 className="w-4 h-4 text-purple-400" />}
-                label="Codes Cheats (Game Genie)"
-                onClick={() => {
-                  onOpenCheats?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-purple-200 hover:bg-purple-500/15"
-              />
-
-              <MenuAction
-                icon={<Swords className="w-4 h-4 text-orange-400" />}
-                label="Tournois Arcade Multijoueur"
-                onClick={() => {
-                  onOpenTournament?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-orange-200 hover:bg-orange-500/15"
-              />
-
-              <MenuAction
-                icon={<BookOpen className="w-4 h-4 text-emerald-400" />}
-                label="Manuels & Notices d'Époque"
-                onClick={() => {
-                  onOpenManuals?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-emerald-200 hover:bg-emerald-500/15"
-              />
-
-              <MenuAction
-                icon={<History className="w-4 h-4 text-amber-400" />}
-                label="Musée & Frise Chronologique"
-                onClick={() => {
-                  onOpenTimeline?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-amber-200 hover:bg-amber-500/15"
-              />
-
-              <MenuAction
-                icon={<Printer className="w-4 h-4 text-emerald-400" />}
-                label="Print Studio (Jaquettes 1:1)"
-                onClick={() => {
-                  onOpenPrintStudio?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-emerald-200 hover:bg-emerald-500/15"
-              />
-
-              <MenuAction
-                icon={<PackageCheck className="w-4 h-4 text-blue-400" />}
-                label="Pack Nomade & Clé USB"
-                onClick={() => {
-                  onOpenNomadBackup?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-blue-200 hover:bg-blue-500/15"
-              />
-
-              <MenuAction
-                icon={<Smartphone className="w-4 h-4 text-green-400" />}
-                label="Overlays Portables LCD"
-                onClick={() => {
-                  onOpenHandheldOverlays?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-green-200 hover:bg-green-500/15"
-              />
-
-              <MenuAction
-                icon={<Users className="w-4 h-4 text-pink-400" />}
-                label="Multi-Profils Joueurs"
-                onClick={() => {
-                  onOpenProfiles?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-pink-200 hover:bg-pink-500/15"
-              />
-
-              <MenuAction
-                icon={<FolderSearch className="w-4 h-4 text-fuchsia-400" />}
-                label="Musiques & Scan Auto"
-                onClick={() => {
-                  onOpenMusicManager?.();
-                  setRetroLabOpen(false);
-                }}
-                className="text-fuchsia-200 hover:bg-fuchsia-500/15"
-              />
-            </div>
-          )}
-        </div>
+        {/* Labo Rétro retiré de l'admin : le fun (musique, succès, tournois…) vit dans le Kiosque */}
 
         {/* ── BOUTON DIRECT : KIOSQUE ARCADE ── */}
         {!isKioskMode ? (
@@ -903,22 +607,6 @@ export const Navigation: React.FC<NavigationProps> = ({
 
         {/* Contrôles Audio Réduits */}
         <div className="flex items-center gap-0.5 bg-slate-900/60 p-0.5 rounded-lg border border-slate-800">
-          {/* BGM Jukebox */}
-          <button
-            type="button"
-            onClick={onOpenJukebox || onToggleBgm}
-            title={bgmActive ? 'Jukebox Chiptune Actif' : 'Ouvrir Jukebox Chiptune'}
-            className={`p-1.5 rounded-md transition ${
-              bgmActive
-                ? isJukeboxMuted
-                  ? 'bg-amber-500/20 text-amber-300'
-                  : 'bg-pink-500/25 text-pink-300 shadow-[0_0_8px_rgba(236,72,153,0.3)]'
-                : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <Disc3 className={`w-3.5 h-3.5 ${bgmActive && !isJukeboxMuted ? 'animate-spin' : ''}`} />
-          </button>
-
           {/* Effets Sonores FX */}
           <button
             type="button"
