@@ -416,6 +416,18 @@ export const COMPUTING_ERAS: { id: string; label: string; years: string; systemI
     years: '1984 — 1990',
     systemIds: ['cpc464', 'cpc664', 'amstradcpc', 'cpc6128', 'cpcplus', 'gx4000'],
   },
+  {
+    id: 'msxfamille',
+    label: 'La famille MSX',
+    years: '1983 — 1990',
+    systemIds: ['msx', 'msx2', 'msx2p', 'msxturbor'],
+  },
+  {
+    id: 'atari8bitfamille',
+    label: 'La famille Atari 8-bit',
+    years: '1979 — 1987',
+    systemIds: ['atari8bit', 'xegs'],
+  },
 ];
 
 export const COMPUTING_SYSTEM_IDS = new Set<string>([
@@ -430,4 +442,6 @@ export const COMPUTING_SYSTEM_IDS = new Set<string>([
   // Autres modèles Commodore et gamme CPC
   'pet', 'c16', 'sx64', 'cdtv', 'c64gs', 'amiga600', 'cd32',
   'cpc464', 'cpc664', 'cpc6128', 'cpcplus',
+  // Complément : MSX2+/turbo R, Macintosh, Atari XE GS
+  'msx2p', 'msxturbor', 'macintosh', 'xegs',
 ]);

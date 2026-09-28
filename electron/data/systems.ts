@@ -2947,6 +2947,214 @@ const RAW_SYSTEMS: System[] = [
     themeColor: '#5c2d91',
     logoUrl: './logos/consoles/gx4000.png',
     biosList: []
+  },
+
+  // COMPLÉMENT — LES MACHINES MANQUANTES DES GRANDES FAMILLES
+  {
+    id: 'fds',
+    name: 'Famicom Disk System',
+    shortName: 'FDS',
+    companyId: 'nintendo',
+    manufacturer: 'Nintendo',
+    releaseYear: 1986,
+    generation: '3e génération (Extension disquettes)',
+    specs: {
+      cpu: 'Ricoh 2A03 @ 1.79 MHz (Famicom + RAM adaptateur)',
+      gpuOrAudio: 'PPU 2C02 + canal audio extra du disque (wavetable)',
+      resolution: '256x240 pixels',
+      media: 'Disquettes 2.8" (Famicom Disk Cards, ~64 KB par face)',
+      unitsSold: '4,4 millions — la « douzième console » de Nintendo au Japon'
+    },
+    extensions: ['.fds', '.zip'],
+    libretroSystemName: 'Nintendo_-_Famicom_Disk_System',
+    defaultCoreLinux: 'fceumm_libretro.so',
+    defaultCoreWindows: 'fceumm_libretro.dll',
+    subfolder: 'fds',
+    icon: 'Disc3',
+    themeColor: '#c62828',
+    logoUrl: './logos/consoles/fds.png',
+    biosList: [
+      { filename: 'disksys.rom', description: 'BIOS Famicom Disk System (obligatoire)', optional: false }
+    ]
+  },
+  {
+    id: 'nomad',
+    name: 'Sega Genesis Nomad',
+    shortName: 'Nomad',
+    companyId: 'sega',
+    manufacturer: 'SEGA',
+    releaseYear: 1995,
+    generation: '4e génération (Portable 16-bit)',
+    specs: {
+      cpu: 'Motorola 68000 @ 7.6 MHz (100% Mega Drive)',
+      gpuOrAudio: 'VDP + YM2612/PSG — le son Mega Drive authentique',
+      resolution: '320x224 sur écran LCD couleur rétroéclairé',
+      media: 'Cartouches Mega Drive/Genesis originales',
+      unitsSold: '~1 million (USA seulement) — la Mega Drive de poche'
+    },
+    extensions: ['.md', '.bin', '.gen', '.zip'],
+    libretroSystemName: 'Sega_-_Mega_Drive_-_Genesis',
+    defaultCoreLinux: 'genesis_plus_gx_libretro.so',
+    defaultCoreWindows: 'genesis_plus_gx_libretro.dll',
+    subfolder: 'nomad',
+    icon: 'Gamepad2',
+    themeColor: '#2c5aa0',
+    logoUrl: './logos/consoles/nomad.png',
+    biosList: []
+  },
+  {
+    id: 'supergrafx',
+    name: 'NEC SuperGrafx',
+    shortName: 'SGX',
+    companyId: 'nec',
+    manufacturer: 'NEC Avenue',
+    releaseYear: 1989,
+    generation: '4e génération (PC Engine surpuissant)',
+    specs: {
+      cpu: 'HuC6280 @ 7.16 MHz + double PCE (2 HuC6270 + 2 VDC)',
+      gpuOrAudio: '2x PCB Engine : 2 plans de scroll + sprites dédoublés',
+      resolution: '512x242 (contre 256 sur PC Engine)',
+      media: 'HuCards et CD-ROM² (compatible totale)',
+      unitsSold: '~100 000 — 5 jeux dédiés seulement, parenthèse culte'
+    },
+    extensions: ['.pce', '.cue', '.bin', '.zip'],
+    libretroSystemName: 'NEC_-_PC_Engine_SuperGrafx',
+    defaultCoreLinux: 'mednafen_supergrafx_libretro.so',
+    defaultCoreWindows: 'mednafen_supergrafx_libretro.dll',
+    subfolder: 'supergrafx',
+    icon: 'Gamepad2',
+    themeColor: '#d0d0d8',
+    logoUrl: './logos/consoles/supergrafx.png',
+    biosList: []
+  },
+  {
+    id: 'pcfx',
+    name: 'NEC PC-FX',
+    shortName: 'PC-FX',
+    companyId: 'nec',
+    manufacturer: 'NEC Home Electronics',
+    releaseYear: 1994,
+    generation: '5e génération (successeur PC Engine CD)',
+    specs: {
+      cpu: 'NEC V810 RISC 32-bit @ 21.5 MHz',
+      gpuOrAudio: 'Full-motion vidéo, animation 2D haute, KingMax FX',
+      resolution: 'Up to 640x480 (interlaced)',
+      media: 'CD-ROM (FX-BMC cards pour les saves)',
+      unitsSold: '~400 000 (Japon) — trop orienté anime/visual novels'
+    },
+    extensions: ['.cue', '.bin', '.iso', '.toc', '.zip'],
+    libretroSystemName: 'NEC_-_PC-FX',
+    defaultCoreLinux: 'beetle_pcfx_libretro.so',
+    defaultCoreWindows: 'beetle_pcfx_libretro.dll',
+    subfolder: 'pcfx',
+    icon: 'Box',
+    themeColor: '#b8a2d8',
+    logoUrl: './logos/consoles/pcfx.png',
+    biosList: [
+      { filename: 'pcfx.rom', description: 'BIOS PC-FX (obligatoire pour Beetle PC-FX)', optional: false }
+    ]
+  },
+  {
+    id: 'msx2p',
+    name: 'MSX2+ (MSX2 Plus)',
+    shortName: 'MSX2+',
+    companyId: 'multiple',
+    manufacturer: 'Panasonic / Sanyo (standard ASCII)',
+    releaseYear: 1988,
+    generation: 'Micro-ordinateur 8-bit japonais amélioré',
+    specs: {
+      cpu: 'Zilog Z80A @ 3.58 MHz',
+      gpuOrAudio: 'V9958 : 19 268 couleurs (YJK) + MSX-MUSIC 9 voix FM',
+      resolution: '256x212 à 512x212 (mode YJK 19268 couleurs !)',
+      media: 'Disquettes 3.5" + cartouches',
+      unitsSold: 'Japon seulement — FS-A1WX/WSX, le crépuscule du MSX'
+    },
+    extensions: ['.dsk', '.rom', '.mx1', '.cas', '.zip'],
+    libretroSystemName: 'Microsoft_-_MSX2',
+    defaultCoreLinux: 'bluemsx_libretro.so',
+    defaultCoreWindows: 'bluemsx_libretro.dll',
+    subfolder: 'msx2p',
+    icon: 'Cpu',
+    themeColor: '#7a9ac8',
+    logoUrl: './logos/consoles/msx2p.png',
+    biosList: []
+  },
+  {
+    id: 'msxturbor',
+    name: 'MSX turbo R',
+    shortName: 'turbo R',
+    companyId: 'multiple',
+    manufacturer: 'Panasonic (FS-A1ST/GT)',
+    releaseYear: 1990,
+    generation: 'Micro-ordinateur 16-bit MSX (dernier standard)',
+    specs: {
+      cpu: 'R800 RISC 16-bit @ 7.16 MHz (compatible Z80 natif) + Z80 secours',
+      gpuOrAudio: 'V9958 YJK + MSX-MUSIC + PCM 1-bit (sample par basculement)',
+      resolution: '256x212 à 512x212 YJK',
+      media: 'Disquettes 3.5" 2DD + CD-ROM sur GT',
+      unitsSold: 'Très faible — le dernier MSX officiel (1990-1991)'
+    },
+    extensions: ['.dsk', '.rom', '.mx1', '.cas', '.zip'],
+    libretroSystemName: 'Microsoft_-_MSX',
+    defaultCoreLinux: 'bluemsx_libretro.so',
+    defaultCoreWindows: 'bluemsx_libretro.dll',
+    subfolder: 'msxturbor',
+    icon: 'Cpu',
+    themeColor: '#5a7ab0',
+    logoUrl: './logos/consoles/msxturbor.png',
+    biosList: []
+  },
+  {
+    id: 'macintosh',
+    name: 'Macintosh (System 1-7)',
+    shortName: 'Macintosh',
+    companyId: 'apple',
+    manufacturer: 'Apple Computer',
+    releaseYear: 1984,
+    generation: 'Micro-ordinateur 16/32-bit (68k, GUI)',
+    specs: {
+      cpu: 'Motorola 68000 @ 7.83 MHz (Mac 128K) à 68040 @ 33 MHz (Quadra)',
+      gpuOrAudio: 'QuickDraw natif + Sound Chip ASC/AMIC (Mac II)',
+      resolution: '512x342 (1-bit) à 1024x768 (couleurs)',
+      media: 'Disquettes 3.5" 400 KB à 1.44 MB, disques durs SCSI',
+      unitsSold: 'Des millions — l\'informatique à la souris et aux fenêtres'
+    },
+    extensions: ['.dsk', '.img', '.hfv', '.zip'],
+    libretroSystemName: 'Apple_-_Macintosh',
+    defaultCoreLinux: 'minivmac_libretro.so',
+    defaultCoreWindows: 'minivmac_libretro.dll',
+    subfolder: 'macintosh',
+    icon: 'Mouse',
+    themeColor: '#b8b8c0',
+    logoUrl: './logos/consoles/macintosh.png',
+    biosList: [
+      { filename: 'macplus.rom', description: 'ROM Macintosh Plus 128K (obligatoire pour Mini vMac)', optional: false }
+    ]
+  },
+  {
+    id: 'xegs',
+    name: 'Atari XE Game System',
+    shortName: 'XEGS',
+    companyId: 'atari',
+    manufacturer: 'Atari Corporation',
+    releaseYear: 1987,
+    generation: 'Console 8-bit (Atari 8-bit family)',
+    specs: {
+      cpu: 'MOS 6502C @ 1.79 MHz (100% compatible Atari 800XL)',
+      gpuOrAudio: 'ANTIC + GTIA + POKEY — le hardware Atari 8-bit classique',
+      resolution: '320x192 (16 couleurs)',
+      media: 'Cartouches XEGS + compatibilité disquettes/cassettes via 1010/1050',
+      unitsSold: 'Faible — un 800XL déguisé sorti contre la NES, trop tard'
+    },
+    extensions: ['.atr', '.xex', '.xfd', '.rom', '.zip'],
+    libretroSystemName: 'Atari_-_8-bit_Family',
+    defaultCoreLinux: 'atari800_libretro.so',
+    defaultCoreWindows: 'atari800_libretro.dll',
+    subfolder: 'xegs',
+    icon: 'Gamepad2',
+    themeColor: '#d8d8d8',
+    logoUrl: './logos/consoles/xegs.png',
+    biosList: []
   }
 ];
 

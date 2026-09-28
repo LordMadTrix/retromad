@@ -75,6 +75,8 @@ const KIOSK_COMPUTING_IDS = new Set([
   // Autres modèles Commodore et gamme CPC
   'pet', 'c16', 'sx64', 'cdtv', 'c64gs', 'amiga600', 'cd32',
   'cpc464', 'cpc664', 'cpc6128', 'cpcplus',
+  // Complément : MSX2+/turbo R, Macintosh, Atari XE GS
+  'msx2p', 'msxturbor', 'macintosh', 'xegs',
 ]);
 
 /**

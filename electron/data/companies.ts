@@ -11,7 +11,7 @@ export const COMPANIES: Company[] = [
     youtubeId: 'in4X7qOUxEg',
     description: 'Fondée initialement en 1889 pour fabriquer des cartes à jouer Hanafuda par Fusajiro Yamauchi, Nintendo s\'est transformée dans les années 70-80 sous l\'impulsion de figures comme Gunpei Yokoi et Shigeru Miyamoto pour devenir le pionnier mondial absolu du jeu vidéo moderne.',
     famousFranchises: ['Super Mario', 'The Legend of Zelda', 'Pokémon', 'Metroid', 'Donkey Kong', 'Kirby', 'Star Fox'],
-    consoles: ['nes', 'snes', 'n64', 'gamecube', 'wii', 'wiiu', 'switch', 'gb', 'gbc', 'gba', 'nds', '3ds']
+    consoles: ['nes', 'snes', 'n64', 'gamecube', 'wii', 'wiiu', 'switch', 'gb', 'gbc', 'gba', 'nds', '3ds', 'fds', 'virtualboy', 'gameandwatch', 'pokemonmini']
   },
   {
     id: 'sega',
@@ -23,7 +23,7 @@ export const COMPANIES: Company[] = [
     youtubeId: 'F-25xDO5Qc4',
     description: 'Née de la fusion entre Service Games et Rosen Enterprises, SEGA a régné sur les salles d\'arcade du monde entier avant d\'engager la guerre mythique des consoles des années 90 ("Sega c\'est plus fort que toi") avec sa mascotte Sonic.',
     famousFranchises: ['Sonic The Hedgehog', 'Streets of Rage', 'Shenmue', 'Shinobi', 'Golden Axe', 'Phantasy Star', 'Virtua Fighter'],
-    consoles: ['mastersystem', 'megadrive', 'gamegear', 'saturn', 'dreamcast']
+    consoles: ['mastersystem', 'megadrive', 'gamegear', 'saturn', 'dreamcast', 'sg1000', 'sega32x', 'segacd', 'nomad']
   },
   {
     id: 'sony',
@@ -71,7 +71,7 @@ export const COMPANIES: Company[] = [
     youtubeId: '7qAadfsJrmM',
     description: 'Créée par Nolan Bushnell et Ted Dabney, Atari a littéralement inventé l\'industrie commerciale du jeu vidéo avec Pong et la mythique console de salon Atari 2600 (VCS), marquant l\'âge d\'or des années 70-80.',
     famousFranchises: ['Pong', 'Asteroids', 'Centipede', 'Breakout', 'Tempest', 'Adventure'],
-    consoles: ['atari2600', 'atari7800', 'lynx', 'atari5200', 'jaguar', 'atarist']
+    consoles: ['atari2600', 'atari7800', 'lynx', 'atari5200', 'jaguar', 'atarist', 'atari8bit', 'xegs']
   },
   {
     id: 'nec',
@@ -83,7 +83,7 @@ export const COMPANIES: Company[] = [
     youtubeId: 'osIMDXgfo1g',
     description: 'NEC a lancé le PC Engine / TurboGrafx-16, première console 16-bit de facto avec sa puce HuC6280, et son extension CD-ROM² a révolutionné le jeu sur CD. En partenariat avec Hudson Soft, NEC a marqué l\'histoire du jeu vidéo japonais.',
     famousFranchises: ['PC Engine', 'TurboGrafx-16', 'PC-FX', 'Bonk', 'Rondo of Blood'],
-    consoles: ['pcengine', 'pcenginecd']
+    consoles: ['pcengine', 'pcenginecd', 'supergrafx', 'pcfx']
   },
   {
     id: 'commodore',
@@ -167,7 +167,7 @@ export const COMPANIES: Company[] = [
     youtubeId: 'ML9ZsqN-9QA',
     description: 'Apple Computer a créé le Apple II en 1977, l\'un des micro-ordinateurs les plus importants de l\'histoire, qui a démocratisé l\'informatique personnelle et le jeu sur ordinateur. Avec son bus d\'extension ouvert et son lecteur de disquettes Disk II, le Apple II est devenu la plateforme de référence pour les logiciels éducatifs et les premiers jeux commerciaux.',
     famousFranchises: ['Apple II', 'Lode Runner', 'Oregon Trail', 'Prince of Persia', 'Ultima'],
-    consoles: ['appleii']
+    consoles: ['appleii', 'macintosh']
   },
   {
     id: 'amstrad',
@@ -224,6 +224,6 @@ export const COMPANIES: Company[] = [
     youtubeId: 'x6aNPsjNwFo',
     description: "Regroupant les classiques des salles d'arcade et les standards MSX développés par Microsoft et ASCII Corporation, cette catégorie célèbre l'âge d'or de l'arcade et la diversité du jeu sur micro-ordinateurs standards.",
     famousFranchises: ['Pac-Man', 'Street Fighter', 'Metal Gear (MSX)', 'Space Invaders', 'Donkey Kong'],
-    consoles: ['mame', 'msx2', 'msx', 'scummvm']
+    consoles: ['mame', 'msx2', 'msx', 'msx2p', 'msxturbor', 'scummvm']
   }
 ];

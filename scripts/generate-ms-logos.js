@@ -139,7 +139,59 @@ const LOGOS = [
   { id: 'cpc664', svg: amstradSvg('CPC 664', 1985, '#2f5ea8') },
   { id: 'cpc6128', svg: amstradSvg('CPC 6128', 1985, '#27528e') },
   { id: 'cpcplus', svg: amstradSvg('CPC+', 1990, '#1e467a') },
+  // Complément — machines manquantes des grandes familles
+  { id: 'fds', svg: fdsSvg() },
+  { id: 'nomad', svg: brandSvg('SEGA', 'GENESIS NOMAD', 1995, '#2c5aa0', '#0f1420') },
+  { id: 'supergrafx', svg: brandSvg('NEC', 'SUPERGRAFX', 1989, '#e8e8ee', '#0f1420') },
+  { id: 'pcfx', svg: brandSvg('NEC', 'PC-FX', 1994, '#b8a2d8', '#0f1420') },
+  { id: 'msx2p', svg: brandSvg('MSX', 'MSX2+', 1988, '#7a9ac8', '#101820') },
+  { id: 'msxturbor', svg: brandSvg('MSX', 'turbo R', 1990, '#5a7ab0', '#101820') },
+  { id: 'macintosh', svg: macSvg() },
+  { id: 'xegs', svg: brandSvg('ATARI', 'XE GAME SYSTEM', 1987, '#d8d8d8', '#1a1a1a') },
 ];
+
+/** Logo Famicom Disk System : disquette rouge Famicom. */
+function fdsSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#f4f2ec"/>
+  <g transform="translate(450,180)">
+    <rect x="-140" y="-90" width="280" height="180" rx="14" fill="#c62828"/>
+    <rect x="-140" y="-90" width="280" height="66" rx="14" fill="#e53935"/>
+    <rect x="70" y="-70" width="46" height="40" rx="4" fill="#f4f2ec"/>
+    <circle cx="-60" cy="30" r="34" fill="#8e1c1c"/>
+    <circle cx="-60" cy="30" r="14" fill="#f4f2ec"/>
+  </g>
+  <text x="450" y="365" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="54" fill="#c62828">Famicom Disk System</text>
+  <text x="450" y="420" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#7a7468">1986 · Disk Writer · Koji Kondo jingle</text>
+</svg>`;
+}
+
+/** Logo générique de marque : wordmark + nom du modèle. */
+function brandSvg(brand, model, year, color, bg) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="${bg}"/>
+  <rect x="8" y="8" width="884" height="484" fill="none" stroke="${color}" stroke-opacity="0.35" stroke-width="6"/>
+  <text x="450" y="175" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="92" fill="#ffffff" letter-spacing="14">${brand}</text>
+  <text x="450" y="300" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="64" fill="${color}">${model}</text>
+  <text x="450" y="380" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#9a9aa8">${year}</text>
+</svg>`;
+}
+
+/** Logo Macintosh : le boîtier beige compact avec le visage smiley. */
+function macSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#dfe1e4"/>
+  <g transform="translate(450,225)">
+    <rect x="-125" y="-155" width="250" height="310" rx="18" fill="#e8e0cc" stroke="#a89a80" stroke-width="6"/>
+    <rect x="-95" y="-125" width="190" height="150" rx="6" fill="#f2efe4" stroke="#a89a80" stroke-width="4"/>
+    <circle cx="-48" cy="-60" r="7" fill="#3a3a3a"/>
+    <circle cx="48" cy="-60" r="7" fill="#3a3a3a"/>
+    <path d="M-40 -18 Q0 14 40 -18" stroke="#3a3a3a" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <rect x="-70" y="60" width="140" height="26" rx="6" fill="#d8cfb8" stroke="#a89a80" stroke-width="3"/>
+  </g>
+  <text x="450" y="445" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="46" fill="#5a5248">Macintosh · System 1-7</text>
+</svg>`;
+}
 
 /** Logo Commodore : wordmark « Commodore » + nom du modèle sur plaque. */
 function commodoreSvg(model, year, color) {

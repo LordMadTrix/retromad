@@ -3443,4 +3443,232 @@ export const MUSEUM_DATA: Record<string, MuseumExhibition> = {
     rivalry: "Face à la Mega Drive/SNES : un 8-bit de 1990 contre du 16-bit — même combat perdu que le C64GS.",
     curatorNote: "Le CPC de tous les superlatifs techniques : ses sprites hardware, enfin exploités par la homebrew, restent un terrain de jeu magique.",
   },
+
+/* =====================================================================
+   COMPLÉMENT — LES MACHINES MANQUANTES DES GRANDES FAMILLES
+   ===================================================================== */
+
+  fds: {
+    tagline: "La Famicom aux disquettes : Zelda, Metroid et les sauvegardes enfin possibles.",
+    history: "Le Famicom Disk System (février 1986) branche une unité disquette sur la Famicom : plus de mémoire (côté RAM adaptateur), des sauvegardes par pile et même un canal audio supplémentaire. Zelda, Metroid, Kid Icarus et SMB2 (Lost Levels) y naissent. La puce « Dick » de Nintendo en protégeait les disquettes.",
+    innovations: [
+      "Premières sauvegardes Nintendo : la quête de Zelda continue après extinction",
+      "Canal audio wavetable additionnel (Zelda, Metroid, Kid Icarus)",
+      "Réécriture de disquettes dans les kiosques Disk Writer des magasins",
+    ],
+    anecdotes: [
+      "Les Disk Cards ne tenaient qu'une face : certains jeux exigeaient de retourner la disquette en pleine partie — et le bruit de la motorisation fait partie du folklore.",
+      "Le logo jaune et rouge du FDS et son jingle de démarrage composé par Koji Kondo sont devenus des memes culturels au Japon.",
+    ],
+    iconicGames: [
+      "The Legend of Zelda (1986)", "Metroid", "Kid Icarus",
+      "Super Mario Bros. 2 (Lost Levels)", "Doki Doki Panic",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Ricoh 2A03 @ 1.79 MHz (via RAM adaptateur 32 KB)",
+      ram: "32 KB RAM adaptateur + 8 KB BIOS",
+      soundChip: "APU Famicom + canal wavetable disque (FDS Sound)",
+      videoChip: "PPU 2C02 identique Famicom",
+      colors: "54 palette, 25 simultanées",
+      controllers: "Manettes Famicom (ports I/II)",
+    },
+    rivalry: "Face aux cartouches expandées (MMC) qui rendaient le FDS inutile : la console disparaît en 1989.",
+    curatorNote: "La boîte de Pandore : c'est ici que les sauvegardes, et donc les mondes persistants, entrent chez Nintendo.",
+  },
+
+  nomad: {
+    tagline: "La Mega Drive de poche : les cartouches 16-bit sur écran LCD couleur — l'ambition ultime de Sega.",
+    history: "Le Nomad (octobre 1995) est une Mega Drive entièrement portable : écran LCD couleur 3.25 pouces, rétroéclairage, port manette 2, sortie TV. 100% compatible avec les milliers de cartouches Genesis. Mais sorti au pire moment (Saturn à venir, Game Boy imbattable, 6 piles pour 2 heures), il ne sortira que de l'Amérique du Nord.",
+    innovations: [
+      "Portable 16-bit 100% compatible Mega Drive/Genesis (à l'exception du Master System adaptateur)",
+      "Sortie TV : le Nomad devient la console de salon quand on le branche",
+      "Second port manette : du multijoueur portable en 1995 !",
+    ],
+    anecdotes: [
+      "Il consommait 6 piles AA en 2 heures : les gamers l'appelaient « le mangeur de piles » — les packs rechargeables ont sauvé sa réputation.",
+      "Sega avait déjà essayé la Mega Drive portable au Japon : le Mega Jet (1993, pour les avions JAL) est son ancêtre direct.",
+    ],
+    iconicGames: [
+      "Sonic The Hedgehog 1/2", "Streets of Rage 2", "Gunstar Heroes",
+      "Shining Force II", "Castlevania: Bloodlines",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Motorola 68000 @ 7.6 MHz (Mega Drive complète)",
+      ram: "64 KB + 64 KB VRAM",
+      soundChip: "YM2612 FM + PSG — le son Genesis authentique",
+      videoChip: "VDP sur LCD couleur rétroéclairé 320x224",
+      colors: "512 palette, 61 simultanées",
+      controllers: "Croix + A/B/C + Start, port manette 2, sortie TV",
+    },
+    rivalry: "Face à la Game Boy (150 h de piles) : la puissance contre l'autonomie — l'autonomie a gagné.",
+    curatorNote: "Le monstre sacré de Sega : la portable la plus ambitieuse de sa décennie, aujourd'hui culte et très chère en boîte.",
+  },
+
+  supergrafx: {
+    tagline: "Deux PC Engine dans un boîtier : le monstre qui n'a eu que 5 jeux.",
+    history: "Le SuperGrafx (décembre 1989) double le hardware de la PC Engine : deux VDC, deux plans de scroll de plus, des sprites dédoublés, une résolution doublée. Conçu pour contrer la Super Famicom à venir, il ne reçut que 5 jeux dédiés (Daimakaimura !) mais est 100% compatible PC Engine HuCard et CD.",
+    innovations: [
+      "Double chipset vidéo : 4 plans de scroll et 128 sprites",
+      "Résolution 512x242 — la plus haute du 8-bit grand public",
+      "Rétrocompatibilité totale PC Engine (HuCard + CD-ROM²)",
+    ],
+    anecdotes: [
+      "Daimakaimura (Ghouls'n Ghosts) sur SuperGrafx reste le portage le plus fidèle de l'arcade sur 8/16-bit de sa génération.",
+      "Les émulateurs longtemps « SuperGrafx-ready » ont survécu dans les romsets MAME : la machine était si rare qu'elle fut d'abord préservée virtuellement.",
+    ],
+    iconicGames: [
+      "Daimakaimura (Ghouls'n Ghosts)", "Aldynes", "Madoka!",
+      "Ginga Fukei Densetsu Sapphire (CD, paie son or)", "Battle Ace",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "HuC6280 @ 7.16 MHz (même CPU que la PC Engine)",
+      ram: "32 KB (+ 32 KB si CD)",
+      soundChip: "HuC6280 6 canaux WSG + CD ADPCM",
+      videoChip: "2x HuC6270 VDC + 2x VCE : 512x242, 48 couleurs",
+      colors: "512 palette, 48 simultanées",
+      controllers: "Pads PC Engine (2 ports)",
+    },
+    rivalry: "Face à la Mega Drive et la future Super Famicom : doublé le hardware n'a pas suffi faute de jeux.",
+    curatorNote: "Le dinosaure bienveillant : 5 jeux dédiés, 100 000 acheteurs, et une aura de machine interdite qui grandit chaque année.",
+  },
+
+  pcfx: {
+    tagline: "Le successeur PC Engine misé sur les anime FMV — la mauvaise carte de NEC.",
+    history: "La PC-FX (décembre 1994) succède à la PC Engine : CPU RISC 32-bit V810, vidéo Full-Motion très performante, pad à 6 boutons façon Mega Drive. Mais NEC a préféré la 2D animée et les visual novels à la 3D naissante : face à la PlayStation, la machine a vécu dans l'ombre (400 000 unités Japon seulement).",
+    innovations: [
+      "FMV et animation 2D pleine vitesse — la référence du genre sur 5e gen",
+      "Pad 6 boutons + port pour carte mémoire FX-BMC",
+      "Architecture multi-CPU optionnelle (V810 + V830 sur certaines cartes)",
+    ],
+    anecdotes: [
+      "La PC-FX n'a presque pas de jeux 3D du tout : NEC avait décrété la 3D « gadget » deux mois avant la sortie de la PlayStation.",
+      "Son design tour tower blanc fait penser à un PC hifi : les japonais l'appelaient affectueusement « la machine à visual novels ».",
+    ],
+    iconicGames: [
+      "Graduation", "Tokimeki Memorial (FX)", "Power League FX",
+      "Beyond the Beyond (2D showcase)", "Team Innocent",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "NEC V810 RISC 32-bit @ 21.5 MHz",
+      ram: "2 MB + 1 MB VRAM",
+      soundChip: "KingMax FX : ADPCM 2 canaux + PCM 16-bit",
+      videoChip: "HuC6270-NG : backgrounds + BG/FMV pleine vitesse",
+      colors: "16,7 millions (YUV, FMV)",
+      controllers: "Pad 6 boutons (FX-PAD), multi-tap",
+    },
+    rivalry: "Face à la PlayStation et la Saturn : la 2D du passé contre la 3D de l'avenir.",
+    curatorNote: "Le pari perdu : la machine à anime ultime, aujourd'hui prisée des fans de visual novels et des collectionneurs NEC.",
+  },
+
+  msx2p: {
+    tagline: "Le MSX japonais ultime en 8-bit : 19 268 couleurs YJK et FM 9 voix.",
+    history: "Le MSX2+ (1988) est le standard MSX Japon raffiné : puce V9958 avec le mode YJK qui affiche jusqu'à 19 268 couleurs simultanées (un record absolu du 8-bit), MSX-MUSIC 9 voix FM intégré, et machines Panasonic FS-A1WX/WSX au design hi-fi. Microsoft avait abandonné le standard depuis longtemps : le Japon continuait seul.",
+    innovations: [
+      "Mode YJK : 19 268 couleurs simultanées sur un Z80 8-bit",
+      "MSX-MUSIC : 9 voix FM OPLL intégrées à la machine",
+      "BASIC 3.0 et menus Kanji intégrés",
+    ],
+    anecdotes: [
+      "Le YJK encode les couleurs comme un JPEG : un Z80 à 3.58 MHz affichait des dégradés impossibles à ses rivaux 16-bit en dégradés.",
+      "Les FS-A1WSX Panasonic avaient un sous-matin intégré et des boutons de magnétoscope : l'ultime machine média 8-bit.",
+    ],
+    iconicGames: [
+      "Metal Gear 2: Solid Snake (1988)", "SD Snatcher", "Aleste 2",
+      "Space Manbow", "Pennant Race 2",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Zilog Z80A @ 3.58 MHz",
+      ram: "64-256 KB (mapped)",
+      soundChip: "MSX-MUSIC OPLL 9 voix + PSG 3 voix",
+      videoChip: "V9958 : 256x212 à 512x212, mode YJK",
+      colors: "19 268 simultanées (YJK)",
+      controllers: "Clavier, 2 ports joystick, lecteur 3.5 pouces 2DD",
+    },
+    rivalry: "Face à la PC Engine au Japon : le MSX2+ a gardé les fans de 2D pure jusqu'en 1991.",
+    curatorNote: "Le joyau caché : ses dégradés YJK écrasent techniquement toute la concurrence 8-bit et même beaucoup de 16-bit.",
+  },
+
+  msxturbor: {
+    tagline: "Le dernier MSX : un RISC 16-bit à 7 MHz qui respecte le Z80 — la fin magnifique.",
+    history: "Le MSX turbo R (1990) clôt l'aventure : CPU R800 RISC propriétaire à 7.16 MHz (compatible Z80 natif, ~10x plus rapide), PCM 1-bit, et sur le FS-A1GT une télécommande, un MIDI et même un lecteur CD-ROM. Un monstre technique sorti dans un monde 16-bit déjà conquis — le dernier standard MSX officiel.",
+    innovations: [
+      "CPU RISC R800 : compatible Z80 natif et 10 fois plus rapide",
+      "PCM 1-bit par basculement DMA : voix numérisées sans puce dédiée",
+      "FS-A1GT : MIDI, CD-ROM, télécommande IR — le MSX hi-fi ultime",
+    ],
+    anecdotes: [
+      "Le R800 exécute le Z80 en mode « interprété RISC » : un exploit d'ingénierie signé Ascii/Matsushita.",
+      "Après 1991, le MSX survit via la communauté : les MSX turbo R tournent encore aujourd'hui dans des concerts chiptune au Japon.",
+    ],
+    iconicGames: [
+      "F1 Spirit 3D Special", "Space Manbow (turbo)", "SD Snatcher (turbo)",
+      "Homebrew moderne : des jeux 2020+ sortent toujours",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "R800 RISC 16-bit @ 7.16 MHz + Z80 de secours",
+      ram: "256 KB à 1 MB (mapped)",
+      soundChip: "MSX-MUSIC + PCM 1-bit + PSG",
+      videoChip: "V9958 YJK 19 268 couleurs",
+      colors: "19 268 simultanées (YJK)",
+      controllers: "Clavier, 2 ports joystick, MIDI, CD-ROM (A1GT)",
+    },
+    rivalry: "Face aux PC 16-bit et à la PC Engine : le MSX n'a plus eu de place — mais il est parti en beauté.",
+    curatorNote: "L'élégie du MSX : la machine la plus puissante du standard, sortie au moment où plus personne ne regardait. Culte absolu au Japon.",
+  },
+
+  macintosh: {
+    tagline: "L'ordinateur à la souris : 128 Ko, fenêtres, corbeille — l'ergonomie avant la puissance.",
+    history: "Le Macintosh (janvier 1984, pub « 1984 » de Ridley Scott) popularise l'interface graphique : fenêtres, icônes, souris, corbeille, polices Susan Kare. Sur Motorola 68000, de System 1 à System 7, il a porté les jeux Apple (Prince of Persia, Myst, le Pathways into Dark) et posé l'ergonomie moderne de tous les ordinateurs.",
+    innovations: [
+      "Première interface graphique grand public complète (fenêtres + souris + menus)",
+      "QuickDraw : graphisme vectoriel et polices WYSIWYG natifs",
+      "Sound Chip ASC : la voix numérisée dès 1986 (Mac II)",
+    ],
+    anecdotes: [
+      "La pub « 1984 » (Ridley Scott) n'a été diffusée qu'une fois au Super Bowl : elle reste la pub la plus primée de l'histoire.",
+      "Le Macintosh 128K n'avait pas de ventilateur : Apple voulait le silence absolu — les Mac cuisaient doucement.",
+    ],
+    iconicGames: [
+      "Prince of Persia (1989)", "Myst (1993)", "SimCity", "Oregon Trail",
+      "Dark Castle", "Shufflepuck Café", "Lode Runner",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Motorola 68000 @ 7.83 MHz à 68040 @ 33 MHz",
+      ram: "128 KB (1984) à 128 MB (Quadra)",
+      soundChip: "Beeper 1-bit → ASC/AMIC 8-bit stéréo (Mac II)",
+      videoChip: "QuickDraw sur écran 1-bit 512x342 (couleur dès Mac II)",
+      colors: "1-bit (noir/blanc) → 16,7 millions",
+      controllers: "Souris 1 bouton (l'iconique), clavier ADB, SCSI",
+    },
+    rivalry: "Face au PC/Windows : la guerre des interfaces et du design contre le prix — toujours en cours.",
+    curatorNote: "Le père ergonomique : tout PC moderne descend de ce petit boîtier beige de 128 Ko. Mini vMac le fait revivre en un clic.",
+  },
+
+  xegs: {
+    tagline: "Un Atari 800XL déguisé en console : le dernier baroud 8-bit d'Atari face à la NES.",
+    history: "L'XE Game System (1987) reprend l'architecture Atari 800XL en console : clavier détachable, cartouches XEGS, compatibilité totale disquettes et cassettes de la famille 8-bit. Sortie contre la NES dominante, elle a vécu discrètement — mais offre aujourd'hui l'accès le plus simple à la ludothèque Atari 8-bit.",
+    innovations: [
+      "Console ET ordinateur : clavier détachable, mode « jeu » ou « boot »",
+      "100% compatible Atari 8-bit (cartouches, disquettes, cassettes)",
+      "BASIC intégré en ROM (désactivable)",
+    ],
+    anecdotes: [
+      "La XEGS est sortie la même année que le lancement européen de la NES : le combat était de la science-fiction.",
+      "Son pad « ProSystem » à 2 boutons a inspiré le design du futur Jaguar pad.",
+    ],
+    iconicGames: [
+      "Ballblazer", "Rescue on Fractalus!", "Summer Games",
+      "Archon", "M.U.L.E.", "Star Raiders II",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "MOS 6502C @ 1.79 MHz",
+      ram: "64 KB",
+      soundChip: "POKEY 4 voix (le son Atari 8-bit classique)",
+      videoChip: "ANTIC + GTIA : 320x192, 16 couleurs (256 palette)",
+      colors: "16 simultanées (256 palette)",
+      controllers: "Pads ProSystem, ports joystick Atari (2), clavier détachable",
+    },
+    rivalry: "Face à la NES : l'architecture de 1979 contre la machine de 1983 optimisée — le fossé était trop large.",
+    curatorNote: "Le couteau suisse sous-estimé : une XEGS, c'est un Atari 800 complet ET une console — le meilleur rapport fun/prix du rétro Atari.",
+  },
 };
