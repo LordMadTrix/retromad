@@ -84,23 +84,17 @@ export const AdminLockScreen: React.FC<AdminLockScreenProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center overflow-hidden select-none">
-      {/* Fond rétro : grille + halos */}
+      {/* Fond sobre : légère vignette, aucun halo coloré */}
       <div
-        className="absolute inset-0 opacity-[0.13]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(0,242,254,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(0,242,254,0.22) 1px, transparent 1px)',
-          backgroundSize: '44px 44px',
-        }}
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.025) 0%, transparent 60%)' }}
       />
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-retro-purple/25 blur-[110px]" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-retro-accent/20 blur-[110px]" />
 
       <div className="relative z-10 w-full max-w-md mx-4">
         {/* Carte principale */}
-        <div className="bg-[#0b1024]/95 border border-cyan-500/30 rounded-3xl shadow-[0_0_60px_rgba(0,242,254,0.15)] p-8 flex flex-col items-center">
+        <div className="bg-[#0d1220]/95 border border-slate-700/70 rounded-3xl shadow-2xl p-8 flex flex-col items-center">
           {/* Blason */}
-          <div className="w-16 h-16 rounded-2xl bg-cyan-500/15 border border-cyan-400/50 flex items-center justify-center text-cyan-300 mb-4 shadow-[0_0_25px_rgba(0,242,254,0.3)]">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-600 flex items-center justify-center text-slate-300 mb-4">
             <Lock className="w-8 h-8" />
           </div>
 
@@ -126,7 +120,7 @@ export const AdminLockScreen: React.FC<AdminLockScreenProps> = ({
                 key={idx}
                 className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
                   idx < pin.length
-                    ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_10px_#00f2fe]'
+                    ? 'bg-slate-200 border-slate-200'
                     : 'border-slate-600 bg-slate-800/80'
                 }`}
               />
@@ -148,7 +142,7 @@ export const AdminLockScreen: React.FC<AdminLockScreenProps> = ({
                 key={key}
                 type="button"
                 onClick={() => handleKeyPress(key)}
-                className="h-12 rounded-xl bg-slate-800/80 border border-slate-600/60 text-lg font-bold text-slate-100 hover:bg-cyan-500/20 hover:border-cyan-400/60 hover:text-white active:scale-95 transition flex items-center justify-center"
+                className="h-12 rounded-xl bg-slate-800/80 border border-slate-600/60 text-lg font-bold text-slate-100 hover:bg-slate-700 hover:border-slate-500 hover:text-white active:scale-95 transition flex items-center justify-center"
                 title={key === 'C' ? 'Effacer tout' : key === 'DEL' ? 'Corriger' : key}
               >
                 {key === 'DEL' ? <Delete className="w-5 h-5" /> : key}
@@ -156,11 +150,11 @@ export const AdminLockScreen: React.FC<AdminLockScreenProps> = ({
             ))}
           </div>
 
-          {/* Accès direct Kiosque */}
+          {/* Accès direct Kiosque (seul accent de couleur : la borne) */}
           <button
             type="button"
             onClick={handleKiosk}
-            className="mt-6 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(251,191,36,0.35)] hover:brightness-110 active:scale-[0.98] transition"
+            className="mt-6 w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.98] transition"
             title="Laisser la régie verrouillée et jouer en mode Kiosque"
           >
             <Gamepad2 className="w-5 h-5" />
