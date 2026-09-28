@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 
 interface CompanyLogoProps {
   companyId: string;
+  /**
+   * Identifiant de logo alternatif (ex. 'microsoft_pc' → logos/companies/microsoft_pc.svg).
+   * Utilisé pour afficher une identité différente selon le contexte (PC vs Consoles).
+   */
+  logoId?: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   companyId,
+  logoId,
   className = '',
   size = 'md',
 }) => {
@@ -21,9 +27,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     xl: 'h-24 w-[360px]',
   }[size];
 
-  if (!companyId) return null;
+  if (!companyId && !logoId) return null;
 
-  const id = companyId.toLowerCase();
+  const id = (logoId || companyId).toLowerCase();
   const primarySrc = `./logos/companies/${id}.svg`;
   const logoSrc = retrySrc || primarySrc;
 

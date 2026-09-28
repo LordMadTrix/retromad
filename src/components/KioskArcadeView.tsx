@@ -70,6 +70,28 @@ const KIOSK_COMPUTING_IDS = new Set([
   'plus4', 'thomson', 'pc8000', 'gx4000',
 ]);
 
+/**
+ * Identité d'affichage alternative d'une firme selon le cadre actif.
+ * Ex. : côté informatique, Microsoft s'affiche « Microsoft » avec le logo
+ * aux quatre carrés (MS-DOS) au lieu de « Microsoft Gaming (Xbox) ».
+ */
+interface CompanyDisplayOverride {
+  name?: string;
+  logoId?: string;
+}
+const COMPANY_DISPLAY_BY_CATEGORY: Record<'computing' | 'consoles', Record<string, CompanyDisplayOverride>> = {
+  computing: {
+    microsoft: { name: 'Microsoft', logoId: 'microsoft_pc' },
+  },
+  consoles: {},
+};
+
+function companyDisplayName(company: Company, category: KioskCategory): string {
+  const override =
+    category === 'all' ? undefined : COMPANY_DISPLAY_BY_CATEGORY[category][company.id];
+  return override?.name || company.name;
+}
+
 /** Filtrer les firmes selon la catégorie choisie (PC / Consoles). */
 function companyMatchesCategory(companyId: string, systems: System[], category: KioskCategory): boolean {
   if (category === 'all') return true;
@@ -709,7 +731,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   }`}
                 >
                   <Gamepad2 className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{selectedCompany.name.toUpperCase()}</span>
+                  <span className="truncate">{companyDisplayName(selectedCompany, category).toUpperCase()}</span>
                 </span>
               </>
             )}
@@ -1025,14 +1047,22 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
 
                   {/* Contenu de la carte positionné au-dessus de la vidéo */}
                   <div className="relative z-10 w-full flex flex-col items-center justify-between flex-1">
-                    {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND */}
+                    {/* Vrai Logo Vectoriel Officiel de la Firme EN GRAND (variante PC/Consoles si définie) */}
                     <div className="w-full h-16 sm:h-20 flex items-center justify-center my-1 sm:my-2 transition-transform duration-300 group-hover:scale-110">
-                      <CompanyLogo companyId={company.id} size="xl" />
+                      <CompanyLogo
+                        companyId={company.id}
+                        logoId={
+                          category === 'all'
+                            ? undefined
+                            : COMPANY_DISPLAY_BY_CATEGORY[category][company.id]?.logoId
+                        }
+                        size="xl"
+                      />
                     </div>
 
-                    {/* Nom de la firme */}
+                    {/* Nom de la firme (variante PC/Consoles si définie) */}
                     <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-wider mb-1">
-                      {company.name}
+                      {companyDisplayName(company, category)}
                     </h3>
 
                     {/* Badges de statistiques */}
@@ -1074,7 +1104,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                           : 'bg-slate-900/80 group-hover:bg-slate-800 text-slate-200 border border-slate-700'
                       }`}
                     >
-                      <span>Machines {company.name}</span>
+                      <span>Machines {companyDisplayName(company, category)}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
 
@@ -1120,7 +1150,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition flex items-center space-x-2.5 shadow-2xl hover:scale-105 active:scale-95 cursor-pointer group"
               >
                 <Landmark className="w-4 h-4 text-amber-400 group-hover:rotate-6 transition-transform" />
-                <span>Visiter le Grand Musée Virtuel de {companies[companyIndex].name}</span>
+                <span>Visiter le Grand Musée Virtuel de {companyDisplayName(companies[companyIndex], category)}</span>
                 <span className="px-1.5 py-0.5 rounded bg-black/50 text-[10px] font-mono border border-white/20 text-amber-300">Y / M</span>
               </button>
             </div>
@@ -1136,10 +1166,18 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           {/* En-tête centré avec logo firme */}
           <div className={`text-center ${isCompactFit ? 'mb-2' : 'mb-3 sm:mb-5'}`}>
             <div className="flex items-center justify-center space-x-3 mb-1">
-              <CompanyLogo companyId={selectedCompany.id} size="md" />
+              <CompanyLogo
+                companyId={selectedCompany.id}
+                logoId={
+                  category === 'all'
+                    ? undefined
+                    : COMPANY_DISPLAY_BY_CATEGORY[category][selectedCompany.id]?.logoId
+                }
+                size="md"
+              />
             </div>
             <h1 className={`${isCompactFit ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'} font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]`}>
-              MACHINES {selectedCompany.name.toUpperCase()}
+              MACHINES {companyDisplayName(selectedCompany, category).toUpperCase()}
             </h1>
             <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
               {companySystems.length} machine{companySystems.length > 1 ? 's' : ''} disponible{companySystems.length > 1 ? 's' : ''} • Cliquez sur une machine pour explorer sa ludothèque
@@ -1158,10 +1196,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   boxShadow: `0 0 15px ${selectedCompany.accentColor}33`,
                 }}
                 className="px-3.5 py-1.5 rounded-full border text-xs font-bold text-slate-200 hover:text-white transition flex items-center space-x-2 hover:scale-105 active:scale-95 shadow"
-                title={`Explorer le Musée historique complet de ${selectedCompany.name}`}
+                title={`Explorer le Musée historique complet de ${companyDisplayName(selectedCompany, category)}`}
               >
                 <Landmark className="w-3.5 h-3.5 text-amber-400" />
-                <span>Musée Virtuel {selectedCompany.name} (Épopée, Archives, Secrets)</span>
+                <span>Musée Virtuel {companyDisplayName(selectedCompany, category)} (Épopée, Archives, Secrets)</span>
                 <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
               </button>
             </div>
@@ -1328,10 +1366,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                 borderColor: `${selectedCompany.accentColor}70`,
               }}
               className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border text-white text-xs font-bold transition flex items-center space-x-2 shadow hover:scale-105 active:scale-95 cursor-pointer"
-              title={`Consulter le Grand Musée de la firme ${selectedCompany.name}`}
+              title={`Consulter le Grand Musée de la firme ${companyDisplayName(selectedCompany, category)}`}
             >
               <Landmark className="w-4 h-4 text-amber-400" />
-              <span>Musée Firme : {selectedCompany.name}</span>
+              <span>Musée Firme : {companyDisplayName(selectedCompany, category)}</span>
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             </button>
 

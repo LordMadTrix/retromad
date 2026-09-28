@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="920" height="220" role="img" aria-label="Microsoft">
+  <!-- Logo Microsoft officiel : quatre carrés + wordmark -->
+  <g transform="translate(10,50)">
+    <rect x="0" y="0" width="50" height="50" fill="#f25022"/>
+    <rect x="56" y="0" width="50" height="50" fill="#7fba00"/>
+    <rect x="0" y="56" width="50" height="50" fill="#00a4ef"/>
+    <rect x="56" y="56" width="50" height="50" fill="#ffb900"/>
+  </g>
+  <g fill="#5e5e5e">
+    <text x="140" y="118" font-family="'Segoe UI', 'Arial', sans-serif" font-size="92" font-weight="600" letter-spacing="2">Microsoft</text>
+  </g>
+</svg>
