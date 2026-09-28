@@ -139,8 +139,16 @@ app.whenReady().then(() => {
   const serveFile = async (resolved: string): Promise<Response> => {
     const data = await fs.promises.readFile(resolved);
     const ext = path.extname(resolved).toLowerCase();
+    // no-store partout : sans cet en-tête, Chromium met index.html en cache
+    // disque et recharge un ANCIEN bundle après un rebuild (symptôme :
+    // « toujours l'ancienne version »). Les fichiers sont servis depuis le
+    // disque local — lire à chaque requête coûte moins qu'un stale cache.
     return new Response(data, {
-      headers: { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' },
+      headers: {
+        'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
     });
   };
 
