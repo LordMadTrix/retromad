@@ -41,6 +41,12 @@ protocol.registerSchemesAsPrivileged([
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
+  // Masquer le token « Electron/x.y » du User-Agent : YouTube refuse
+  // l'initialisation de son player intégré depuis un navigateur embarqué
+  // identifiable (erreur 152-4 « Cette vidéo n'est pas disponible »).
+  // Un User-Agent Chrome standard passe sans problème.
+  const ua = app.userAgentFallback.replace(/ Electron\/[0-9.]+/g, '');
+  app.userAgentFallback = ua;
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
