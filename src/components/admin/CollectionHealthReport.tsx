@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Image } from 'lucide-react';
 import { Game, BiosStatus } from '../../types';
 
 interface CollectionHealthReportProps {
@@ -7,6 +7,12 @@ interface CollectionHealthReportProps {
   biosStatuses: BiosStatus[];
   isCheckingBios?: boolean;
   onCheckBios?: () => Promise<void>;
+  /** Scraper la jaquette d'un jeu précis */
+  onScrapeGame?: (game: Game) => Promise<void>;
+  /** Supprimer un jeu (doublon) */
+  onDeleteGame?: (game: Game) => void;
+  /** Jeu en cours de scraping (spinner) */
+  scrapingGameId?: string | null;
 }
 
 const formatBytes = (bytes: number): string => {
@@ -24,6 +30,9 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
   biosStatuses,
   isCheckingBios = false,
   onCheckBios,
+  onScrapeGame,
+  onDeleteGame,
+  scrapingGameId = null,
 }) => {
   // ROMs sans jaquette
   const gamesWithoutBoxart = useMemo(
@@ -109,18 +118,29 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
           ) : (
             <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
               {gamesWithoutBoxart.slice(0, 20).map((g) => (
-                <div key={g.id} className="text-[11px] text-slate-400 truncate">
-                  • {g.cleanTitle || g.title} <span className="text-slate-600 font-mono">({g.systemId})</span>
+                <div key={g.id} className="text-[11px] text-slate-400 truncate flex items-center justify-between gap-2">
+                  <span className="truncate">
+                    • {g.cleanTitle || g.title} <span className="text-slate-600 font-mono">({g.systemId})</span>
+                  </span>
+                  {onScrapeGame && (
+                    <button
+                      type="button"
+                      onClick={() => onScrapeGame(g)}
+                      disabled={scrapingGameId === g.id}
+                      className="shrink-0 px-1.5 py-0.5 rounded-md bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold transition flex items-center gap-1 disabled:opacity-50"
+                      title={`Scraper la jaquette de ${g.cleanTitle}`}
+                    >
+                      <Image className={`w-3 h-3 ${scrapingGameId === g.id ? 'animate-pulse' : ''}`} />
+                      {scrapingGameId === g.id ? '…' : 'Scraper'}
+                    </button>
+                  )}
                 </div>
               ))}
               {gamesWithoutBoxart.length > 20 && (
-                <div className="text-[10px] text-slate-500 italic">… et {gamesWithoutBoxart.length - 20} autres</div>
+                <div className="text-[10px] text-slate-500 italic">… et {gamesWithoutBoxart.length - 20} autres (utilise la recherche du catalogue)</div>
               )}
             </div>
           )}
-          <p className="text-[10px] text-slate-500 mt-2">
-            Lance le Scraper pour récupérer les jaquettes manquantes.
-          </p>
         </section>
 
         {/* 2. BIOS manquants */}
@@ -169,18 +189,36 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5" /> Aucun doublon détecté.
             </p>
           ) : (
-            <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-1 pr-1">
+            <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
               {duplicates.slice(0, 8).map((group) => (
                 <div key={group[0].id} className="text-[11px]">
                   <span className="text-slate-300 font-bold truncate block">{group[0].cleanTitle}</span>
-                  <span className="text-slate-500 font-mono text-[10px]">
-                    {group.map((g) => g.filename).join(' · ')}
-                  </span>
+                  <div className="space-y-0.5">
+                    {group.map((g, idx) => (
+                      <div key={g.id} className="flex items-center justify-between gap-2">
+                        <span className="text-slate-500 font-mono text-[10px] truncate">
+                          {idx === 0 ? '★ ' : ''}{g.filename}
+                        </span>
+                        {idx > 0 && onDeleteGame && (
+                          <button
+                            type="button"
+                            onClick={() => onDeleteGame(g)}
+                            className="shrink-0 p-1 rounded-md bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/40 text-rose-400 transition"
+                            title={`Supprimer le doublon ${g.filename} (le premier ★ est conservé)`}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           )}
-          <p className="text-[10px] text-slate-500 mt-2">Même titre sur le même système (régions différentes…).</p>
+          {duplicates.length > 0 && (
+            <p className="text-[10px] text-slate-500 mt-2">Le ★ (premier de chaque groupe) est conservé — supprime les copies.</p>
+          )}
         </section>
 
         {/* 4. Poids disque */}

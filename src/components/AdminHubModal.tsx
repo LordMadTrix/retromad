@@ -363,6 +363,21 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     notify(`Scraping de la sélection terminé !`);
   };
 
+  // Rapport santé : scraping unitaire avec indicateur sur la ligne concernée
+  const [healthScrapingId, setHealthScrapingId] = useState<string | null>(null);
+  const handleHealthScrape = async (game: Game) => {
+    if (!onScrapeGame) return;
+    setHealthScrapingId(game.id);
+    try {
+      await onScrapeGame(game);
+      notify(`Jaquette de « ${game.cleanTitle || game.title} » récupérée !`);
+    } catch {
+      notify(`Échec du scraping pour « ${game.cleanTitle || game.title} ».`);
+    } finally {
+      setHealthScrapingId(null);
+    }
+  };
+
   const handleBatchClearMedia = (ids: string[]) => {
     const idSet = new Set(ids);
     const updated = games.map((g) => {
@@ -850,6 +865,9 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   biosStatuses={biosStatuses}
                   isCheckingBios={isCheckingBios}
                   onCheckBios={onCheckBios}
+                  onScrapeGame={handleHealthScrape}
+                  onDeleteGame={(g) => handleDeleteGame(g.id)}
+                  scrapingGameId={healthScrapingId}
                 />
 
                 {/* Barre d'outils Batch au-dessus de la recherche */}
