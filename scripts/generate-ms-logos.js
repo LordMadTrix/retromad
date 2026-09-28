@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Génère les logos PNG des versions de MS-DOS (1.0 → 6.22) et de Windows
- * (1.01 → 11) dans public/logos/consoles/, à partir de SVG construits ici.
+ * Génère les logos PNG des versions de MS-DOS (1.0 → 6.22), de Windows
+ * (1.01 → 11), des autres modèles Commodore (PET → CD32) et de la gamme
+ * Amstrad CPC (464 → CPC+) dans public/logos/consoles/.
  * Moteur de rendu : @resvg/resvg-js (local, pas de réseau).
  *
  *   node scripts/generate-ms-logos.js
@@ -125,7 +126,85 @@ const LOGOS = [
   { id: 'win7', svg: winSvg('7', 2009, '0e8ec9', 'aero') },
   { id: 'win10', svg: winSvg('10', 2015, '0078d4', 'flat') },
   { id: 'win11', svg: winSvg('11', 2021, '0078d4', 'flat') },
+  // Commodore — autres modèles
+  { id: 'pet', svg: commodoreSvg('PET 2001', 1977, '#d8d3c0') },
+  { id: 'c16', svg: commodoreSvg('C16', 1984, '#7a7a7a') },
+  { id: 'sx64', svg: commodoreSvg('SX-64', 1984, '#c8b890') },
+  { id: 'cdtv', svg: commodoreCdSvg('CDTV', 1991, '#6a5a9a') },
+  { id: 'c64gs', svg: commodoreConsoleSvg('GAMES SYSTEM', 1990, '#a89868') },
+  { id: 'amiga600', svg: commodoreSvg('AMIGA 600', 1992, '#9a8ab8') },
+  { id: 'cd32', svg: commodoreCdSvg('CD32', 1993, '#8a7ac8') },
+  // Amstrad — gamme CPC
+  { id: 'cpc464', svg: amstradSvg('CPC 464', 1984, '#3a6ec0') },
+  { id: 'cpc664', svg: amstradSvg('CPC 664', 1985, '#2f5ea8') },
+  { id: 'cpc6128', svg: amstradSvg('CPC 6128', 1985, '#27528e') },
+  { id: 'cpcplus', svg: amstradSvg('CPC+', 1990, '#1e467a') },
 ];
+
+/** Logo Commodore : wordmark « Commodore » + nom du modèle sur plaque. */
+function commodoreSvg(model, year, color) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#0f1420"/>
+  <rect x="8" y="8" width="884" height="484" fill="none" stroke="#5a5a72" stroke-width="6"/>
+  <g transform="translate(450,175)" >
+    <circle r="95" fill="none" stroke="#${color.slice(1)}" stroke-width="14"/>
+    <path d="M-62 30 Q0 -66 62 30" fill="none" stroke="#${color.slice(1)}" stroke-width="14" stroke-linecap="round"/>
+  </g>
+  <text x="450" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="56" fill="#ffffff">Commodore</text>
+  <text x="450" y="405" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="58" fill="${color}">${model}</text>
+  <text x="450" y="455" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#8a8a9a">${year}</text>
+</svg>`;
+}
+
+/** Logo Commodore CD (CDTV / CD32) : disque compact + arc Commodore. */
+function commodoreCdSvg(model, year, color) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#0f1420"/>
+  <rect x="8" y="8" width="884" height="484" fill="none" stroke="#5a5a72" stroke-width="6"/>
+  <g transform="translate(450,165)">
+    <circle r="92" fill="#d8dce4"/>
+    <circle r="92" fill="none" stroke="#${color.slice(1)}" stroke-width="10"/>
+    <circle r="60" fill="none" stroke="#9aa2b2" stroke-width="8"/>
+    <circle r="20" fill="#0f1420"/>
+    <path d="M-80 -40 A90 90 0 0 1 60 -70" stroke="#7ac0e8" stroke-width="10" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="450" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="52" fill="#ffffff">Commodore</text>
+  <text x="450" y="405" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="62" fill="${color}">${model}</text>
+  <text x="450" y="455" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#8a8a9a">${year}</text>
+</svg>`;
+}
+
+/** Logo console Commodore (C64GS) : pad stylisé + plaque du modèle. */
+function commodoreConsoleSvg(model, year, color) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#0f1420"/>
+  <rect x="8" y="8" width="884" height="484" fill="none" stroke="#5a5a72" stroke-width="6"/>
+  <g transform="translate(450,160)">
+    <rect x="-110" y="-38" width="220" height="86" rx="34" fill="#1c2334" stroke="#${color.slice(1)}" stroke-width="8"/>
+    <circle cx="-58" cy="5" r="16" fill="#${color.slice(1)}"/>
+    <rect x="-18" y="-16" width="86" height="18" rx="8" fill="#3a4358"/>
+    <rect x="-18" y="10" width="56" height="18" rx="8" fill="#3a4358"/>
+  </g>
+  <text x="450" y="300" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="50" fill="#ffffff">Commodore</text>
+  <text x="450" y="375" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="50" fill="${color}">C64 ${model}</text>
+  <text x="450" y="440" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#8a8a9a">${year}</text>
+</svg>`;
+}
+
+/** Logo Amstrad CPC : bandeau bleu + nom du modèle. */
+function amstradSvg(model, year, color) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#e9edf2"/>
+  <rect x="0" y="0" width="900" height="130" fill="#0f1420"/>
+  <text x="450" y="88" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="64" fill="#ffffff" letter-spacing="6">AMSTRAD</text>
+  <g transform="translate(450,285)">
+    <rect x="-150" y="-60" width="300" height="120" rx="14" fill="#f2f5f8" stroke="#0f1420" stroke-width="8"/>
+    <rect x="-118" y="-30" width="236" height="60" rx="8" fill="#${color.slice(1)}"/>
+    <text y="14" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="44" fill="#ffffff">${model}</text>
+  </g>
+  <text x="450" y="440" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#5a6474">${year} · Locomotive BASIC</text>
+</svg>`;
+}
 
 for (const { id, svg } of LOGOS) {
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 640 } });

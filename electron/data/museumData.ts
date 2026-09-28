@@ -3125,4 +3125,322 @@ export const MUSEUM_DATA: Record<string, MuseumExhibition> = {
     curatorNote: "Le présent et le futur : les jeux de 1981 aux jeux 2026 tournent tous ici via DOSBox, émulateurs et natif — le musée vivant de RetroMad.",
   },
 
+/* =====================================================================
+   COMMODORE — LES AUTRES MODÈLES DE LA FAMILLE
+   ===================================================================== */
+
+  pet: {
+    tagline: "Le premier micro de Commodore : clavier, moniteur et lecteur dans une seule machine béton.",
+    history: "Le PET (Personal Electronic Transactor, 1977) est la réponse de Jack Tramiel au Apple II : un micro tout-en-un avec écran 9 pouces, clavier graphique et lecteur de cassette. Vendu aux écoles et aux entreprises américaines et allemandes, il a inauguré la trinité 1977 (PET, Apple II, TRS-80) qui a lancé l'informatique personnelle.",
+    innovations: [
+      "Premier ordinateur personnel tout-en-un de Commodore (écran + clavier + stockage)",
+      "Jeu de caractères PETSCII : les graphismes en texte, ancêtre des sprites",
+      "Fabrication verticale : Commodore possédait MOS Technology et ses puces 6502",
+    ],
+    anecdotes: [
+      "Bill Gates a écrit un article rageur contre les pirates du PET : le ruban papier de la Homebrew Computer Club diffusait le BASIC du PET gratuitement.",
+      "Son boîtier métallique incliné lui a valu le surnom de « micro à pain de mie » — il était indestructible, d'où son succès scolaire.",
+    ],
+    iconicGames: [
+      "Space Invaders (clones PETSCII)", "Wizard (1978)",
+      "Hamurabi et les classiques BASIC", "Delta Drawing (éducatif)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "MOS 6502 @ 1 MHz",
+      ram: "8 KB (2001) à 96 KB (SuperPET)",
+      soundChip: "Petit haut-parleur : bips via le port d'impression (pas de puce sonore !)",
+      videoChip: "CRT 9 pouces monochrome, 40x25 caractères PETSCII",
+      colors: "1 (vert ou blanc phosphore)",
+      controllers: "Clavier graphique (modèle 2001), port IEEE-488 (imprimantes, disques)",
+    },
+    rivalry: "Face au Apple II (plus cher mais couleur) et au TRS-80 : le PET dominait l'école, pas le salon.",
+    curatorNote: "Le doyen de la famille : sans le PET, pas de VIC-20 ni de C64. Une machine de musée absolue.",
+  },
+
+  c16: {
+    tagline: "Le petit frère du Plus/4 : 121 couleurs et un prix mini pour Noël 1984.",
+    history: "Le Commodore 16 est le modèle grand public de la famille 264 : même CPU 7501, même puce TED aux 121 couleurs, mais sans les logiciels bureautiques ni les ports d'extension du Plus/4. Vendu très bas pour remplacer le VIC-20 face au ZX Spectrum, il a bien marché en Europe de l'Est et au Mexique (clone Tanon).",
+    innovations: [
+      "Puce TED : 121 couleurs — la palette la plus riche de tout le 8-bit",
+      "Interface cartouche simplifiée et lecteur cassette 1531 dédié",
+      "Clavier restylé gris sombre avec retour mécanique correct",
+    ],
+    anecdotes: [
+      "Le « 16 » de son nom fait référence à ses 16 KB de RAM, pas à ses couleurs — piège classique de quizz rétro.",
+      "En Hongrie et en Tchéquie, le C16/Plus4 a eu une scène de jeu si active qu'elle a duré jusqu'en 1995.",
+    ],
+    iconicGames: [
+      "Kikstart 2", "Trashman", "Summer Games (portage)",
+      "Sanxion (démo scène)", "Les compilations musicales 2 voies",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "MOS 7501 @ 1.76 MHz (clone du 6502)",
+      ram: "16 KB (12 KB utilisables en BASIC)",
+      soundChip: "TED 2 voix (sans bruit blanc) — moins bon que le SID mais original",
+      videoChip: "TED : 121 couleurs, 2 à 27 simultanées selon le mode",
+      colors: "121 (palette fixe)",
+      controllers: "2 ports joystick DB9, Datasette 1531",
+    },
+    rivalry: "Face au ZX Spectrum 48K : plus de couleurs, moins de mémoire et moins de jeux.",
+    curatorNote: "La belle inconnue : sa puce TED offre des dégradés impossibles sur C64. La scène hongroise l'a récemment ressuscitée.",
+  },
+
+  sx64: {
+    tagline: "Un C64 dans une valise avec écran couleur et lecteur intégré : le premier portable couleur de l'Histoire.",
+    history: "Le SX-64 (1984) est le C64 portable officiel : un écran 5 pouces couleur, le lecteur 1541 intégré, un clavier détachable qui sert de capot et même un joystick rangé sur le côté. 23 kg de valise légendaire — vendu environ 18 000 exemplaires, surtout aux professionnels et aux démos de l'époque.",
+    innovations: [
+      "Premier ordinateur portable couleur du commerce (1984 !)",
+      "Lecteur 1541 et écran incorporés : le C64 100% autonome",
+      "Clavier-capot et rangement joystick : un design unique",
+    ],
+    anecdotes: [
+      "Commodore a montré un prototype SX-100 avec écran vert avant de choisir le couleur : les SX-100 n'ont jamais été vendus et sont aujourd'hui introuvables.",
+      "La scène démo et les DJ de l'époque l'adoraient : le SX-64 servait de machine de scène pour les visuels et la musique SID.",
+    ],
+    iconicGames: [
+      "Toute la ludothèque C64 sur disquette (100% compatible)",
+      "Summer Games et ses marathons en chambre d'hôtel",
+      "The Last Ninja (démos portables légendaires)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "MOS 6510 @ 1.02 MHz (identique au C64)",
+      ram: "64 KB + 20 KB ROM",
+      soundChip: "SID 6581 complet — le son C64 authentique en valise",
+      videoChip: "VIC-II sur écran CRT 5 pouces couleur (composite)",
+      colors: "16 couleurs",
+      controllers: "2 ports joystick, clavier détachable, rangement latéral pour joystick",
+    },
+    rivalry: "Face au Osborne 1 et au Kaypro (monochromes, Z80) : le SX-64 gagnait en couleur, perdait en poids.",
+    curatorNote: "Le Graal des collectionneurs Commodore : une valise 100% C64 qui fonctionne encore souvent après 40 ans.",
+  },
+
+  cdtv: {
+    tagline: "L'Amiga au salon : un lecteur CD multimédia avant la PlayStation.",
+    history: "Le CDTV (Commodore Dynamic Total Vision, 1991) est un Amiga 500 dans un boîtier hi-fi : lecteur CD-ROM, télécommande infrarouge, Kickstart en ROM. Deux ans avant la PlayStation et la 3DO, il promettait le multimédia au salon — mais Commodore, en pleine déroute, n'a jamais su le vendre ni comme console ni comme hi-fi.",
+    innovations: [
+      "Premier lecteur CD multimédia grand public (1991, avant CD-i aux USA)",
+      "Télécommande infrarouge et interface salon (le nom voulait dire « TV »)",
+      "Kickstart 1.2 en ROM : démarrage direct sans disquette",
+    ],
+    anecdotes: [
+      "Commodore a refusé que le CDTV joue aux jeux Amiga disquette pour ne pas « cannibaliser » les PC : la décision a tué la machine.",
+      "La scène a enfin réhabilité le CDTV : aujourd'hui, il boote en Workbench et lit la quasi-totalité de la ludothèque Amiga A500.",
+    ],
+    iconicGames: [
+      "Dig! (démo CDTV)", "Les CD picture & encyclopédies d'époque",
+      "Ports CD : Battlements, Impact!",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Motorola 68EC020 @ 14.3 MHz",
+      ram: "1 MB Chip + 256 KB Slow",
+      soundChip: "Paula 4 canaux + CD audio/CD+G",
+      videoChip: "ECS (Enhanced Chip Set)",
+      colors: "32 à 4096 (HAM)",
+      controllers: "Télécommande IR, pad optionnel, clavier externe",
+    },
+    rivalry: "Face au Philips CD-i (même année) : deux géants perdus, la PS1 les enterre en 1994.",
+    curatorNote: "Le prototype raté du salon multimédia : techniquement un Amiga complet, commercialement un non-sens. Fascinant.",
+  },
+
+  c64gs: {
+    tagline: "Un C64 sans clavier, que des cartouches : le pari console raté de Commodore en Europe.",
+    history: "Le C64 Games System (1990) dépouille le C64 de son clavier pour en faire une console à cartouches : 28 jeux officiels (Flimbo's Quest, International Karate+…) et un design noir mat avec des touches de couleur. Mais en 1990, la Mega Drive et la Super Nintendo écrasent tout : le C64GS s'est vendu lamentablement.",
+    innovations: [
+      "Design console compacte à cartouches ROM (jusqu'à 1 MB)",
+      "Deux pads DB9 fournis — le C64 en bornes de salon",
+      "100% compatible avec les cartouches C64 existantes",
+    ],
+    anecdotes: [
+      "La plupart des éditeurs ont refusé de porter leurs jeux sur cartouche (coût) : beaucoup de C64GS ont fini branchés avec des cartouches de test.",
+      "C'est aujourd'hui l'une des consoles les plus rares d'Europe : complète en boîte, elle vaut plusieurs milliers d'euros.",
+    ],
+    iconicGames: [
+      "Flimbo's Quest", "International Karate+", "Bubble Bobble (cartouche)",
+      "Motos", "Fiendish Freddy's Big Top o' Fun",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "MOS 6510 @ 1.02 MHz",
+      ram: "64 KB",
+      soundChip: "SID 6581 — le même son légendaire",
+      videoChip: "VIC-II, 320x200",
+      colors: "16 couleurs",
+      controllers: "2 pads DB9 fournis (C1311)",
+    },
+    rivalry: "Face à la NES et la Mega Drive : un 8-bit de 1982 en 1990 — le combat était inégal.",
+    curatorNote: "Le fantôme doré de Commodore : une console qui n'aurait jamais dû exister, mais que tout collectionneur rêve d'avoir.",
+  },
+
+  amiga600: {
+    tagline: "L'Amiga A500 miniaturisé avec IDE intégré — sans pavé numérique, au grand dam des fans.",
+    history: "L'Amiga 600 (mars 1992) devait s'appeler A300 et remplacer le A500 : boîtier compact type portable fermé, chipset ECS, 1 MB Chip et surtout un port IDE 2.5 pouces intégré (une première chez Commodore). Sa sortie a cannibalisé l'A1200 à venir ; sans pavé numérique ni port PCMCIA complet, il a partagé les fans.",
+    innovations: [
+      "Premier Amiga avec interface IDE interne (disque dur 2.5 pouces optionnel)",
+      "Boîtier ultra-compact (le plus petit Amiga desktop jamais produit)",
+      "Port PCMCIA (modem, mémoire flash)",
+    ],
+    anecdotes: [
+      "Commodore a renommé le projet A300 en A600 à la dernière minute pour éviter la confusion avec le futur A3000 — le marketing s'est emmêlé.",
+      "Son absence de pavé numérique a scandalisé les joueurs : un adaptateur officiel a sorti quelques mois plus tard.",
+    ],
+    iconicGames: [
+      "Toute la ludothèque A500 (100% compatible)",
+      "James Pond 2: Robocod (bundler)", "Zool",
+      "Scenes from the démo-scene WHDLoad", "Turrican II",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Motorola 68EC000 @ 7.09 MHz",
+      ram: "1 MB Chip (extensible via PCMCIA)",
+      soundChip: "Paula 4 canaux 8-bit stéréo",
+      videoChip: "ECS Denise : 320x256 à 640x512",
+      colors: "32 à 4096 (HAM)",
+      controllers: "2 ports joystick DB9, souris, port PCMCIA",
+    },
+    rivalry: "Face à l'A500 qu'il devait remplacer : trop proche et trop tard — les fans sont restés fidèles au A500.",
+    curatorNote: "L'Amiga méconnu mais attachant : son IDE intégré en fait la plateforme parfaite pour le WHDLoad moderne.",
+  },
+
+  cd32: {
+    tagline: "La première console CD 32-bit d'Europe — et le dernier souffle de Commodore.",
+    history: "La CD32 (septembre 1993) est un Amiga 1200 en console : chipset AGA, lecteur CD 2x, pads avec pavé de direction complet. Débloquée par la douane allemande (dettes de Commodore), abandonnée après ~100 000 exemplaires, elle reste la première console CD 32-bit d'Europe et le chant du cygne de la firme.",
+    innovations: [
+      "Première console 32-bit à CD-ROM commercialisée en Europe",
+      "Chipset AGA : 256 couleurs simultanées, ports vidéo améliorés",
+      "Puce Akiko : compression vidéo CDXL et accélération C2P en hardware",
+    ],
+    anecdotes: [
+      "La douane allemande a bloqué et revendu des dizaines de milliers de CD32 pour payer les dettes de Commodore — la firme a fait faillite quelques mois plus tard.",
+      "Son pad (le SX-1 pour deux joueurs) est l'un des premiers pads de console à avoir des gâchettes avant et un pavé directionnel complet.",
+    ],
+    iconicGames: [
+      "Zool (CD)", "Nicky Boom", "Oscar",
+      "Banshee (AGA)", "Simon the Sorcerer", "Beneath a Steel Sky (version CD)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Motorola 68EC020 @ 14.3 MHz",
+      ram: "2 MB Chip + 1 KB Flash (sauvegardes via cartouche)",
+      soundChip: "Paula 4 canaux + CD audio",
+      videoChip: "AGA Lisa : 256 couleurs simultanées, 4096 en HAM8",
+      colors: "256 (AGA) / 262 144 en HAM8",
+      controllers: "Pads DB9 avec boutons avant et arrière, port clavier",
+    },
+    rivalry: "Face à la 3DO (sortie le même mois) et la future PlayStation : trop faible, trop tard.",
+    curatorNote: "Le joyau condamné : un vrai Amiga AGA en console, dont la bibliothèque FMV et plateformistique a vieilli avec un charme fou.",
+  },
+
+/* =====================================================================
+   AMSTRAD — LES MODÈLES DE LA GAMME CPC
+   ===================================================================== */
+
+  cpc464: {
+    tagline: "Le micro complet à 199 £ : clavier, moniteur et lecteur de cassette inclus — rien à ajouter.",
+    history: "Le CPC 464 (1984) est l'assaut d'Alan Sugar sur le marché du micro familial : tout-en-un (lecteur cassette intégré au clavier, moniteur vendu en pack couleur ou vert), BASIC Locomotive, et une qualité de fabrication déconcertante pour le prix. ~2 millions d'exemplaires : il a fait entrer des millions d'enfants européens dans l'informatique.",
+    innovations: [
+      "Pack tout-en-un : la machine complète au prix du seul ordinateur des concurrents",
+      "Lecteur cassette intégré au clavier — pas de câbles, rien à acheter",
+      "BASIC Locomotive et Gate Array : 27 couleurs propres",
+    ],
+    anecdotes: [
+      "Les pubs Amstrad moquaient directement le ZX Spectrum « sans clavier sérieux » et le C64 « à qui il manque le moniteur » — la guerre des pubs britannique était brutale.",
+      "En France, le CPC 464 a été la machine la plus vendue devant le Thomson MO5 : toute une génération a appris le BASIC sur son clavier bleu.",
+    ],
+    iconicGames: [
+      "Roland Goes Digging (série Roland)", "Paperboy", "Ghostbusters",
+      "Bruce Lee", "Gary Lineker's Super Skills", "Batman (Ocean)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Zilog Z80A @ 4 MHz",
+      ram: "64 KB",
+      soundChip: "AY-3-8912 : 3 voix + 1 bruit blanc (stéréo via prise jack !)",
+      videoChip: "CRTC + Gate Array : 27 couleurs, 16 simultanées par ligne",
+      colors: "27 palette / 16 par ligne",
+      controllers: "Clavier bleu mécanique, joystick DB9, lecteur cassette intégré",
+    },
+    rivalry: "Face au ZX Spectrum (moins cher mais minimal) et au C64 (sonore mais cher) : le CPC gagnait l'Europe du jeu familial.",
+    curatorNote: "La machine de la génération CPC : complète, robuste, au son AY inimitable. Le clavier bleu reste une icône du design.",
+  },
+
+  cpc664: {
+    tagline: "Le CPC à disquettes : vendu quelques mois, remplacé aussitôt — la pièce introuvable.",
+    history: "Le CPC 664 (été 1985) remplace la cassette du 464 par un lecteur disquette 3 pouces : c'est la réponse d'Amstrad à la demande des gamers. Mais Amstrad sort le 6128 trois mois plus tard (128 KB) : le 664, quasi identique mais 64 KB, est immédiatement démodé. Vendu surtout en Allemagne et aux USA, il est aujourd'hui l'un des CPC les plus rares.",
+    innovations: [
+      "Premier CPC avec lecteur disquette 3 pouces intégré (le format Hitachi propriétaire)",
+      "Clavier gris restylé (les touches tampons du 464 restées bleues)",
+      "Compatibilité totale 464 : même Gate Array, même AY",
+    ],
+    anecdotes: [
+      "Amstrad a racheté le stock de disquettes 3 pouces à Hitachi à prix cassé : le format propriétaire coûtait moins cher que les 3.5 pouces de Sony.",
+      "Les propriétaires de 664 l'ont souvent transformé en 6128 (upgrade RAM officielle) : les 664 d'origine sont donc devenus extrêmement rares.",
+    ],
+    iconicGames: [
+      "Toute la ludothèque CPC sur disquettes (100% compatible)",
+      "Harrier Attack (sur disquette)", "Les compilations presse Amsoft",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Zilog Z80A @ 4 MHz",
+      ram: "64 KB",
+      soundChip: "AY-3-8912 : 3 voix + bruit",
+      videoChip: "CRTC + Gate Array : 27 couleurs",
+      colors: "27 palette / 16 par ligne",
+      controllers: "Clavier, joystick DB9, lecteur 3 pouces intégré",
+    },
+    rivalry: "Face au Sinclair ZX Spectrum +2 (Amstrad le rachètera en 1986 !) : la disquette gagne contre la cassette.",
+    curatorNote: "Le chaînon manquant des CPC : moins culte que le 464, plus rare que le 6128 — la pièce que les collectionneurs cherchent.",
+  },
+
+  cpc6128: {
+    tagline: "Le CPC définitif : 128 KB, disquettes et CP/M — la star des écoles françaises.",
+    history: "Le CPC 6128 (automne 1985) complète la gamme : 128 KB de RAM, lecteur 3 pouces intégré et CP/M Plus inclus — le micro est enfin aussi un outil de bureau. C'est LA machine des écoles françaises (plan IPT oblige) et le CPC le plus vendu (~1,5 million) : la quasi-totalité des jeux CPC d'après 1985 sortent sur lui.",
+    innovations: [
+      "128 KB de RAM gérés par banques (ROM 7 du BASIC relogeable)",
+      "CP/M Plus (3.1) fourni sur disquette : l'ère du bureau personnel",
+      "Clavier gris-bleu redesigné et affichage multi-fréquences (vert/couleur)",
+    ],
+    anecdotes: [
+      "Le port d'extension du 6128 servira aussi au GX4000 (la console Amstrad) : le même bus interne, 5 ans plus tard.",
+      "La presse française du « Club des CPC » a fait du 6128 un phénomène culturel : les kiosques vendaient des disquettes de jeux chaque mois.",
+    ],
+    iconicGames: [
+      "Savage", "Midnight Resistance", "Operation Wolf",
+      "Crazy Cars", "Prehistoric Tale", "Sokoban (officiel)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Zilog Z80A @ 4 MHz",
+      ram: "128 KB (banques 64 KB)",
+      soundChip: "AY-3-8912 : 3 voix + bruit blanc",
+      videoChip: "CRTC + Gate Array : 27 couleurs",
+      colors: "27 palette / 16 par ligne",
+      controllers: "Clavier, joystick DB9, lecteur 3 pouces intégré, port imprimante",
+    },
+    rivalry: "Face au Atari 520ST (1985, 16-bit) : le 6128 a tenu la route 5 ans grâce à son prix et sa ludothèque.",
+    curatorNote: "Le CPC absolu : si tu as connu les écoles françaises des années 80-90, c'est lui. Sa ludothèque est la plus riche des CPC.",
+  },
+
+  cpcplus: {
+    tagline: "Le CPC avec sprites hardware : l'ASIC qui arrivait dix ans trop tard.",
+    history: "La gamme CPC+ (1990) — 464 Plus et 6128 Plus — ajoute une puce ASIC : sprites hardware 16x16, DMA audio, scroll horizontal par pixel et 4096 couleurs. Trop tard face aux consoles 16-bit, la gamme a aussi servi de base au GX4000 (même bus, même ASIC). Une curiosité technique magnifique et méconnue.",
+    innovations: [
+      "ASIC : sprites hardware, scroll fin et DMA audio sur un Z80 8-bit",
+      "Palette étendue à 4096 couleurs (12-bit) par ligne",
+      "Port cartouche (le même que le GX4000)",
+    ],
+    anecdotes: [
+      "Les jeux cartouches CPC+ et GX4000 sont interchangeables : le GX4000 EST un CPC Plus sans clavier.",
+      "La scène homebrew récente (2020+) exploite enfin l'ASIC : des jeux CPC Plus dépassent aujourd'hui ce que la Mega Drive paraissait imposer.",
+    ],
+    iconicGames: [
+      "Cartouches : Pang, Burning Rubber, Plotting",
+      "Disquettes CPC+ : Navy Seals, Prohibition",
+      "Homebrew ASIC moderne : des démos à couper le souffle",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Zilog Z80A @ 4 MHz + ASIC",
+      ram: "64 KB (464+) / 128 KB (6128+)",
+      soundChip: "AY-3-8912 + DMA audio 8-bit (ASIC)",
+      videoChip: "Gate Array + ASIC : sprites 16x16 hardware, scroll fin",
+      colors: "4096 palette / 32 simultanées",
+      controllers: "Clavier, pads GX4000 compatibles, port cartouche",
+    },
+    rivalry: "Face à la Mega Drive/SNES : un 8-bit de 1990 contre du 16-bit — même combat perdu que le C64GS.",
+    curatorNote: "Le CPC de tous les superlatifs techniques : ses sprites hardware, enfin exploités par la homebrew, restent un terrain de jeu magique.",
+  },
 };

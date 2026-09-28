@@ -72,6 +72,9 @@ const KIOSK_COMPUTING_IDS = new Set([
   'dos1', 'dos2', 'dos3', 'dos4', 'dos5', 'dos6',
   'win1', 'win2', 'win30', 'win31', 'win95', 'win98', 'winme', 'win2000',
   'winxp', 'winvista', 'win7', 'win10', 'win11',
+  // Autres modèles Commodore et gamme CPC
+  'pet', 'c16', 'sx64', 'cdtv', 'c64gs', 'amiga600', 'cd32',
+  'cpc464', 'cpc664', 'cpc6128', 'cpcplus',
 ]);
 
 /**

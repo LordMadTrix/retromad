@@ -404,6 +404,18 @@ export const COMPUTING_ERAS: { id: string; label: string; years: string; systemI
       'win2000', 'winxp', 'winvista', 'win7', 'win10', 'win11',
     ],
   },
+  {
+    id: 'commodorefamille',
+    label: 'La famille Commodore',
+    years: '1977 — 1993',
+    systemIds: ['pet', 'vic20', 'c64', 'sx64', 'c16', 'plus4', 'c128', 'c64gs', 'amiga', 'amiga600', 'amiga1200', 'cdtv', 'cd32'],
+  },
+  {
+    id: 'amstradcpcfamille',
+    label: 'La gamme Amstrad CPC',
+    years: '1984 — 1990',
+    systemIds: ['cpc464', 'cpc664', 'amstradcpc', 'cpc6128', 'cpcplus', 'gx4000'],
+  },
 ];
 
 export const COMPUTING_SYSTEM_IDS = new Set<string>([
@@ -415,4 +427,7 @@ export const COMPUTING_SYSTEM_IDS = new Set<string>([
   'dos1', 'dos2', 'dos3', 'dos4', 'dos5', 'dos6',
   'win1', 'win2', 'win30', 'win31', 'win95', 'win98', 'winme', 'win2000',
   'winxp', 'winvista', 'win7', 'win10', 'win11',
+  // Autres modèles Commodore et gamme CPC
+  'pet', 'c16', 'sx64', 'cdtv', 'c64gs', 'amiga600', 'cd32',
+  'cpc464', 'cpc664', 'cpc6128', 'cpcplus',
 ]);
