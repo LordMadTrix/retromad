@@ -296,16 +296,27 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     return () => clearTimeout(timer);
   }, [playCoin]);
 
-  // Consoles de la firme sélectionnée (filtrées selon le cadre actif : PC / Consoles)
+  // Machines de la firme sélectionnée : d'abord les PC/micros, puis les consoles
+  // (affichage groupé « PC & Micro-ordinateurs » / « Consoles » au niveau 2)
   const companySystems = useMemo(() => {
     if (!selectedCompany) return [];
-    return systems.filter((s) => {
-      if (s.companyId !== selectedCompany.id) return false;
-      if (category === 'consoles') return !KIOSK_COMPUTING_IDS.has(s.id);
-      if (category === 'computing') return KIOSK_COMPUTING_IDS.has(s.id);
-      return true;
-    });
+    const all = systems.filter((s) => s.companyId === selectedCompany.id);
+    const pcs = all.filter((s) => KIOSK_COMPUTING_IDS.has(s.id));
+    const consoles = all.filter((s) => !KIOSK_COMPUTING_IDS.has(s.id));
+    if (category === 'computing') return pcs;
+    if (category === 'consoles') return consoles;
+    return [...pcs, ...consoles];
   }, [systems, selectedCompany, category]);
+
+  // Sous-listes pour l'affichage groupé du niveau 2
+  const companyPcSystems = useMemo(
+    () => companySystems.filter((s) => KIOSK_COMPUTING_IDS.has(s.id)),
+    [companySystems]
+  );
+  const companyConsoleSystems = useMemo(
+    () => companySystems.filter((s) => !KIOSK_COMPUTING_IDS.has(s.id)),
+    [companySystems]
+  );
 
   // Jeux de la console sélectionnée (avec filtre favoris optionnel)
   // Tri : derniers joués d'abord (reprise rapide), puis favoris, puis alphabétique
@@ -915,7 +926,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                   <div className="text-base sm:text-lg font-black text-white uppercase tracking-wider leading-tight">PC</div>
                   <div className="text-[10px] sm:text-[11px] text-amber-200/90 font-bold uppercase tracking-widest">Informatique · Micros</div>
                   <div className="text-[10px] text-slate-400 mt-0.5 truncate">
-                    {systems.filter((s) => KIOSK_COMPUTING_IDS.has(s.id)).length} machines · ZX Spectrum, CPC, Amiga...
+                    {systems.filter((s) => KIOSK_COMPUTING_IDS.has(s.id)).length} machines · ZX Spectrum, CPC, MS-DOS...
                   </div>
                 </div>
               </div>
@@ -967,7 +978,13 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${isCompactFit ? 'gap-2.5 sm:gap-3' : 'gap-3 sm:gap-5'} max-w-6xl w-full justify-center`}>
             {visibleCompanies.map((company, idx) => {
               const isFocused = idx === companyIndex;
-              const consoleCount = systems.filter((s) => s.companyId === company.id).length;
+              // Compteur adapté au cadre actif : PC (micros) ou consoles de salon
+              const consoleCount =
+                category === 'computing'
+                  ? systems.filter((s) => s.companyId === company.id && KIOSK_COMPUTING_IDS.has(s.id)).length
+                  : category === 'consoles'
+                    ? systems.filter((s) => s.companyId === company.id && !KIOSK_COMPUTING_IDS.has(s.id)).length
+                    : systems.filter((s) => s.companyId === company.id).length;
               const romCount = gamesCountByCompany.get(company.id) || 0;
               const heroes = HEROES_BY_COMPANY[company.id] || [];
 
@@ -1021,7 +1038,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     {/* Badges de statistiques */}
                     <div className="flex items-center space-x-2 my-1 sm:my-2">
                       <span className="px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-900/80 border border-slate-700 text-[10px] sm:text-[11px] font-bold text-slate-200 shadow">
-                        {consoleCount} Console{consoleCount > 1 ? 's' : ''}
+                        {consoleCount} Machine{consoleCount > 1 ? 's' : ''}
                       </span>
                       <span
                         style={{
@@ -1057,7 +1074,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                           : 'bg-slate-900/80 group-hover:bg-slate-800 text-slate-200 border border-slate-700'
                       }`}
                     >
-                      <span>Consoles {company.name}</span>
+                      <span>Machines {company.name}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
 
@@ -1122,10 +1139,10 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
               <CompanyLogo companyId={selectedCompany.id} size="md" />
             </div>
             <h1 className={`${isCompactFit ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'} font-black text-white tracking-wider uppercase drop-shadow-[0_0_15px_rgba(0,242,254,0.4)]`}>
-              CONSOLES {selectedCompany.name.toUpperCase()}
+              MACHINES {selectedCompany.name.toUpperCase()}
             </h1>
             <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-              {companySystems.length} consoles disponibles • Cliquez sur une console pour explorer sa ludothèque
+              {companySystems.length} machine{companySystems.length > 1 ? 's' : ''} disponible{companySystems.length > 1 ? 's' : ''} • Cliquez sur une machine pour explorer sa ludothèque
             </p>
 
             {/* Bouton d'accès direct au Grand Musée de la firme */}
@@ -1155,10 +1172,40 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             {companySystems.map((sys, idx) => {
               const isFocused = idx === consoleIndex;
               const romCount = gamesCountBySystem.get(sys.id) || 0;
+              // En-têtes de groupes : « PC & Micro-ordinateurs » puis « Consoles »
+              const showPcHeader = idx === 0 && companyPcSystems.length > 0;
+              const showConsolesHeader =
+                idx === companyPcSystems.length && companyConsoleSystems.length > 0;
 
               return (
+                <React.Fragment key={sys.id}>
+                  {(showPcHeader || showConsolesHeader) && (
+                    <div className="col-span-full flex items-center justify-center gap-2 mt-1 mb-0.5 sm:mb-1.5">
+                      {showPcHeader && (
+                        <>
+                          <Monitor className="w-4 h-4 text-amber-300" />
+                          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-amber-300/90">
+                            PC &amp; Micro-ordinateurs
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono font-bold text-amber-300">
+                            {companyPcSystems.length}
+                          </span>
+                        </>
+                      )}
+                      {showConsolesHeader && (
+                        <>
+                          <Gamepad2 className="w-4 h-4 text-cyan-300" />
+                          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-cyan-300/90">
+                            Consoles
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-mono font-bold text-cyan-300">
+                            {companyConsoleSystems.length}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
                 <div
-                  key={sys.id}
                   onClick={() => {
                     setConsoleIndex(idx);
                     handleSelectConsole(sys);
@@ -1255,6 +1302,7 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     </button>
                   </div>
                 </div>
+                </React.Fragment>
               );
             })}
           </div>
