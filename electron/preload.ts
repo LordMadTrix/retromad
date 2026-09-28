@@ -9,6 +9,8 @@ export const API = {
   getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings: Partial<AppSettings>): Promise<AppSettings> => ipcRenderer.invoke('save-settings', settings),
   selectDirectory: (): Promise<string | null> => ipcRenderer.invoke('select-directory'),
+  // Rapport santé : ouvre (ou crée) le dossier BIOS d'un système dans l'explorateur
+  openBiosFolder: (systemId: string): Promise<boolean> => ipcRenderer.invoke('open-bios-folder', systemId),
 
   // Données de base
   getSystems: (): Promise<System[]> => ipcRenderer.invoke('get-systems'),

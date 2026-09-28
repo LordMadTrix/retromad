@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Image, Images, Square } from 'lucide-react';
+import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Image, Images, Square, FolderOpen } from 'lucide-react';
 import { Game, BiosStatus } from '../../types';
 
 interface CollectionHealthReportProps {
@@ -126,6 +126,26 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
 
   const issuesCount =
     gamesWithoutBoxart.length + missingBios.length + duplicates.reduce((a, d) => a + d.length - 1, 0);
+
+  // ── Dossier BIOS : ouvre public/bios/<système> (créé si absent) dans l'explorateur ──
+  const openBiosFolder = typeof window !== 'undefined' && (window as any).api?.openBiosFolder
+    ? (window as any).api.openBiosFolder.bind((window as any).api)
+    : null;
+  const [biosFolderOpening, setBiosFolderOpening] = useState(false);
+  // Cible : le système du premier BIOS obligatoire manquant, sinon le premier de la liste
+  const biosFolderSystemId = useMemo(() => {
+    const firstRequired = missingBios.find((b) => !b.optional);
+    return (firstRequired || missingBios[0])?.systemId || '';
+  }, [missingBios]);
+  const handleOpenBiosFolder = async () => {
+    if (!openBiosFolder || !biosFolderSystemId) return;
+    setBiosFolderOpening(true);
+    try {
+      await openBiosFolder(biosFolderSystemId);
+    } finally {
+      setTimeout(() => setBiosFolderOpening(false), 600);
+    }
+  };
 
   const cardCls = 'p-4 rounded-2xl bg-slate-950/60 border border-slate-800';
   const statNumber = 'text-2xl font-black';
@@ -280,6 +300,17 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
                   </span>
                 </div>
               ))}
+              {openBiosFolder && missingBios.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleOpenBiosFolder}
+                  className="mt-1.5 w-full px-2 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-600 text-[11px] font-bold text-slate-200 transition flex items-center justify-center gap-1.5"
+                  title={`Ouvre (ou crée) le dossier ${biosFolderSystemId} dans l'explorateur de fichiers`}
+                >
+                  <FolderOpen className={`w-3.5 h-3.5 text-amber-400 ${biosFolderOpening ? 'animate-pulse' : ''}`} />
+                  Ouvrir le dossier {biosFolderSystemId}
+                </button>
+              )}
             </div>
           )}
           <p className="text-[10px] text-slate-500 mt-2">

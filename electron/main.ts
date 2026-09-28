@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, protocol, net } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, protocol, net, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { storage } from './services/storage';
@@ -249,6 +249,29 @@ ipcMain.handle('select-directory', async () => {
     return null;
   }
   return result.filePaths[0];
+});
+
+// Ouvre (ou crée puis ouvre) le dossier BIOS d'un système dans le
+// gestionnaire de fichiers de l'OS — depuis le rapport santé.
+ipcMain.handle('open-bios-folder', async (_event, systemId: string) => {
+  try {
+    const settings = storage.getSettings();
+    const biosRoot = settings.biosDir?.trim()
+      ? settings.biosDir.trim()
+      : path.join(app.getAppPath(), 'public', 'bios');
+    // Chemin relatif → ancré au projet ; absolu → utilisé tel quel.
+    const root = path.isAbsolute(biosRoot)
+      ? biosRoot
+      : path.join(app.getAppPath(), biosRoot);
+    // Le checker organise par système : public/bios/<systemId>/…
+    const target = path.join(root, systemId);
+    await fs.promises.mkdir(target, { recursive: true });
+    await shell.openPath(target);
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] Ouverture du dossier BIOS impossible :', e);
+    return false;
+  }
 });
 
 ipcMain.handle('get-systems', async () => {
