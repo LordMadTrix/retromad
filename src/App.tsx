@@ -1370,7 +1370,27 @@ export const App: React.FC = () => {
   }, !isKioskMode);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-transparent text-slate-100 select-none overflow-hidden relative font-display">
+    <div className={`h-screen w-screen flex flex-col bg-transparent text-slate-100 select-none overflow-hidden relative font-display ${
+      // Régie admin = sobre : désaturation douce + contrastes réduits.
+      // Le Kiosque garde toutes ses couleurs et ses effets.
+      !isKioskMode ? 'admin-sober' : ''
+    }`}>
+      {!isKioskMode && (
+        <style>{`
+          .admin-sober .bg-gradient-to-tr,
+          .admin-sober .bg-gradient-to-r,
+          .admin-sober .bg-gradient-to-br {
+            filter: saturate(0.25) brightness(0.92);
+          }
+          .admin-sober img { filter: saturate(0.55) contrast(0.95); }
+          .admin-sober video { filter: saturate(0.4) brightness(0.85); }
+          .admin-sober .shadow-neon,
+          .admin-sober [class*="shadow-[0_0"] {
+            filter: saturate(0.3);
+          }
+          .admin-sober iframe { filter: saturate(0.75) brightness(0.9); }
+        `}</style>
+      )}
       {/* Filtre d'écran CRT Rétro Global si activé avec profil personnalisé */}
       {settings.crtEffect && (
         <div
