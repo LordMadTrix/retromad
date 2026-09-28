@@ -3,6 +3,10 @@ import { System } from '../types';
 import { ConsoleLogo } from './ConsoleLogo';
 import { CompanyLogo } from './CompanyLogo';
 import {
+  companyLogoIdFor,
+  isComputingSystem,
+} from '../utils/companyDisplay';
+import {
   X,
   Landmark,
   Cpu,
@@ -235,7 +239,14 @@ export const ConsoleExhibitionModal: React.FC<ConsoleExhibitionModalProps> = ({
                     Constructeur
                   </span>
                   <div className="h-6 flex items-center justify-center">
-                    <CompanyLogo companyId={system.companyId} size="sm" />
+                    <CompanyLogo
+                      companyId={system.companyId}
+                      logoId={companyLogoIdFor(
+                        system.companyId,
+                        isComputingSystem(system.id) ? 'computing' : 'gaming'
+                      )}
+                      size="sm"
+                    />
                   </div>
                 </div>
 
