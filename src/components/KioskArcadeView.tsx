@@ -68,6 +68,10 @@ const KIOSK_COMPUTING_IDS = new Set([
   'zxspectrum', 'zx81', 'pc8801', 'pc9801', 'amiga1200', 'cdi', 'fmtowns',
   'bbcmicro', 'odyssey2', 'x68000', 'x1', 'atari8bit', 'vic20', 'c128',
   'plus4', 'thomson', 'pc8000', 'gx4000',
+  // Versions de MS-DOS et de Windows (famille Microsoft PC)
+  'dos1', 'dos2', 'dos3', 'dos4', 'dos5', 'dos6',
+  'win1', 'win2', 'win30', 'win31', 'win95', 'win98', 'winme', 'win2000',
+  'winxp', 'winvista', 'win7', 'win10', 'win11',
 ]);
 
 /**

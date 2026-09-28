@@ -2575,5 +2575,554 @@ export const MUSEUM_DATA: Record<string, MuseumExhibition> = {
     rivalry: "Face à la Mega Drive et la Super Nintendo en 1990 : 8-bit contre 16-bit — le match était perdu d'avance.",
     curatorNote: "Le chant du cygne d'Amstrad : un dernier cri 8-bit lancé dans la bataille 16-bit. Sa rareté en fait le Graal des collectionneurs européens.",
   },
-};
 
+/* =====================================================================
+   MICROSOFT — LES VERSIONS DE MS-DOS (1.0 → 6.22)
+   Chaque version a son époque, ses jeux et sa personnalité.
+   ===================================================================== */
+
+  dos1: {
+    tagline: "Le DOS d'origine : 86-DOS racheté 50 000 $, devenu la porte d'entrée de l'informatique mondiale.",
+    history: "En 1980, IBM cherche un système pour son futur PC. Microsoft achète 86-DOS (QDOS) à Seattle Computer Products pour 50 000 $, l'adapte, et le livre sous le nom PC-DOS 1.0 avec l'IBM PC d'août 1981. Sur disquettes 160 KB, il offre un interpréteur de commandes, un utilitaire de copie et le BASIC IBM : le début d'un empire.",
+    innovations: [
+      "Premier système de fichiers FAT (File Allocation Table) — ancêtre de tous les FAT modernes",
+      "Compatible CP/M : les logiciels existants se portent facilement sur PC",
+      "Licence non exclusive : Microsoft peut revendre MS-DOS aux autres constructeurs — l'accord du siècle",
+    ],
+    anecdotes: [
+      "Gary Kildall (CP/M) aurait raté la rencontre IBM, la légende dit qu'il était en avion. IBM se tourne vers Microsoft, qui n'avait alors... aucun OS à vendre.",
+      "Les disquettes de l'époque tenaient 160 KB : DOS 1.0 tient sur une seule, et il n'a pas de sous-répertoires — tout à plat à la racine !",
+    ],
+    iconicGames: [
+      "Jeu PC d'époque : Advent, Zork I (versions booter)",
+      "Donkey.BAS ( BASIC écrit avec Bill Gates en personne)",
+      "L'ensemble des « PC booters » 1981-1983 (lug Chelsea Copps)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 8088 @ 4.77 MHz (bus 8-bit, extension 16-bit interne)",
+      ram: "64 KB minimum (128-256 KB courant)",
+      soundChip: "Haut-parleur PC (PC speaker) : bip 1 bit piloté par le PIT 8253",
+      videoChip: "IBM CGA (4 couleurs 320x200) ou MDA (texte 720x350)",
+      colors: "4 couleurs CGA (palette cyan/magenta/blanc) ou monochrome",
+      controllers: "Clavier 83 touches IBM Model F, port cassette",
+    },
+    rivalry: "Face au CP/M-86 de Digital Research, resté cher et en retard : le marché bascule en un an.",
+    curatorNote: "La pierre angulaire : sans ce petit OS racheté à l'arrache, ni Microsoft ni l'ère PC n'auraient existé sous cette forme.",
+  },
+
+  dos2: {
+    tagline: "La réécriture qui a inventé l'arborescence : sous-répertoires, disque dur et UNIX en inspiration.",
+    history: "Pour accompagner l'IBM PC/XT et son disque dur de 10 MB, Microsoft reconstruit DOS de zéro en 1983 : arborescence de répertoires (inspirée d'UNIX), système de handles de fichiers, pilotes installables (CONFIG.SYS) et pipes/redirection. La grande majorité des jeux DOS classiques des années 80 tourne sur cette base.",
+    innovations: [
+      "Arborescence de répertoires avec chemins \\DOS\\JEUX — fini le tout-à-plat",
+      "Gestion du disque dur et partitionnement (FDISK)",
+      "Pilotes installables via CONFIG.SYS (ANSI.SYS, RAMDRIVE...)",
+    ],
+    anecdotes: [
+      "Microsoft s'est inspiré directement d'UNIX (XENIX, qu'il vendait alors) pour l'arborescence : le \\ et le . .. viennent de là.",
+      "C'est la version qui popularise le fichier AUTOEXEC.BAT — chaque gamer des années 80 a bricolé le sien pour charger sa souris et sa carte son.",
+    ],
+    iconicGames: [
+      "King's Quest I (Sierra — 1984, le jeu graphique révolutionnaire)",
+      "Elite (1984)",
+      "Ultima III", "F-15 Strike Eagle", "Spy Hunter",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 8088/8086 @ 4.77-8 MHz",
+      ram: "256-512 KB",
+      soundChip: "PC speaker, puis AdLib (1987) sur machines plus récentes",
+      videoChip: "CGA, puis EGA (16 couleurs, 640x350)",
+      colors: "4 (CGA) à 16 (EGA)",
+      controllers: "Clavier, joystick analogique PC (port jeu)",
+    },
+    rivalry: "Face aux clones MS-DOS des concurrents et au CP/M en fin de vie : DOS devient LE standard.",
+    curatorNote: "Le DOS des jeux d'aventure graphique et des premières légendes du PC. Sa structure vit encore dans tous les Windows actuels.",
+  },
+
+  dos3: {
+    tagline: "Le DOS des PC/AT et du réseau : la version des entreprises et des compatibles.",
+    history: "Livré avec l'IBM PC/AT (286) en 1987, DOS 3.x apporte la gestion des disquettes 3,5 pouces, le partage de fichiers réseau (avec l'IBM PC Network) et les permissions en lecture seule. C'est la version la plus répandue de la décennie : la quasi-totalité des compatibles IBM vendus entre 1987 et 1990 tournent dessus.",
+    innovations: [
+      "Support des disquettes 3,5 pouces 720 KB puis 1.44 MB (DOS 3.3)",
+      "Partage de fichiers réseau et verrouillage d'enregistrements",
+      "Partition jusqu'à 32 MB, code page internationale (CHARACTER.SET)",
+    ],
+    anecdotes: [
+      "DOS 3.0 était sorti avec l'AT en 1984, mais c'est 3.3 (1987) qui reste dans les mémoires : il tient sur une seule disquette 720 KB.",
+      "Beaucoup de jeux 1988-1992 (Prince of Persia, Wolfenstein 3D) exigent DOS 3.3 ou plus — c'est le socle de l'âge d'or.",
+    ],
+    iconicGames: [
+      "Prince of Persia (1989)", "Wolfenstein 3D (1992)", "Civilization (1991)",
+      "Lemmings (1991)", "SimCity (1989)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 8086 à 80286 @ 6-12 MHz (mode réel)",
+      ram: "512 KB-2 MB",
+      soundChip: "AdLib OPL2 FM (1987) puis Sound Blaster (1989, voix numérisées)",
+      videoChip: "EGA puis VGA IBM (256 couleurs en mode 13h)",
+      colors: "16 (EGA/VGA texte) à 256 (VGA mode 13h)",
+      controllers: "Clavier, joystick, souris série/PS2 (MOUSE.SYS)",
+    },
+    rivalry: "Face à OS/2 (le projet conjoint IBM/Microsoft) qui était censé remplacer DOS... avant que Windows ne prenne le relais.",
+    curatorNote: "La fondation de l'âge d'or du jeu PC : presque tout ce qui fait la légende DOS tourne sur un 3.3.",
+  },
+
+  dos4: {
+    tagline: "Le DOS du DOS Shell : interface graphique, mais pas que — la version maudite.",
+    history: "Né du projet conjoint IBM/Microsoft (base commune avec OS/2 1.0), DOS 4.0 (1988) introduit le DOS Shell, un gestionnaire graphique de fichiers avec souris, et dépasse la barrière des 32 MB par partition. Sa version corrigée 4.01 (1989) est restée célèbre pour ses bugs, mais son Shell est adoré des nostalgiques.",
+    innovations: [
+      "DOS Shell : interface graphique semi-moderne avec liste de fichiers et changement de tâche",
+      "Partitions FAT supérieures à 32 MB (jusqu'à 512 MB avec BIOS compatible)",
+      "MS-DOS Executive remplacé par le Shell en plein écran ou fenêtré",
+    ],
+    anecdotes: [
+      "DOS 4.0 consommait trop de mémoire pour l'époque : beaucoup de gamers ont sauté cette version directement de la 3.3 à la 5.0.",
+      "Le code de DOS 4.x a été retravaillé par Microsoft après des rapports de bugs venus du monde entier — un fiasco discret qui a coûté cher en réputation.",
+    ],
+    iconicGames: [
+      "SimCity (1989)", "Populous (1989)", "Covert Action (1990)",
+      "Indy 500 (1989)", "Les débuts du VGA 256 couleurs",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 286/386 @ 12-25 MHz",
+      ram: "1-4 MB",
+      soundChip: "Sound Blaster 1.0 (DSP 8-bit mono, FM OPL2)",
+      videoChip: "VGA 256 Ko (mode 13h 320x200x256)",
+      colors: "256 couleurs simultanées (VGA)",
+      controllers: "Clavier, souris bus/PS2, joystick",
+    },
+    rivalry: "Face à DR-DOS 5.0 (Digital Research) qui venait de sortir une version plus optimisée.",
+    curatorNote: "La version en transition : imparfaite mais précurseuse, avec son Shell qui annonce Windows et son support des gros disques.",
+  },
+
+  dos5: {
+    tagline: "Le DOS que tout le monde aimait : QBasic, EDIT, et enfin la mémoire haute maîtrisée.",
+    history: "Sorti en juin 1991 avec une campagne marketing d'un million de dollars, DOS 5.0 est un bond géant : 640 KB de mémoire conventionnelle enfin dépassées (HMA/UMB avec HIMEM.SYS et EMM386), QBasic et l'éditeur EDIT plein écran intégrés, UNDELETE, et un Shell retravaillé. Plus de 7 millions d'exemplaires partent en un an.",
+    innovations: [
+      "Gestion de la mémoire haute (HMA) et supérieure (UMB) : les jeux gagnent enfin de la place",
+      "QBasic intégré — des millions d'adolescents apprennent à programmer dessus",
+      "EDIT, UNDELETE, DOSKEY et l'assistant SETUP graphique",
+    ],
+    anecdotes: [
+      "IBM et Microsoft se sont battus en justice autour de cette version : IBM voulait la vendre sous le nom PC-DOS 5.0 avec des extensions propres.",
+      "La convention de QBasic (Nibbles, Gorilla, Snake) livrée avec le DOS a formé une génération entière de développeurs.",
+    ],
+    iconicGames: [
+      "Id Software : Hovertank 3D, Catacomb 3D (précurseurs du FPS)",
+      "Monkey Island 2 (1991)", "Another World (1991)",
+      "Lands of Lore, Ultima VII (1992)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 386/486 @ 16-33 MHz",
+      ram: "1-8 MB (HMA + blocs UMB gérés)",
+      soundChip: "Sound Blaster Pro (stéréo FM + PCM) / Gravis Ultrasound",
+      videoChip: "VGA/SVGA (Tseng ET4000, Trident) jusqu'à 800x600",
+      colors: "256 couleurs (VGA), VESA pour les modes étendus",
+      controllers: "Clavier, souris PS2, joystick, premiers CD-ROM Sound Blaster",
+    },
+    rivalry: "Écrase DR-DOS 6.0 au prix et au marketing : la guerre des DOS tourne à l'avantage Microsoft.",
+    curatorNote: "Le point d'équilibre parfait du DOS : puissant, léger, et la porte d'entrée du jeu PC moderne. Le favori absolu des nostalgiques.",
+  },
+
+  dos6: {
+    tagline: "Le dernier DOS autonome : DoubleSpace, ScanDisk et le sommet de l'ère.",
+    history: "DOS 6.0 (1993) puis 6.2/6.21/6.22 (1993-1994) sont l'apothéose : compression de disque DoubleSpace (puis DriveSpace après un procès de Stacker), ScanDisk, Defrag, MSBackup, MS Anti-Virus, et le démarrage pas-à-pas. La 6.22 est le dernier MS-DOS vendu seul — après lui, DOS n'est plus qu'une couche cachée de Windows 95.",
+    innovations: [
+      "Compression DoubleSpace/DriveSpace : doubler l'espace disque d'un clic",
+      "ScanDisk et Defrag intégrés (auparavant payants)",
+      "Menu de démarrage F5/F8 et configuration multi-boot",
+    ],
+    anecdotes: [
+      "Le procès Stac Electronics contre Microsoft (compression Stacker vs DoubleSpace) coûte 120 millions de dollars à Microsoft et force la 6.21 sans compression.",
+      "Dans Windows 95, taper EXIT depuis la session DOS fermait... la couche DOS : le vieux monde subsistait en dessous.",
+    ],
+    iconicGames: [
+      "DOOM (1993) et DOOM II — l'apogée absolue du jeu DOS",
+      "Duke Nukem 3D (1996)", "Commander Keen (série)",
+      "Warcraft II (1995)", "Quake (1996, version DOS)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 486DX à Pentium @ 33-100 MHz",
+      ram: "4-16 MB",
+      soundChip: "Sound Blaster 16 (16-bit stéréo) / Gravis Ultrasound / Roland MT-32",
+      videoChip: "SVGA (Trident, Cirrus Logic, S3) jusqu'à 1024x768, VESA VBE",
+      colors: "256 couleurs, VESA pour modes supérieurs",
+      controllers: "Clavier, souris, joystick, lecteurs CD-ROM (MSCDEX)",
+    },
+    rivalry: "Face à Windows 3.11 qui grignote le même marché — et face à DR-DOS/NW-DOS en fin de course.",
+    curatorNote: "Le roi final : la machine à DOOM. Si tu as connu le jeu PC des années 90, c'était probablement sur un 6.22.",
+  },
+
+/* =====================================================================
+   MICROSOFT — LES VERSIONS DE WINDOWS (1.01 → 11)
+   De la surcouche mosaïque de 1985 au système moderne 2021.
+   ===================================================================== */
+
+  win1: {
+    tagline: "La première fenêtre de Microsoft : des pavés en mosaïque qui ne se chevauchent jamais.",
+    history: "Annoncé en 1983, livré en novembre 1985, Windows 1.01 est une surcouche graphique au DOS : fenêtres en mosaïque obligatoires (pour ne pas concurrencer... une licence Apple), Paint, Notepad, Calculator, Clock, Reversi et l'horloge. Steve Ballmer en fait une pub absurde devenue culte. Ce fut un demi-succès : lent mais révolutionnaire.",
+    innovations: [
+      "Premier environnement graphique multi-fenêtres grand public de Microsoft",
+      "Bibliothèque d'interface commune (procédures de fenêtres) pour les développeurs",
+      "Échange dynamique de données (DDE) entre applications",
+    ],
+    anecdotes: [
+      "Les fenêtres ne pouvaient PAS se chevaucher : Apple détenait une licence sur cette idée. Ironie : Microsoft signera l'accord qui donnera lieu à un procès 10 ans plus tard...",
+      "Dans la vidéo de lancement, Steve Ballmer hurl « WINDOWS ONE-NAUGHT-ONE ! » avec un enthousiasme resté légendaire sur Internet.",
+    ],
+    iconicGames: [
+      "Reversi (inclus) — le premier jeu fourni avec Windows",
+      "DOS games via la fenêtre MS-DOS Executive",
+      "AD&D: Gateway to the Savage Frontier (era Windows-native très rare)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 8088/8086 @ 4.77-8 MHz",
+      ram: "256 KB minimum (512 KB recommandés + deux lecteurs)",
+      soundChip: "PC speaker (bips) — aucun son numérique",
+      videoChip: "CGA/EGA — 640x350 en 16 couleurs maximum",
+      colors: "2 à 16 couleurs",
+      controllers: "Clavier + souris Microsoft (à 2 boutons, optionnelle !)",
+    },
+    rivalry: "Face à GEM (Digital Research) et Mac System 1 : Microsoft arrive troisième mais persiste.",
+    curatorNote: "Le premier pas : tout est là en germe — fenêtres, Paint, la calculatrice qui existe toujours 40 ans plus tard.",
+  },
+
+  win2: {
+    tagline: "Les fenêtres se chevauchent enfin : Excel et Word débarquent sur Windows.",
+    history: "Windows 2.0 (décembre 1987) autorise enfin les fenêtres superposées, ajoute les raccourcis clavier, les menus déroulants et le bureau métaphore. C'est l'hôte d'Excel 2.0 et de Word pour Windows — les applications qui feront le succès du futur. Il servira de base au Windows/386 qui virtualise les applications DOS.",
+    innovations: [
+      "Fenêtres à chevauchement libre (overlap) et icônes à la Windows",
+      "Excel 2.0 : le tableur qui battra Lotus 1-2-3 quelques années plus tard",
+      "Windows/386 : exécution de plusieurs programmes DOS en multitâche virtuel",
+    ],
+    anecdotes: [
+      "Apple a poursuivi Microsoft pour ce chevauchement de fenêtres (procès Hewlett-Packard vs Apple) — et a perdu en 1994 : les interfaces graphiques ne sont pas protégables ainsi.",
+      "Le vieux Paint de Windows 2 s'appelait encore « Paintbrush » et il est resté presque inchangé jusqu'à Windows 95.",
+    ],
+    iconicGames: [
+      "Reversi et le Solitaire (pré-Challenge)", "AD&D collectible:小游戏 échecs Windows",
+      "Les premiers jeux Windows natifs (Sokoban, Tetris clones)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 8086/80286 @ 8-12 MHz",
+      ram: "512 KB-1 MB",
+      soundChip: "PC speaker / AdLib pour les jeux DOS hôtes",
+      videoChip: "EGA/VGA 640x480",
+      colors: "16 couleurs",
+      controllers: "Clavier, souris Microsoft/PS2",
+    },
+    rivalry: "Face à OS/2 (projet IBM) : Microsoft maintenait deux stratégies contradictoires.",
+    curatorNote: "La version charnière : c'est ici que naissent Excel et Word pour Windows — les machines de guerre à venir.",
+  },
+
+  win30: {
+    tagline: "10 millions de copies : la version qui a fait de Microsoft le maître du bureau.",
+    history: "Windows 3.0 (mai 1990) est la délivrance : interface retravaillée (Icônes Program Manager), mode 386 étendu avec mémoire jusqu'à 16 MB, support des 256 couleurs VGA, et File Manager. Vendu à 10 millions d'exemplaires, c'est la première version que les entreprises adoptent massivement — Microsoft devient incontournable.",
+    innovations: [
+      "Mode 386 étendu : accès à la mémoire au-delà de 640 KB (jusqu'à 16 MB)",
+      "Program Manager et File Manager : le bureau moderne apparaît",
+      "Support VGA 256 couleurs et cartes réseau améliorées",
+    ],
+    anecdotes: [
+      "Microsoft a dépensé 3 millions de dollars pour son lancement — le double du budget de développement.",
+      "Le Solitaire (Klondike) incluait une mission pédagogique cachée : apprendre le glisser-déposer à la souris à la planète entière.",
+    ],
+    iconicGames: [
+      "Solitaire (inclus) — l'apprentissage universel du drag & drop",
+      "Minesweeper (réinventé par Robert Donner pour 3.0)",
+      "Jeux DOS via le mode 386 (en fenêtre !)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 286 (Standard) / 386 (mode étendu) @ 12-25 MHz",
+      ram: "1-2 MB",
+      soundChip: "AdLib / Sound Blaster (drivers multimédia 3.0a avec Multimedia Extensions)",
+      videoChip: "VGA 256 couleurs",
+      colors: "16 à 256 couleurs",
+      controllers: "Clavier, souris, joystick (avec Multimedia Extensions)",
+    },
+    rivalry: "Face à IBM OS/2 : le divorce est consommé, Microsoft choisit Windows en 1990-1991.",
+    curatorNote: "La victoire totale : à partir de 3.0, Windows n'est plus une blague — c'est l'OS de fait du monde professionnel.",
+  },
+
+  win31: {
+    tagline: "TrueType, Minesweeper et les Entertainment Packs : le Windows des gamers avant l'heure.",
+    history: "Windows 3.1 (avril 1992) peaufine tout : polices TrueType (échelle sans escaliers), OLE (glisser un tableau Excel dans Word), Media Player, et l'abandon du mode réel. Les Entertainment Packs (1992-1994) livrent Hearts, Minesweeper officiel, Chip's Challenge, SkiFree et la critique WinG pour les jeux. Plus de 25 millions de licences.",
+    innovations: [
+      "Polices TrueType vectorielles — le WYSIWYG universel",
+      "OLE 1.0 : composés de documents mixtes (texte + tableur + image)",
+      "Multimédia : Media Player, Sound Recorder, drivers cartes son standardisés",
+    ],
+    anecdotes: [
+      "SkiFree (1991, Entertainment Pack 3) et son Yéti qui dévore le skieur est resté l'un des jeux les plus joués de l'histoire grâce aux PC de bureau du monde entier.",
+      "Le fameux Ctrl+Alt+Suppr « à trois doigts » a été popularisé par les plantages de Windows 3.1 — son créateur David Bradley le regrette encore.",
+    ],
+    iconicGames: [
+      "Chip's Challenge", "SkiFree", "Tut's Tomb", "JezzBall",
+      "Rodent's Revenge", "Hoyle Card Games",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 386SX à 486DX2 @ 16-33 MHz",
+      ram: "2-4 MB",
+      soundChip: "Sound Blaster 16 (drivers Win32s et MME)",
+      videoChip: "VGA/SVGA — WinG pour accélérer les jeux",
+      colors: "256 couleurs",
+      controllers: "Souris, clavier, joystick analogique",
+    },
+    rivalry: "Face à IBM OS/2 2.0 (32-bit) : Windows 3.1, pourtant 16-bit, gagne par la simplicité.",
+    curatorNote: "L'apogée du Windows 16-bit : c'est là que le jeu PC grand public décolle avec les Entertainment Packs et les premiers hits Windows natifs.",
+  },
+
+  win95: {
+    tagline: "Start Me Up : le lancement le plus médiatisé de l'informatique mondiale.",
+    history: "Le 24 août 1995, Microsoft achète Start Me Up des Rolling Stones, embauche Friends pour la pub, et fait la queue à minuit devant les magasins — pour un OS ! Windows 95 apporte le menu Démarrer, la barre des tâches, le bureau 32-bit, le Plug & Play et le réseau intégré. 7 millions de licences en 5 semaines, 40 millions la première année : le jeu PC grand public explose.",
+    innovations: [
+      "Menu Démarrer et barre des tâches — l'interface la plus copiée de l'histoire",
+      "Architecture 32-bit Win32 avec préemptif multitâche partiel",
+      "Plug & Play, DirectX 1.0 et pilotes réseau/modem intégrés",
+    ],
+    anecdotes: [
+      "Bill Gates a dû redémarrer Windows 95 EN DIRECT pendant la conférence de lancement — le fameux écran bleu improvisé.",
+      "DirectX 1 (Games SDK) est né de la frustration des devs face à WinG : l'objectif était de faire de Windows une plateforme de jeu crédible.",
+    ],
+    iconicGames: [
+      "Age of Empires (1997)", "C&C: Red Alert (1996)", "Diablo (1996)",
+      "StarCraft (1998)", "Total Annihilation (1997)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel 486DX2 à Pentium @ 33-100 MHz",
+      ram: "8-32 MB",
+      soundChip: "Sound Blaster 16 / AWE32 — DirectX DirectSound",
+      videoChip: "SVGA 2D + premières accélératrices 3D (Direct3D dès 1996)",
+      colors: "16-bit (65 536 couleurs) et 24-bit",
+      controllers: "Manettes USB (Win95 OSR2), joystick, souris PS2",
+    },
+    rivalry: "Face à MacOS 7.5 et OS/2 Warp : la guerre est gagnée en un an.",
+    curatorNote: "L'événement fondateur : c'est Windows 95 qui a créé le marché massif du jeu PC familial et multijoueur.",
+  },
+
+  win98: {
+    tagline: "L'âge d'or du jeu PC : 3dfx, USB, AGP et DirectX 7 — la machine à Quake III.",
+    history: "Windows 98 (juin 1998) est le système des gamers : support USB natif, port AGP, DirectX 6 puis 7, pilotes 3dfx Voodoo/NVIDIA/ATI matures et Internet Explorer intégré. Avec plus de 58 millions de licences, il reste le système de prédilection des LANs, des cartes 3D et de Counter-Strike 1.x.",
+    innovations: [
+      "Support USB et AGP natif — les accélératrices 3D se généralisent",
+      "DirectX 7 : T&L hardware, musique DLS, le standard des jeux 1999-2001",
+      "FAT32, DVD-ROM et veille ACPI",
+    ],
+    anecdotes: [
+      "La démo de lancement de Windows 98 (plug & play d'un scanner) a planté en direct avec Bill Gates — « c'est pourquoi nous appelons ça Plug and Play » a-t-il lâché.",
+      "Des gamers ont tenu Windows 98 jusqu'en 2010 pour les vieux jeux : il tournait mieux que XP sur les configs modestes.",
+    ],
+    iconicGames: [
+      "Half-Life (1998) et Counter-Strike (1999)", "Quake III Arena (1999)",
+      "Unreal Tournament (1999)", "The Sims (2000)", "Diablo II (2000)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Pentium MMX à Pentium III @ 166-600 MHz",
+      ram: "16-128 MB",
+      soundChip: "Sound Blaster Live! (EAX) — DirectSound3D / A3D",
+      videoChip: "3dfx Voodoo 2/Banshee, NVIDIA RIVA TNT/GeForce 256, ATI Rage",
+      colors: "16/24/32-bit",
+      controllers: "USB : manettes, pads Dual Analog, wheels — Gravis GamePad",
+    },
+    rivalry: "Face à Windows NT 4.0 (bureau) : le 9x reste le choix des gamers jusqu'à XP.",
+    curatorNote: "La plate-forme légendaire du jeu PC rétro : si tu veux du 3dfx authentique, c'est ici.",
+  },
+
+  winme: {
+    tagline: "Le dernier des 9x : Restauration système et Movie Maker, mais l'instabilité finit par l'emporter.",
+    history: "Windows Me (septembre 2000) clôt la lignée 9x : Restauration système (retour en arrière du système), Windows Movie Maker, Media Player 7 et Windows Image Acquisition. Mais en supprimant l'accès DOS réel et en gardant l'architecture 9x fragile, il se fait lamenter par les gamers — beaucoup sont repartis en 98 SE ou ont attendu XP.",
+    innovations: [
+      "Restauration système : points de retour en arrière automatiques",
+      "Windows Movie Maker et Windows Media Player 7",
+      "Support des lecteurs ZIP, DVD et caméras DV via IEEE 1394 (FireWire)",
+    ],
+    anecdotes: [
+      "« Windows Me » était surnommé « Windows Mistake Edition » par la presse : PC World l'a classé 4e pire produit technologique de l'histoire.",
+      "En supprimant le mode DOS réel, Me a cassé beaucoup de vieux jeux et d'utilitaires — une leçon apprise pour XP.",
+    ],
+    iconicGames: [
+      "Jeux DirecteX 7-8 (The Sims, Black & White)",
+      "Midtown Madness 2", "Crimson Skies", "Messenger-era games (MSN Gaming Zone)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Pentium II/III / AMD Athlon @ 300-800 MHz",
+      ram: "32-256 MB",
+      soundChip: "Sound Blaster Live! / Audigy — DirectSound, EAX 2",
+      videoChip: "NVIDIA GeForce 2/3, ATI Radeon — DirectX 8",
+      colors: "32-bit",
+      controllers: "USB standardisé : manettes, wheels, DInput",
+    },
+    rivalry: "Face à Windows 2000 (NT) : le 9x perd la partie technique, XP réconciliera tout le monde.",
+    curatorNote: "Le maillon faible mais le dernier des dinosaures 9x : à jouer pour la nostalgie de la restauration système et du Movie Maker.",
+  },
+
+  win2000: {
+    tagline: "Le NT professionnel : NTFS chiffré, fiabilité légendaire et la base de XP.",
+    history: "Windows 2000 (février 2000) est la quintessence du noyau NT : NTFS 3.0 avec chiffrement EFS, Active Directory, gestion de disques dynamiques, et une stabilité légendaire. Réservé au professionnel (Workstation/Server), il a prouvé que le NT pouvait tout faire — XP l'apportera au grand public l'année suivante.",
+    innovations: [
+      "NTFS 3.0 avec chiffrement EFS transparent et quotas disque",
+      "Active Directory : la gestion centralisée des réseaux d'entreprise",
+      "Noyau NT 5.0 : plug & play (enfin !) et gestion d'énergie ACPI",
+    ],
+    anecdotes: [
+      "Des serveurs Windows 2000 ont tourné sans redémarrage pendant des années — une révolution pour l'époque.",
+      "Son jeu caché dans le logo de démarrage (via un easter egg de développement) n'a jamais été confirmé officiellement mais reste une légende urbaine des forums.",
+    ],
+    iconicGames: [
+      "Jeux DirectX 7-8 en bureautique d'entreprise (défense de jouer au bureau !)",
+      "Half-Life et mods réseau sur les LANs d'entreprise",
+      "Serveurs de jeux dédiés Counter-Strike/Quake III",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Pentium II/III / AMD Athlon @ 300 MHz-1 GHz",
+      ram: "32-256 MB (jusqu'à 4 GB en Pro)",
+      soundChip: "DirectSound / EAX (pilotes NT souvent limités)",
+      videoChip: "GeForce / Radeon avec drivers NT5 — DirectX 7",
+      colors: "32-bit",
+      controllers: "USB, PS2 — DirectInput complet",
+    },
+    rivalry: "Face à Windows Me : la version sérieuse du même millésime — et elle a gagné l'histoire.",
+    curatorNote: "L'ingénierie avant le marketing : le socle exact dont XP héritera pour dominer le monde pendant 12 ans.",
+  },
+
+  winxp: {
+    tagline: "Bliss, les collines vertes : le système le plus aimé de l'histoire de Microsoft.",
+    history: "Windows XP (octobre 2001) fusionne enfin le noyau NT avec le confort 9x : stabilité, thème Luna coloré, assistance à distance, Wi-Fi intégré et Rapid Switching utilisateur. Vendu à plus de 400 millions de licences, il a vécu 12 ans de support (jusqu'en 2014) et reste, pour beaucoup, LE Windows parfait pour le jeu (DirectX 9, pilotes matures).",
+    innovations: [
+      "Noyau NT pour le grand public : stabilité totale, sessions multi-utilisateurs",
+      "DirectX 9.0c (2004) : shaders 2.0/3.0, le socle de 10 ans de jeux PC",
+      "Assistance à distance, Wi-Fi et pare-feu intégrés",
+    ],
+    anecdotes: [
+      "Le fond d'écran Bliss est une vraie photo (Sonoma County, 1996, Charles O'Rear) jamais retouchée — Microsoft a payé la licence plus cher que n'importe quel shoot de production.",
+      "XP a survécu à Vista : des entreprises ont payé pour prolonger son support jusqu'en 2023 (POSReady), 22 ans après sa sortie.",
+    ],
+    iconicGames: [
+      "Half-Life 2 (2004)", "World of Warcraft (2004)", "Counter-Strike: Source",
+      "GTA: San Andreas", "The Elder Scrolls IV: Oblivion (2006)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Pentium 4 / AMD Athlon XP @ 1-3 GHz",
+      ram: "128-512 MB (jusqu'à 4 GB en 32-bit)",
+      soundChip: "Sound Blaster Audigy / X-Fi, Realtek HD — EAX 4, OpenAL",
+      videoChip: "GeForce FX à 8800, Radeon 9700 à HD 2000 — DirectX 9",
+      colors: "32-bit",
+      controllers: "Xbox 360 Controller (XInput, 2005), wheels, HOTAS",
+    },
+    rivalry: "Face à MacOS X : le duel des années 2000 — XP domine le marché mondial du jeu.",
+    curatorNote: "Le grand réconciliateur : la stabilité NT + la simplicité 9x. Le meilleur système pour jouer rétro en natif, encore aujourd'hui.",
+  },
+
+  winvista: {
+    tagline: "Aero Glass et DirectX 10 : vilipendé à sa sortie, fondateur pour la suite.",
+    history: "Windows Vista (janvier 2007) a exigé trop de matériel pour son temps : Aero Glass, l'UAC omniprésent et les exigences RAM l'ont rendu impopulaire. Mais il a introduit DirectX 10, l'audio WDDM, BitLocker et la recherche instantanée — toutes les fondations que Windows 7 a affinées pour triompher.",
+    innovations: [
+      "DirectX 10 : premier pipeline shader unifié, only-Vista (Crysis en exclusivité !)",
+      "Aero Glass : composition du bureau GPU (DWM) — les transitions fluides",
+      "BitLocker, UAC, recherche instantanée indexée (WinFS renaît en Search)",
+    ],
+    anecdotes: [
+      "« The Mojave Experiment » : Microsoft a fait tester Vista à des gens croyant essayer un « nouveau système codé Mojave » — les notes étaient excellentes, prouvant que la réputation était pire que le produit.",
+      "Crysis (2007) exclusif DirectX 10/Vista est resté le benchmark ultime : « mais peut-il tourner Crysis ? » est né là.",
+    ],
+    iconicGames: [
+      "Crysis (2007)", "Halo 2 (Vista only, 2007)", "BioShock (2007)",
+      "Call of Duty 4: Modern Warfare (2007)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Core 2 Duo / AMD Athlon 64 X2 @ 1.8-2.4 GHz",
+      ram: "512 MB-2 GB",
+      soundChip: "DirectSound remplacé par l'audio WDDM/XAudio2 — EAX abandonné",
+      videoChip: "GeForce 8 (Unified shaders) / Radeon HD 2000 — DirectX 10",
+      colors: "32-bit HDR (composition DWM)",
+      controllers: "XInput (Xbox 360), wheels, Xbox 360 wireless adapter",
+    },
+    rivalry: "Face à Mac OS X Leopard et à Windows XP persistant : Vista a perdu contre son propre prédécesseur.",
+    curatorNote: "Le système mal-aimé mais fondateur : sans les exigences de Vista, pas de DirectX 11 ni du Windows 7 triomphant.",
+  },
+
+  win7: {
+    tagline: "Le favori du public : Aero abouti, DirectX 11 et dix ans de règne.",
+    history: "Windows 7 (octobre 2009) répare tout ce que Vista a raté : plus léger, plus rapide, Aero sobre (Snap, Aero Peek, Shake) et DirectX 11 avec tessellation. Vendu à plus de 630 millions de licences, soutenu 10 ans, il reste le système préféré des PC gamers pendant toute la décennie et un refuge encore actif.",
+    innovations: [
+      "DirectX 11 : tessellation GPU, multithreading des commandes, compute shaders",
+      "Snap, Aero Peek, Jump Lists : productivité du bureau à son apogée",
+      "Libraries, HomeGroup, Windows Touch (tactile natif)",
+    ],
+    anecdotes: [
+      "Windows 7 est le seul OS grand public dont la date de fin de support (14 janvier 2020) a été commentée comme un événement mondial dans la presse généraliste.",
+      "Son écran de démarrage avec les quatre lumières qui convergent a été conçu comme un hommage discret au drapeau Windows.",
+    ],
+    iconicGames: [
+      "Skyrim (2011)", "League of Legends", "Minecraft (2011)",
+      "GTA V (2015)", "The Witcher 3 (2015)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel Core 2/i3-i7 / AMD Phenom/Ryzen @ 1-4 GHz",
+      ram: "2-16 GB (jusqu'à 192 GB en Pro 64-bit)",
+      soundChip: "XAudio2, HDMI audio natif, Dolby Home Theater",
+      videoChip: "GeForce 400-900, Radeon HD 5000-RX — DirectX 11/12 (fin de vie)",
+      colors: "32-bit HDR-ready",
+      controllers: "XInput universel, Steam Controller, HOTAS, wheels",
+    },
+    rivalry: "Face à Windows 8 (2012) : le public a refusé l'interface tactile et est resté 3 ans de plus sur 7.",
+    curatorNote: "L'équilibre parfait : moderne, stable et compatible rétro. Encore en 2026, des millions de machines rétro tournent sous 7.",
+  },
+
+  win10: {
+    tagline: "Un milliard et demi de machines : Windows en tant que service, du menu Démarrer retrouvé à WSL.",
+    history: "Windows 10 (juillet 2015) ramène le menu Démarrer après le fiasco 8, installe Windows en tant que service (mises à jour continues), et unifie PC/tablette/Xbox. DirectX 12, WSL (Linux dans Windows), l'Xbox Game Bar et le support HDR en font la plateforme de jeu moderne par excellence — plus d'1,4 milliard de machines actives.",
+    innovations: [
+      "DirectX 12 : accès bas niveau au GPU (comme les consoles), Auto HDR (2021)",
+      "WSL 1 et 2 : un vrai noyau Linux dans Windows — la boucle UNIX bouclée",
+      "Xbox Game Bar, streaming Xbox et Game Pass intégré",
+    ],
+    anecdotes: [
+      "Microsoft avait promis que Windows 10 serait « le dernier Windows » — Windows 11 est arrivé en 2021, mais 10 reste le plus répandu.",
+      "Le terminal de Windows 10 garde l'emoji 🦖 du mode hors-ligne, héritier spirituel du T-Rex de Chrome.",
+    ],
+    iconicGames: [
+      "Forza Horizon 5", "Halo Infinite", "Sea of Thieves",
+      "Tous les Game Pass et Steam modernes (DX12)",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel/AMD x64 multicœur @ 1 GHz+ (TPM 1.2)",
+      ram: "4-32 GB+",
+      soundChip: "XAudio2, WASAPI exclusif, spatial Dolby Atmos / DTS:X",
+      videoChip: "DirectX 12 Ultimate : GeForce RTX, Radeon RX (Ray Tracing)",
+      colors: "HDR10 et Dolby Vision supportés",
+      controllers: "Xbox Series pads, Steam Input, DS4Windows (DualShock 4)",
+    },
+    rivalry: "Face à macOS et Linux gaming (Proton) : la plateforme de jeu principale du monde malgré tout.",
+    curatorNote: "Le pont entre les époques : il fait tourner DOOM DOSBox comme Cyberpunk, et reste la référence des émulateurs rétro.",
+  },
+
+  win11: {
+    tagline: "L'ère moderne : menus centrés, DirectX 12 Ultimate et Copilot — le Windows de 2026.",
+    history: "Windows 11 (octobre 2021) redessine tout : menu Démarrer et fenêtres centrées, coins arrondis, Mica, Snap Layouts et Widgets. Sous le capot : DirectX 12 Ultimate (Ray Tracing, Auto HDR), DirectStorage (chargements SSD), TPM 2.0 obligatoire et Copilot. La plateforme actuelle du jeu PC et des émulateurs nouvelle génération.",
+    innovations: [
+      "DirectStorage : les SSD NVMe chargent les jeux comme une console",
+      "DirectX 12 Ultimate : Ray Tracing, Mesh Shaders, Sampler Feedback",
+      "WSA (sous-système Android), Snap Layouts et Copilot IA intégré",
+    ],
+    anecdotes: [
+      "L'exigence TPM 2.0 a rendu Windows 11 incompatible avec des PC parfaitement capables : la révolte des forums a forcé Microsoft à assoulir l'installation.",
+      "Le Paint de Windows 11 a reçu des calques et de la transparence en 2023 — 38 ans après le Paint de Windows 1.0.",
+    ],
+    iconicGames: [
+      "Starfield (DirectStorage)", "Forza Motorsport (2023)",
+      "Cyberpunk 2077 (Path Tracing)", "Tous les jeux Game Pass PC",
+    ],
+    hardwareHighlights: {
+      cpuArchitecture: "Intel/AMD/ARM x64 moderne (TPM 2.0, Secure Boot)",
+      ram: "4-64 GB+",
+      soundChip: "Spatial sound Windows (Dolby Atmos, DTS:X, Sonic)",
+      videoChip: "GeForce RTX 40 / Radeon RX 7000 — DirectX 12 Ultimate + Auto HDR",
+      colors: "HDR10+, Auto HDR sur des milliers de jeux SDR",
+      controllers: "Xbox Series, DualSense (audio haptique), Steam Deck clients",
+    },
+    rivalry: "Face au Steam Deck (SteamOS) et aux Chromebooks : la machine de jeu complète reste Windows.",
+    curatorNote: "Le présent et le futur : les jeux de 1981 aux jeux 2026 tournent tous ici via DOSBox, émulateurs et natif — le musée vivant de RetroMad.",
+  },
+
+};
