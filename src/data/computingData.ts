@@ -15,6 +15,80 @@ export interface OsEra {
   funFact?: string;
 }
 
+/** Génération d'ordinateurs — classification historique classique (Wikipédia). */
+export interface GenEra {
+  id: string;
+  gen: string;      // « 1re », « 2e »…
+  title: string;    // technologie caractéristique
+  period: string;   // affichage lisible
+  color: string;
+  icon: string;     // nom d'icône lucide-react
+  description: string;
+  machines: string; // machines emblématiques
+  funFact?: string;
+}
+
+/** Les quatre générations classiques d'ordinateurs — d'après
+ *  « Histoire des ordinateurs » (Wikipédia). Affichée au-dessus de la frise OS. */
+export const GENERATIONS_TIMELINE: GenEra[] = [
+  {
+    id: 'gen1',
+    gen: '1re',
+    title: 'Tubes à vide',
+    period: '1936 — 1956',
+    color: '#f97316',
+    icon: 'Lightbulb',
+    description:
+      "Les tout premiers ordinateurs électroniques : relais électromécaniques puis tubes à vide — des machines géantes, brûlantes, gourmandes en électricité et perpétuellement en panne. Programmer revient à re-câbler physiquement les panneaux ou à charger des cartes perforées. Née dans les laboratoires et les guerres (balistique, décryptage), l'informatique reste réservée aux armées, aux universités et aux très grandes entreprises.",
+    machines:
+      'Zuse Z1/Z3 • Atanasoff-Berry Computer • Harvard Mark I • Colossus • ENIAC • SSEM • Ferranti Mark I • UNIVAC I • IBM 701/650/704 • Bull Gamma 3',
+    funFact:
+      "L'ENIAC aligne 17 468 tubes à vide, 30 tonnes et 160 kW. Et le premier « bug » de l'histoire est littéral : en 1947, l'équipe de Grace Hopper colle dans le journal de bord un vrai papillon de nuit coincé dans un relais du Harvard Mark II.",
+  },
+  {
+    id: 'gen2',
+    gen: '2e',
+    title: 'Transistors',
+    period: '1957 — 1965',
+    color: '#22c55e',
+    icon: 'Zap',
+    description:
+      "Le transistor (Bell Labs, 1947) chasse le tube à vide : plus petit, froid, fiable et bien moins cher. Les ordinateurs deviennent industriels et séduisent enfin les entreprises. Cette génération invente la microprogrammation (Wilkes, 1955), les langages évolués (FORTRAN 1957, LISP 1958, COBOL 1959), le premier disque dur (IBM RAMAC 305, 1956) et le premier multiprocesseur multitâche (Bull Gamma 60, 1958).",
+    machines:
+      'IBM RAMAC 305 (1er disque dur) • Bull Gamma 60 (1er multiprocesseur) • IBM 1401 (10 000+ vendus) • IBM 1620 • DEC PDP-1 (1er interactif, 1960)',
+    funFact:
+      "Sur le PDP-1 du MIT, des étudiants programment Spacewar! en 1962 : le premier jeu vidéo diffusé à grande échelle. L'ordinateur n'était pas fait pour ça — il n'a jamais vraiment arrêté depuis.",
+  },
+  {
+    id: 'gen3',
+    gen: '3e',
+    title: 'Circuits intégrés',
+    period: '1965 — 1971',
+    color: '#0ea5e9',
+    icon: 'CircuitBoard',
+    description:
+      "Grâce à Jack Kilby (Texas Instruments, 1958) puis Robert Noyce (Fairchild, 1959), plusieurs transistors tiennent désormais sur une seule pastille de silicium. Les machines rapetissent, accélèrent et deviennent abordables. Avec l'IBM System/360 (1964), un même programme tourne sur toute une gamme de modèles : la compatibilité logicielle — et la notion de « famille » d'ordinateurs — est née.",
+    machines:
+      'IBM System/360 • DEC PDP-8 • CDC 6600 (1er supercalculateur, 1964)',
+    funFact:
+      'Le pari System/360 coûte à IBM 5 milliards de dollars — plus que le projet Manhattan. Quant à Kilby, il recevra le prix Nobel de physique en 2000, 42 ans après avoir bricolé son premier circuit intégré, seul au labo pendant que ses collègues étaient en vacances.',
+  },
+  {
+    id: 'gen4',
+    gen: '4e',
+    title: 'Microprocesseurs',
+    period: "1971 → aujourd'hui",
+    color: '#c084fc',
+    icon: 'Microchip',
+    description:
+      "En 1971, Intel grave un processeur complet sur une seule puce : le 4004. En divisant prix et taille par dix, le microprocesseur fait sortir l'ordinateur des salles climatisées : Altair 8800 (1975), Apple II (1977), ZX Spectrum, Commodore 64, Amstrad CPC, IBM PC (1981), Macintosh (1984), Amiga et Atari ST (1985). L'informatique devient personnelle — ce sont précisément ces machines que célèbre cette section.",
+    machines:
+      'Intel 4004 • Altair 8800 • Apple II • ZX Spectrum • Commodore 64 • Amstrad CPC • IBM PC • Macintosh • Amiga / Atari ST',
+    funFact:
+      "L'Altair 8800 se vendait en kit, sans clavier ni écran : on le programmait via ses interrupteurs frontaux. Bill Gates et Paul Allen y adaptent un BASIC — le tout premier produit de Microsoft.",
+  },
+];
+
 /** Frise chronologique des ordinateurs et OS — de la Pascaline (1642) à nos jours.
  *  Jalons historiques d'après « Histoire des ordinateurs » (Wikipédia). */
 export const OS_TIMELINE: OsEra[] = [

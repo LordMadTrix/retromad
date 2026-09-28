@@ -2,17 +2,24 @@ import React, { useMemo, useState } from 'react';
 import {
   Monitor, Cpu, Terminal, Disc3, Mouse, Rainbow, AppWindow,
   Grid2x2, Bird, LayoutGrid, MonitorSmartphone, MonitorCog,
-  ChevronRight, Lightbulb, HardDrive, X, History,
+  ChevronRight, Lightbulb, HardDrive, X, History, Layers,
+  Calculator, Cog, CreditCard, Binary, Zap, Database,
+  CircuitBoard, Microchip, Smartphone,
   Gamepad2, Landmark
 } from 'lucide-react';
 import { System, Game } from '../../../electron/types';
-import { OS_TIMELINE, COMPUTING_SYSTEM_IDS, OsEra } from '../../data/computingData';
+import {
+  OS_TIMELINE, GENERATIONS_TIMELINE,
+  COMPUTING_SYSTEM_IDS, OsEra, GenEra,
+} from '../../data/computingData';
 import { ConsoleLogo } from '../ConsoleLogo';
 
 /** Icônes lucide référencées par nom dans les données. */
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Terminal, FloppyDisk: Disc3, Monitor, SquareTerminal: Cpu, Mouse, Rainbow,
   AppWindow, Grid2x2, Bird, LayoutGrid, MonitorSmartphone, MonitorCog,
+  Calculator, Cog, CreditCard, Binary, Zap, Database, CircuitBoard,
+  Microchip, Layers, Smartphone, Lightbulb,
   Cpu,
 };
 
@@ -30,6 +37,7 @@ export const ComputingView: React.FC<ComputingViewProps> = ({
   onOpenSystemExhibition,
 }) => {
   const [selectedEra, setSelectedEra] = useState<OsEra | null>(null);
+  const [selectedGen, setSelectedGen] = useState<GenEra | null>(null);
   const [isHovered, setIsHovered] = useState<string | null>(null);
 
   /** Machines informatiques réellement présentes dans les données de l'app. */
@@ -60,9 +68,115 @@ export const ComputingView: React.FC<ComputingViewProps> = ({
           </h2>
           <p className="text-sm text-slate-400 max-w-2xl mx-auto">
             La même passion que les consoles, côté micro-ordinateurs : machines
-            cultes et frise des systèmes d'exploitation, d'UNIX (1969) à nos jours.
+            cultes, frise des générations d'ordinateurs (des tubes à vide aux
+            microprocesseurs) et frise des systèmes d'exploitation.
           </p>
         </header>
+
+        {/* ── Frise des générations d'ordinateurs ── */}
+        <section aria-label="Frise des générations d'ordinateurs">
+          <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-cyan-300/90 mb-3">
+            <Layers className="w-4 h-4" />
+            Frise des Générations d'Ordinateurs
+          </h3>
+
+          <div className="relative">
+            {/* Ligne horizontale */}
+            <div className="absolute top-[52px] left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500/60 via-emerald-400/40 to-fuchsia-400/60" />
+
+            <div className="flex gap-2 overflow-x-auto pb-3 pt-1 snap-x">
+              {GENERATIONS_TIMELINE.map((gen) => {
+                const IconCmp = ICONS[gen.icon] || Cpu;
+                return (
+                  <button
+                    key={gen.id}
+                    type="button"
+                    onClick={() => setSelectedGen(selectedGen === gen ? null : gen)}
+                    className="group relative flex flex-col items-center shrink-0 w-[136px] snap-start focus:outline-none"
+                    title={`${gen.gen} génération — ${gen.title}`}
+                  >
+                    {/* Période */}
+                    <span
+                      className="text-[11px] font-mono font-bold mb-1 whitespace-nowrap"
+                      style={{ color: gen.color }}
+                    >
+                      {gen.period}
+                    </span>
+
+                    {/* Point sur la ligne */}
+                    <span
+                      className={`relative z-10 flex items-center justify-center w-11 h-11 rounded-full border-2 transition-transform group-hover:scale-110 ${
+                        selectedGen === gen ? 'scale-110 ring-2 ring-white/40' : ''
+                      }`}
+                      style={{
+                        borderColor: gen.color,
+                        backgroundColor: '#0f172a',
+                        boxShadow: `0 0 12px ${gen.color}55`,
+                      }}
+                    >
+                      <IconCmp className="w-5 h-5" />
+                      <span className="sr-only">{gen.title}</span>
+                    </span>
+
+                    {/* Rang + nom */}
+                    <span className="mt-2 text-[9px] uppercase tracking-widest font-bold text-slate-500">
+                      {gen.gen} génération
+                    </span>
+                    <span
+                      className={`text-[11px] leading-tight text-center font-semibold ${
+                        selectedGen === gen ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                      }`}
+                    >
+                      {gen.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Détail de la génération sélectionnée */}
+          {selectedGen && (
+            <div
+              className="mt-3 rounded-2xl border bg-slate-900/80 p-5 relative"
+              style={{ borderColor: `${selectedGen.color}66` }}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedGen(null)}
+                className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                aria-label="Fermer le détail"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <span
+                  className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold"
+                  style={{ backgroundColor: `${selectedGen.color}22`, color: selectedGen.color }}
+                >
+                  {selectedGen.gen}
+                </span>
+                <h4 className="text-lg font-bold text-white">{selectedGen.title}</h4>
+                <span className="text-xs text-slate-400 font-mono">{selectedGen.period}</span>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed">{selectedGen.description}</p>
+              <div className="mt-3 rounded-lg bg-slate-800/60 border border-slate-700 px-3 py-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">
+                  Machines emblématiques
+                </span>
+                <span className="text-xs font-mono text-slate-300 leading-relaxed">
+                  {selectedGen.machines}
+                </span>
+              </div>
+              {selectedGen.funFact && (
+                <p className="mt-3 text-xs text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-lg px-3 py-2 flex gap-2">
+                  <Lightbulb className="w-4 h-4 shrink-0 text-amber-300" />
+                  {selectedGen.funFact}
+                </p>
+              )}
+            </div>
+          )}
+        </section>
 
         {/* ── Frise chronologique des OS ── */}
         <section aria-label="Frise chronologique des systèmes d'exploitation">
