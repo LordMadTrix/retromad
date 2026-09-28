@@ -620,7 +620,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-retro-800/80 shrink-0">
             <div className="flex items-center space-x-3.5">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-600/30 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-neon">
-                <Settings className="w-5 h-5 animate-spin-slow" />
+                <Settings className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-black text-white tracking-wide flex items-center gap-2">
@@ -658,8 +658,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('games')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'games'
-                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5" />
@@ -670,8 +670,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('systems')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'systems'
-                  ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Cpu className="w-3.5 h-3.5" />
@@ -682,8 +682,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('companies')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'companies'
-                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Landmark className="w-3.5 h-3.5" />
@@ -694,8 +694,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('emulators')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'emulators'
-                  ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
@@ -706,8 +706,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('bios')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'bios'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Cpu className="w-3.5 h-3.5 text-blue-400" />
@@ -718,8 +718,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('extensions')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'extensions'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <DownloadCloud className="w-3.5 h-3.5 text-emerald-400" />
@@ -730,8 +730,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('scraper')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'scraper'
-                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Globe className="w-3.5 h-3.5 text-violet-400" />
@@ -744,8 +744,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('gamepad')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'gamepad'
-                  ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/20 font-black'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5 text-cyan-400" />
@@ -758,8 +758,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('storage')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'storage'
-                  ? 'bg-slate-800 text-white border border-slate-700'
-                  : 'text-slate-400 hover:text-white'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Folder className="w-3.5 h-3.5" />
@@ -770,8 +770,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('kiosk')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'kiosk'
-                  ? 'bg-slate-800 text-white border border-slate-700'
-                  : 'text-slate-400 hover:text-white'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Lock className="w-3.5 h-3.5" />
@@ -782,8 +782,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('appearance')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'appearance'
-                  ? 'bg-slate-800 text-white border border-slate-700'
-                  : 'text-slate-400 hover:text-white'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <Palette className="w-3.5 h-3.5" />
@@ -794,8 +794,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('backups')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'backups'
-                  ? 'bg-cyan-900/60 text-cyan-300 border border-cyan-500/40'
-                  : 'text-slate-400 hover:text-cyan-300'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -806,8 +806,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               onClick={() => setActiveTab('json')}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
                 activeTab === 'json'
-                  ? 'bg-purple-900/60 text-purple-300 border border-purple-500/40'
-                  : 'text-slate-400 hover:text-purple-300'
+                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
               }`}
             >
               <FileJson className="w-3.5 h-3.5" />

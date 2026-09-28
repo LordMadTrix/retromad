@@ -350,12 +350,12 @@ export const Navigation: React.FC<NavigationProps> = ({
                 }}
               className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm ${
                 adminMenuOpen || currentTab === 'settings' || currentTab === 'bios'
-                  ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_10px_rgba(0,242,254,0.3)]'
+                  ? 'bg-slate-800 border-slate-500 text-white'
                   : 'bg-slate-800/80 border-slate-700/60 text-slate-200 hover:text-white hover:border-slate-500'
               }`}
               title="Centre d'administration et configuration complète"
             >
-              <Settings className={`w-3.5 h-3.5 text-cyan-400 ${adminMenuOpen ? 'animate-spin-slow' : ''}`} />
+              <Settings className="w-3.5 h-3.5 text-slate-400" />
               <span className="hidden md:inline">Administration</span>
               <span className="md:hidden">Admin</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} />
@@ -364,9 +364,8 @@ export const Navigation: React.FC<NavigationProps> = ({
             {adminMenuOpen && (
               <div className="absolute left-0 top-full mt-2 w-72 max-h-[82vh] overflow-y-auto bg-[#091228]/98 border border-cyan-500/40 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.85)] backdrop-blur-2xl z-50 py-2 animate-in fade-in zoom-in-95 duration-150">
                 {/* Section Gestion ROMs & Système */}
-                <div className="px-3.5 py-1 text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
+                <div className="px-3.5 py-1 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-800/80 mb-1 flex items-center justify-between">
                   <span>GESTION DE LA LUDOTHÈQUE</span>
-                  <span className="font-mono text-cyan-400/80">CORE</span>
                 </div>
 
                 <MenuAction
@@ -466,9 +465,8 @@ export const Navigation: React.FC<NavigationProps> = ({
                 />
 
                 {/* Section Affichage & Borne */}
-                <div className="px-3.5 py-1 text-[10px] font-black text-pink-400 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
+                <div className="px-3.5 py-1 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
                   <span>AFFICHAGE & BORNE ARCADE</span>
-                  <span className="font-mono text-pink-400/80">STUDIO</span>
                 </div>
 
                 <MenuAction
@@ -516,7 +514,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 )}
 
                 {/* Section Sécurité & Aide */}
-                <div className="px-3.5 py-1 text-[10px] font-black text-amber-400 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
+                <div className="px-3.5 py-1 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-t border-slate-800/80 my-1 flex items-center justify-between">
                   <span>SÉCURITÉ & AIDE</span>
                 </div>
 
