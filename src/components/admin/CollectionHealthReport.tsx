@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Image } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Image, Images, Square } from 'lucide-react';
 import { Game, BiosStatus } from '../../types';
 
 interface CollectionHealthReportProps {
@@ -9,6 +9,8 @@ interface CollectionHealthReportProps {
   onCheckBios?: () => Promise<void>;
   /** Scraper la jaquette d'un jeu précis */
   onScrapeGame?: (game: Game) => Promise<void>;
+  /** Callback de scraping brut (sans notification par jeu) : utilisé par « Tout scraper » */
+  onScrapeGameRaw?: (game: Game) => Promise<void>;
   /** Supprimer un jeu (doublon) */
   onDeleteGame?: (game: Game) => void;
   /** Jeu en cours de scraping (spinner) */
@@ -31,9 +33,67 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
   isCheckingBios = false,
   onCheckBios,
   onScrapeGame,
+  onScrapeGameRaw,
   onDeleteGame,
   scrapingGameId = null,
 }) => {
+  // ── « TOUT SCRAPPER » : chaîne toutes les jaquettes manquantes, avec progression ──
+  const [bulkState, setBulkState] = useState<{
+    running: boolean;
+    done: number;
+    total: number;
+    ok: number;
+    fail: number;
+  } | null>(null);
+  const cancelBulkRef = useRef(false);
+  const gamesRef = useRef(games);
+  useEffect(() => {
+    gamesRef.current = games;
+  }, [games]);
+
+  // Le jeu a-t-il toujours une jaquette manquante dans l'état le plus récent ?
+  const stillMissing = (g: Game): boolean => {
+    const cur = gamesRef.current.find((x) => x.id === g.id);
+    return !cur || (!cur.media?.boxart2d && !cur.media?.boxart3d && !cur.media?.wheel);
+  };
+
+  const handleBulkScrape = async () => {
+    if (!onScrapeGameRaw || bulkState?.running) return;
+    const targets = gamesWithoutBoxart.slice(); // instantané stable pour la boucle
+    if (targets.length === 0) return;
+    cancelBulkRef.current = false;
+    setBulkState({ running: true, done: 0, total: targets.length, ok: 0, fail: 0 });
+    let ok = 0;
+    let fail = 0;
+    let done = 0;
+    for (const g of targets) {
+      if (cancelBulkRef.current) break;
+      try {
+        if (stillMissing(g)) {
+          await onScrapeGameRaw(g);
+          if (!stillMissing(g)) ok++;
+          else fail++;
+        } else {
+          ok++; // déjà résolu entre-temps (scraper manuel pendant la chaîne…)
+        }
+      } catch {
+        fail++;
+      }
+      done++;
+      setBulkState({
+        running: !cancelBulkRef.current && done < targets.length,
+        done,
+        total: targets.length,
+        ok,
+        fail,
+      });
+    }
+    setBulkState((prev) => (prev ? { ...prev, running: false } : prev));
+  };
+
+  const stopBulkScrape = () => {
+    cancelBulkRef.current = true;
+  };
   // ROMs sans jaquette
   const gamesWithoutBoxart = useMemo(
     () => games.filter((g) => !g.media?.boxart2d && !g.media?.boxart3d && !g.media?.wheel),
@@ -88,17 +148,70 @@ export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
           </div>
         </div>
         {onCheckBios && (
-          <button
-            type="button"
-            onClick={() => onCheckBios()}
-            disabled={isCheckingBios}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 transition flex items-center gap-1.5 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isCheckingBios ? 'animate-spin' : ''}`} />
-            Revérifier les BIOS
-          </button>
+          <div className="flex items-center gap-2">
+            {onScrapeGameRaw && (
+              <button
+                type="button"
+                onClick={handleBulkScrape}
+                disabled={!!bulkState?.running || gamesWithoutBoxart.length === 0}
+                className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-40"
+                title={`Scraper automatiquement les ${gamesWithoutBoxart.length} jaquettes manquantes, l'une après l'autre`}
+              >
+                <Images className="w-3.5 h-3.5" />
+                {bulkState?.running
+                  ? `Scraper… ${bulkState.done}/${bulkState.total}`
+                  : `Tout scraper (${gamesWithoutBoxart.length})`}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onCheckBios()}
+              disabled={isCheckingBios}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 transition flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingBios ? 'animate-spin' : ''}`} />
+              Revérifier les BIOS
+            </button>
+          </div>
         )}
       </div>
+
+      {/* Progression du scraping en série */}
+      {bulkState && (
+        <div className={`${cardCls} flex items-center gap-3`}>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-300">
+                {bulkState.running
+                  ? `Scraping en série… ${bulkState.done}/${bulkState.total}`
+                  : bulkState.done > 0
+                  ? `Terminé : ${bulkState.done}/${bulkState.total}`
+                  : 'Scraping annulé'}
+              </span>
+              <span className="text-[10px] font-mono text-slate-500">
+                {bulkState.ok} OK · {bulkState.fail} échec{bulkState.fail > 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-cyan-400 transition-all duration-200"
+                style={{ width: `${bulkState.total > 0 ? Math.round((bulkState.done / bulkState.total) * 100) : 0}%` }}
+              />
+            </div>
+          </div>
+          {bulkState.running && (
+            <button
+              type="button"
+              onClick={stopBulkScrape}
+              className="shrink-0 px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold transition flex items-center gap-1"
+              title="Arrêter le scraping en cours (les jaquettes déjà récupérées sont conservées)"
+            >
+              <Square className="w-3 h-3 fill-current" />
+              Stop
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* 1. Jaquettes manquantes */}

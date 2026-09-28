@@ -866,6 +866,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   isCheckingBios={isCheckingBios}
                   onCheckBios={onCheckBios}
                   onScrapeGame={handleHealthScrape}
+                  onScrapeGameRaw={onScrapeGame}
                   onDeleteGame={(g) => handleDeleteGame(g.id)}
                   scrapingGameId={healthScrapingId}
                 />
