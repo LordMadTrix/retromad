@@ -27,6 +27,8 @@ interface NavigationProps {
   onToggleBgm?: () => void;
   totalGames: number;
   isKioskMode: boolean;
+  /** Régie admin déverrouillée par PIN : sans elle, tout le menu Administration est masqué */
+  isAdminUnlocked?: boolean;
   onEnterKiosk: () => void;
   onUnlockKiosk: () => void;
   onOpenQuickStart?: () => void;
@@ -86,6 +88,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   onToggleBgm,
   totalGames,
   isKioskMode,
+  isAdminUnlocked = false,
   onEnterKiosk,
   onUnlockKiosk,
   onOpenQuickStart,
@@ -188,9 +191,13 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold flex items-center gap-0.5">
                   <Lock className="w-2.5 h-2.5" />KIOSK
                 </span>
-              ) : (
+              ) : isAdminUnlocked ? (
                 <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold flex items-center gap-0.5">
                   <ShieldCheck className="w-2.5 h-2.5" />ADMIN
+                </span>
+              ) : (
+                <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[9px] font-bold flex items-center gap-0.5">
+                  <Lock className="w-2.5 h-2.5" />VERROUILLÉ
                 </span>
               )}
             </div>
@@ -388,8 +395,8 @@ export const Navigation: React.FC<NavigationProps> = ({
           )}
         </div>
 
-        {/* ── MENU DÉROULANT : ADMINISTRATION (Tout l'admin regroupé) ── */}
-        {!isKioskMode && (
+        {/* ── MENU DÉROULANT : ADMINISTRATION (réservé à la régie déverrouillée par PIN) ── */}
+        {!isKioskMode && isAdminUnlocked && (
           <div className="relative shrink-0" ref={adminRef}>
             <button
               type="button"

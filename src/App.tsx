@@ -16,6 +16,7 @@ import { CompanyEditModal } from './components/CompanyEditModal';
 import { ScraperModal } from './components/ScraperModal';
 import { ExtensionsDownloaderModal } from './components/ExtensionsDownloaderModal';
 import { KioskPinModal } from './components/KioskPinModal';
+import { AdminLockScreen } from './components/AdminLockScreen';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { ConsoleExhibitionModal } from './components/ConsoleExhibitionModal';
 import { ComputingView } from './components/extended/ComputingView';
@@ -145,8 +146,10 @@ export const App: React.FC = () => {
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
 
-  // Profil Kiosk vs Admin
+  // Profil Kiosk vs Admin : la régie (administration) est verrouillée par PIN
+  // tant qu'elle n'a pas été déverrouillée — le Kiosque (jeu) reste libre.
   const [isKioskMode, setIsKioskMode] = useState(false);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
   // Données
@@ -754,10 +757,11 @@ export const App: React.FC = () => {
     showNotification('Mode Kiosk activé 🔒. Paramètres et modifications verrouillés.', 'info');
   };
 
-  // Déverrouillage réussi du code PIN
+  // Déverrouillage réussi du code PIN (sortie Kiosque OU écran de verrouillage régie)
   const handleUnlockKioskSuccess = async () => {
     playUnlock();
     setIsKioskMode(false);
+    setIsAdminUnlocked(true);
     setIsPinModalOpen(false);
     if (window.api && settings.kioskFullscreen) {
       await window.api.setKioskMode(false);
@@ -1421,6 +1425,18 @@ export const App: React.FC = () => {
           neonGlows={effNeonGlows}
           animations={effAnimations}
         />
+      ) : !isAdminUnlocked ? (
+        /* RÉGIE VERROUILLÉE : aucun outil d'administration accessible sans PIN.
+           Le Kiosque (jeu) reste libre d'accès depuis cet écran. */
+        <AdminLockScreen
+          correctPin={settings.kioskPin || '1234'}
+          onUnlock={() => {
+            setIsAdminUnlocked(true);
+            showNotification('Régie admin déverrouillée 🛡️ — administration du système autorisée.', 'success');
+          }}
+          onEnterKiosk={handleEnterKiosk}
+          soundEnabled={settings.soundEnabled}
+        />
       ) : (
         <>
           {/* Barre de navigation principale */}
@@ -1454,6 +1470,7 @@ export const App: React.FC = () => {
             }}
             totalGames={visibleGames.length}
             isKioskMode={isKioskMode}
+            isAdminUnlocked={isAdminUnlocked}
             onEnterKiosk={handleEnterKiosk}
             onUnlockKiosk={() => setIsPinModalOpen(true)}
             selectedGenre={selectedGenre}
@@ -1671,7 +1688,7 @@ export const App: React.FC = () => {
                 setExhibitionCompany(comp);
               }}
               onEditCompany={(comp) => {
-                if (!isKioskMode) {
+                if (!isKioskMode && isAdminUnlocked) {
                   setDirectEditingCompany(comp);
                 }
               }}
@@ -1847,7 +1864,7 @@ export const App: React.FC = () => {
         onToggleFavorite={handleToggleFavorite}
         onScrapeGame={handleScrapeSingleGame}
         onEdit={(game) => {
-          if (!isKioskMode) {
+          if (!isKioskMode && isAdminUnlocked) {
             setDirectEditingGame(game);
           }
         }}
@@ -1878,8 +1895,8 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Centre d'Administration en superposition */}
-      {!isKioskMode && isSettingsOpen && (
+      {/* Centre d'Administration en superposition (régie déverrouillée uniquement) */}
+      {!isKioskMode && isAdminUnlocked && isSettingsOpen && (
         <AdminHubModal
           isOpen={isSettingsOpen}
           onClose={() => {
@@ -2022,7 +2039,7 @@ export const App: React.FC = () => {
           }
         }}
         onEditSystem={(sys) => {
-          if (!isKioskMode) {
+          if (!isKioskMode && isAdminUnlocked) {
             setDirectEditingSystem(sys);
           }
         }}
@@ -2048,7 +2065,7 @@ export const App: React.FC = () => {
           setCurrentTab('games');
         }}
         onEditCompany={(comp) => {
-          if (!isKioskMode) {
+          if (!isKioskMode && isAdminUnlocked) {
             setDirectEditingCompany(comp);
           }
         }}
@@ -2056,7 +2073,7 @@ export const App: React.FC = () => {
       />
 
       {/* Modale d'Édition Directe de Jeu (Admin) */}
-      {!isKioskMode && directEditingGame && (
+      {!isKioskMode && isAdminUnlocked && directEditingGame && (
         <GameEditModal
           game={directEditingGame}
           systems={systems}
@@ -2068,7 +2085,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Modale d'Édition Directe de Console (Admin) */}
-      {!isKioskMode && directEditingSystem && (
+      {!isKioskMode && isAdminUnlocked && directEditingSystem && (
         <SystemEditModal
           system={directEditingSystem}
           companies={companies}
@@ -2079,7 +2096,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Modale d'Édition Directe de Firme (Admin) */}
-      {!isKioskMode && directEditingCompany && (
+      {!isKioskMode && isAdminUnlocked && directEditingCompany && (
         <CompanyEditModal
           company={directEditingCompany}
           isOpen={!!directEditingCompany}
@@ -2631,9 +2648,10 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* ASSISTANT DE DÉMARRAGE RAPIDE & PREMIER LANCEMENT */}
-      <QuickStartOnboardingModal
-        isOpen={isOnboardingOpen}
+      {/* ASSISTANT DE DÉMARRAGE RAPIDE & PREMIER LANCEMENT (régie déverrouillée) */}
+      {isAdminUnlocked && (
+        <QuickStartOnboardingModal
+          isOpen={isOnboardingOpen}
         onClose={() => setIsOnboardingOpen(false)}
         settings={settings}
         onSaveSettings={(partial) => {
@@ -2648,14 +2666,15 @@ export const App: React.FC = () => {
         }}
         onEnterKiosk={handleEnterKiosk}
         sampleGamesCount={visibleGames.length}
-        onPlaySound={(type) => {
-          if (type === 'select') playSelect();
-          if (type === 'coin') playCoin();
-          if (type === 'move') playMove();
-          if (type === 'launch') playUnlock();
-          if (type === 'unlock') playUnlock();
-        }}
-      />
+          onPlaySound={(type) => {
+            if (type === 'select') playSelect();
+            if (type === 'coin') playCoin();
+            if (type === 'move') playMove();
+            if (type === 'launch') playUnlock();
+            if (type === 'unlock') playUnlock();
+          }}
+        />
+      )}
     </div>
   );
 };
