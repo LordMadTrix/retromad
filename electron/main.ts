@@ -255,6 +255,10 @@ ipcMain.handle('select-directory', async () => {
 // gestionnaire de fichiers de l'OS — depuis le rapport santé.
 ipcMain.handle('open-bios-folder', async (_event, systemId: string) => {
   try {
+    if (!systemId || typeof systemId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(systemId)) {
+      console.warn('[RetroMad] open-bios-folder: identifiant système invalide :', systemId);
+      return false;
+    }
     const settings = storage.getSettings();
     const biosRoot = settings.biosDir?.trim()
       ? settings.biosDir.trim()
@@ -264,7 +268,12 @@ ipcMain.handle('open-bios-folder', async (_event, systemId: string) => {
       ? biosRoot
       : path.join(app.getAppPath(), biosRoot);
     // Le checker organise par système : public/bios/<systemId>/…
-    const target = path.join(root, systemId);
+    const safeSystemId = path.basename(systemId);
+    const target = path.resolve(root, safeSystemId);
+    if (!target.startsWith(path.resolve(root))) {
+      console.warn('[RetroMad] open-bios-folder: tentative de traversée de chemin :', systemId);
+      return false;
+    }
     await fs.promises.mkdir(target, { recursive: true });
     await shell.openPath(target);
     return true;
@@ -490,6 +499,10 @@ ipcMain.handle('install-all-extensions', async () => {
 });
 
 ipcMain.handle('install-extension', async (_, coreName: string) => {
+  if (!coreName || typeof coreName !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(coreName)) {
+    console.warn('[RetroMad] install-extension: nom de cœur invalide :', coreName);
+    return false;
+  }
   return extensionInstaller.installExtension(coreName);
 });
 

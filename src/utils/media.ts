@@ -14,7 +14,7 @@ export function resolveMediaUrl(path?: string): string | undefined {
     return path;
   }
   // En environnement Electron natif
-  if (typeof window !== 'undefined' && (window as any).isElectron) {
+  if (typeof window !== 'undefined' && window.isElectron) {
     return `retromad-media://${path}`;
   }
   // En environnement Web standard

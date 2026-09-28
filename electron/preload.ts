@@ -1,5 +1,12 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company } from './types';
+
+export interface ScrapeProgressData {
+  total: number;
+  current: number;
+  currentGameTitle: string;
+  systemId?: string;
+}
 
 // Marqueur d'environnement bureau (différencie Electron du mode navigateur/web)
 contextBridge.exposeInMainWorld('isElectron', true);
@@ -25,14 +32,14 @@ export const API = {
   scanRoms: (): Promise<Game[]> => ipcRenderer.invoke('scan-roms'),
   // Notification de l'auto-scan initial (bibliothèque vide -> import auto)
   refreshGamesAfterAutoScan: (callback: (count: number) => void) => {
-    const handler = (_: any, count: number) => callback(count);
+    const handler = (_: IpcRendererEvent, count: number) => callback(count);
     ipcRenderer.on('games-auto-imported', handler);
     return () => {
       ipcRenderer.removeListener('games-auto-imported', handler);
     };
   },
   onScanProgress: (callback: (data: { count: number; file: string }) => void) => {
-    const handler = (_: any, data: any) => callback(data);
+    const handler = (_: IpcRendererEvent, data: { count: number; file: string }) => callback(data);
     ipcRenderer.on('scan-progress', handler);
     return () => {
       ipcRenderer.removeListener('scan-progress', handler);
@@ -42,8 +49,8 @@ export const API = {
   // Scraping
   scrapeGame: (game: Game): Promise<Game> => ipcRenderer.invoke('scrape-game', game),
   scrapeAll: (): Promise<Game[]> => ipcRenderer.invoke('scrape-all'),
-  onScrapeProgress: (callback: (data: any) => void) => {
-    const handler = (_: any, data: any) => callback(data);
+  onScrapeProgress: (callback: (data: ScrapeProgressData) => void) => {
+    const handler = (_: IpcRendererEvent, data: ScrapeProgressData) => callback(data);
     ipcRenderer.on('scrape-progress', handler);
     return () => {
       ipcRenderer.removeListener('scrape-progress', handler);
@@ -70,7 +77,7 @@ export const API = {
   createRomsFolders: (): Promise<{ created: number; total: number }> =>
     ipcRenderer.invoke('create-roms-folders'),
   onExtensionProgress: (callback: (data: ExtensionProgress) => void) => {
-    const handler = (_: any, data: any) => callback(data);
+    const handler = (_: IpcRendererEvent, data: ExtensionProgress) => callback(data);
     ipcRenderer.on('extension-progress', handler);
     return () => {
       ipcRenderer.removeListener('extension-progress', handler);

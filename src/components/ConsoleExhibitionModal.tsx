@@ -77,11 +77,11 @@ export const ConsoleExhibitionModal: React.FC<ConsoleExhibitionModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 select-none animate-in fade-in duration-200"
+      className="retromad-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-5xl max-h-[92vh] bg-retro-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        className="retromad-modal-card max-w-5xl max-h-[92vh]"
       >
         {/* BANNIÈRE SUPÉRIEURE DU MUSÉE */}
         <div
@@ -154,10 +154,10 @@ export const ConsoleExhibitionModal: React.FC<ConsoleExhibitionModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="retromad-modal-close-btn"
               title="Fermer l'exposition (Échap)"
             >
-              <X className="w-6 h-6" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

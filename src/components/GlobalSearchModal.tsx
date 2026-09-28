@@ -110,14 +110,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       className="fixed inset-0 z-[200] flex items-start justify-center pt-[8vh] px-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      {/* Fond sombre scintillant */}
-      <div className="absolute inset-0 bg-retro-900/85 backdrop-blur-md" onClick={onClose} />
+      {/* Fond sombre feutré */}
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-b from-[#0e1a42] to-[#091230] border-2 border-cyan-300/40 shadow-[0_0_60px_rgba(0,242,254,0.25)] overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-[#0c101c]/95 border border-slate-800/80 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden">
         {/* En-tête Recherche */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-700/70 bg-[#0a1432]/80">
-          <Search className="w-5 h-5 text-retro-accent mr-3 shrink-0" />
+        <div className="flex items-center px-5 py-3.5 border-b border-slate-800/80 bg-[#101524]/75">
+          <Search className="w-5 h-5 text-cyan-400 mr-3 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -125,7 +125,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Rechercher un jeu, une console, un développeur..."
-            className="flex-1 bg-transparent text-slate-100 placeholder-slate-500 text-base font-medium outline-none"
+            className="flex-1 bg-transparent text-slate-100 placeholder-slate-500 text-sm font-medium outline-none"
           />
           <div className="flex items-center space-x-2 shrink-0">
             {query && (
@@ -138,9 +138,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-mono transition"
+              className="px-2 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60 text-slate-400 hover:text-slate-200 text-xs font-mono transition"
             >
-              ESC
+              Échap
             </button>
           </div>
         </div>

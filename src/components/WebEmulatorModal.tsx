@@ -139,9 +139,9 @@ export const WebEmulatorModal: React.FC<WebEmulatorModalProps> = ({ game, onClos
 
   // EmulatorJS ne peut pas être démonté proprement : on recharge la page à la fermeture
   const handleClose = () => {
-    if (mountedRef.current && (window as any).EJS_emulator) {
+    if (mountedRef.current && window.EJS_emulator) {
       try {
-        (window as any).EJS_emulator.callEvent?.('exit');
+        window.EJS_emulator.callEvent?.('exit');
       } catch {
         /* noop */
       }
@@ -155,8 +155,8 @@ export const WebEmulatorModal: React.FC<WebEmulatorModalProps> = ({ game, onClos
     // EmulatorJS déclare des globales (EJS_STORAGE...) : le re-monter deux fois
     // (React StrictMode en dev) fait planter "Identifier already declared".
     // On mémorise l'élément et on ne ré-exécute le script qu'une seule fois.
-    if ((window as any).__retromad_ejs_loaded) return;
-    (window as any).__retromad_ejs_loaded = true;
+    if (window.__retromad_ejs_loaded) return;
+    window.__retromad_ejs_loaded = true;
 
     // ROM servie par le serveur web (public/roms/...), ou blob:/http fourni
     // par App.tsx quand la ROM a été lue depuis le disque (mode bureau).
@@ -168,18 +168,18 @@ export const WebEmulatorModal: React.FC<WebEmulatorModalProps> = ({ game, onClos
     const core = EJS_CORE_BY_SYSTEM[game.systemId] || 'nes';
 
     // Config globale EmulatorJS
-    (window as any).EJS_player = '#ejs-game-container';
-    (window as any).EJS_core = core;
-    (window as any).EJS_gameUrl = romUrl;
-    (window as any).EJS_gameName = game.cleanTitle || game.title;
-    (window as any).EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
-    (window as any).EJS_startOnLoaded = true;
+    window.EJS_player = '#ejs-game-container';
+    window.EJS_core = core;
+    window.EJS_gameUrl = romUrl;
+    window.EJS_gameName = game.cleanTitle || game.title;
+    window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+    window.EJS_startOnLoaded = true;
     // Langue forcée en anglais : le CDN ne fournit pas les fichiers de langue
     // fr (404 -> "Missing language" -> crash setupKeys qui bloque le canvas).
-    (window as any).EJS_language = 'en-US';
+    window.EJS_language = 'en-US';
     // Fonctions avancées activées
-    (window as any).EJS_volume = 0.8; // volume par défaut
-    (window as any).EJS_Buttons = {
+    window.EJS_volume = 0.8; // volume par défaut
+    window.EJS_Buttons = {
       playPause: true,
       restart: true,
       mute: true,
@@ -196,8 +196,8 @@ export const WebEmulatorModal: React.FC<WebEmulatorModalProps> = ({ game, onClos
       quickLoad: true,
       contextMenu: false,
     };
-    (window as any).EJS_defaultOptions = { 'save-state-location': 'browser' }; // états sauvés localement
-    (window as any).EJS_fullscreen = true; // bouton plein écran disponible
+    window.EJS_defaultOptions = { 'save-state-location': 'browser' }; // états sauvés localement
+    window.EJS_fullscreen = true; // bouton plein écran disponible
 
     const script = document.createElement('script');
     script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';

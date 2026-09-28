@@ -52,11 +52,11 @@ export function useAudio(
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [isBgmActive, setIsBgmActive] = useState(bgmEnabled);
   const bgmStepRef = useRef(0);
-  const bgmIntervalRef = useRef<any>(null);
+  const bgmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getAudioContext = useCallback(() => {
     if (!audioCtxRef.current) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         audioCtxRef.current = new AudioCtx();
       }

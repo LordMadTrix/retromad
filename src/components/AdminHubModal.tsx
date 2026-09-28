@@ -635,22 +635,21 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-hidden animate-in fade-in duration-200">
-        <div className="relative w-full max-w-7xl h-[94vh] bg-retro-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto">
+      <div className="retromad-modal-overlay">
+        <div className="retromad-modal-card max-w-7xl h-[94vh]">
           {/* EN-TÊTE PRINCIPAL */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-retro-800/80 shrink-0">
+          <div className="retromad-modal-header">
             <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-600/30 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-neon">
-                <Settings className="w-5 h-5 text-cyan-400" />
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                <Settings className="w-4 h-4 text-cyan-400" />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-black text-white tracking-wide flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
                   <span>Centre d'Administration RetroMad</span>
-                  <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                    Contrôle & Gestion Universelle
+                  <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    Contrôle & Gestion
                   </span>
-                  {/* Indicateur de build : hash court du commit, injecté par Vite.
-                      « build ? » rouge = bundle périmé (relancer npm run build + redémarrer). */}
+                  {/* Indicateur de build : hash court du commit, injecté par Vite. */}
                   <span
                     className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${
                       APP_BUILD_HASH
@@ -682,10 +681,10 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-slate-700/60 text-slate-400 hover:text-white transition"
-              title="Fermer le Centre Admin"
+              className="retromad-modal-close-btn"
+              title="Fermer le Centre Admin (Échap)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 

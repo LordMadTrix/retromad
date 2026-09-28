@@ -69,24 +69,24 @@ export const RetroManualsViewerModal: React.FC<RetroManualsViewerModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0b1329] border border-cyan-500/30 rounded-2xl w-full max-w-5xl max-h-[94vh] flex flex-col shadow-[0_0_50px_rgba(0,242,254,0.15)] overflow-hidden">
+    <div className="retromad-modal-overlay">
+      <div className="retromad-modal-card max-w-5xl max-h-[94vh]">
         {/* Top bar */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 bg-[#0d1838] flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
-              <BookOpen className="w-6 h-6 text-slate-950" />
+        <div className="retromad-modal-header">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <BookOpen className="w-5 h-5 text-amber-400" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-xl font-black text-white tracking-wide">
+                <h2 className="text-base font-bold text-white tracking-wide">
                   Livret & Manuel d'Époque
                 </h2>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono font-bold">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono font-semibold">
                   {currentManual.systemName} · {currentManual.releaseYear}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11px] text-slate-400">
                 Notice officielle numérisée, plans et secrets de jeu
               </p>
             </div>
@@ -133,9 +133,10 @@ export const RetroManualsViewerModal: React.FC<RetroManualsViewerModalProps> = (
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="retromad-modal-close-btn"
+              title="Fermer le manuel (Échap)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

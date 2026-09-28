@@ -1,4 +1,6 @@
 // Types pour les 8 modules étendus et le gestionnaire de musique
+import { RetroAchievement, GameCheat, SaveStateItem } from './retroFeatures';
+import { Game, System } from '../../electron/types';
 
 export interface GamePlayStats {
   gameId: string;
@@ -114,13 +116,13 @@ export interface NomadBackupPackage {
   machineId: string;
   profiles: UserProfile[];
   playStats: GamePlayStats[];
-  achievements: any[];
-  cheats: any[];
-  saveStates: any[];
-  bezelConfig?: any;
+  achievements: RetroAchievement[];
+  cheats: GameCheat[];
+  saveStates: SaveStateItem[];
+  bezelConfig?: Record<string, unknown>;
   customMusicCount?: number;
-  games?: any[];
-  systems?: any[];
+  games?: Game[];
+  systems?: System[];
 }
 
 // Module 7 : Overlays de Consoles Portables

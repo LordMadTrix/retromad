@@ -631,9 +631,8 @@ export const App: React.FC = () => {
   // Auto-import desktop : le main process peut scanner les ROMs au démarrage
   // (bibliothèque vide) et notifier le renderer pour rafraîchir la liste.
   useEffect(() => {
-    const api = window.api as any;
-    if (!api?.on || !api?.invoke) return;
-    const handler = async (_: unknown, count: number) => {
+    if (!window.api?.refreshGamesAfterAutoScan) return;
+    const unsub = window.api.refreshGamesAfterAutoScan(async (count: number) => {
       try {
         const fresh = await window.api!.getGames();
         if (fresh?.length) {
@@ -644,13 +643,10 @@ export const App: React.FC = () => {
       } catch (e) {
         console.warn('Rafraîchissement post auto-scan échoué:', e);
       }
+    });
+    return () => {
+      if (typeof unsub === 'function') unsub();
     };
-    // L'API preload n'expose pas ipcRenderer.on génériquement : on passe par
-    // l'écouteur dédié si disponible, sinon on interroge après coup.
-    if (typeof api.refreshGamesAfterAutoScan === 'function') {
-      api.refreshGamesAfterAutoScan(handler);
-    }
-    return () => {};
   }, []);
 
   // Écouteur de progression du scraping
@@ -920,7 +916,7 @@ export const App: React.FC = () => {
   // serveur web en desktop : les chemins /roms/... ou absolus sont traduits
   // en fichier réel avant lecture).
   const launchWithIntegratedPlayer = async (game: Game) => {
-    const readRom = (window.api as any)?.readRomFile;
+    const readRom = window.api?.readRomFile;
     try {
       if (typeof readRom === 'function' && game.path && !game.path.startsWith('http') && !game.path.startsWith('blob:')) {
         // Traduire le chemin en fichier disque réel :
@@ -993,7 +989,7 @@ export const App: React.FC = () => {
 
     // window.api existe aussi en mode web (simulation) : on détecte le vrai bureau
     // Electron via le flag exposé par le preload, sinon émulation web EmulatorJS.
-    const isDesktop = typeof window !== 'undefined' && !!(window as any).isElectron;
+    const isDesktop = typeof window !== 'undefined' && !!window.isElectron;
     if (!isDesktop) {
       setWebEmulatorGame(game);
       return;

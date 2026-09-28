@@ -4,11 +4,11 @@
   "description": "Frontend Retrogaming Moderne compatible Windows et Linux",
   "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 3000",
+    "dev": "vite --host 0.0.0.0 --port 5173",
     "build": "vite build && tsc -p tsconfig.electron.json",
     "build:web": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
-    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "preview": "vite preview --host 0.0.0.0 --port 5173",
     "lint": "tsc --noEmit",
     "test": "npx tsx test/verify.ts"
   },

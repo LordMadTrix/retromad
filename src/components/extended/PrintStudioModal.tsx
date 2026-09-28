@@ -232,25 +232,25 @@ export const PrintStudioModal: React.FC<PrintStudioModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-slate-950 border border-emerald-500/40 rounded-3xl shadow-2xl shadow-emerald-500/10 overflow-hidden text-slate-100">
+    <div className="retromad-modal-overlay">
+      <div className="retromad-modal-card max-w-5xl max-h-[92vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-900/60">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Printer className="w-6 h-6" />
+        <div className="retromad-modal-header">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center shrink-0">
+              <Printer className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-xl font-black tracking-wider text-white uppercase">
-                  Print Studio : Jaquettes & Stickers Imprimables
+                <h2 className="text-base font-bold text-white tracking-wide">
+                  Print Studio : Jaquettes & Stickers
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[10px] font-semibold uppercase">
                   Échelle Réelle 1:1
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-400">
                 Générez des boîtiers complets et des étiquettes de cartouches prêts à imprimer et découper.
               </p>
             </div>
@@ -259,7 +259,7 @@ export const PrintStudioModal: React.FC<PrintStudioModalProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrint}
-              className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/25 flex items-center space-x-2 transition"
+              className="retromad-btn-primary"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimer (1:1)</span>
@@ -267,9 +267,10 @@ export const PrintStudioModal: React.FC<PrintStudioModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition"
+              className="retromad-modal-close-btn"
+              title="Fermer (Échap)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

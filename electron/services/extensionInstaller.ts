@@ -3,7 +3,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { storage } from './storage';
 import { SYSTEMS } from '../data/systems';
 
@@ -68,11 +68,12 @@ export class ExtensionInstallerService {
    * Vérifie si un exécutable autonome existe dans le PATH
    */
   private isStandaloneInstalled(cmd: string): boolean {
+    if (!cmd || !/^[a-zA-Z0-9._-]+$/.test(cmd)) return false;
     const isWindows = process.platform === 'win32';
-    const checkCmd = isWindows ? `where ${cmd}` : `which ${cmd}`;
+    const checkBinary = isWindows ? 'where' : 'which';
     try {
-      execSync(checkCmd, { stdio: 'ignore' });
-      return true;
+      const res = spawnSync(checkBinary, [cmd], { stdio: 'ignore' });
+      return res.status === 0;
     } catch {
       return false;
     }
@@ -180,42 +181,52 @@ export class ExtensionInstallerService {
   }
 
   /**
-   * Extrait une archive ZIP dans le dossier des cœurs
+   * Extrait une archive ZIP dans le dossier des cœurs de façon sécurisée (sans injection shell)
    */
   private extractZip(zipPath: string, targetDir: string): boolean {
     const isWindows = process.platform === 'win32';
 
     if (isWindows) {
       try {
-        execSync(
-          `powershell -command "Expand-Archive -Path '${zipPath}' -DestinationPath '${targetDir}' -Force"`,
-          { stdio: 'ignore' }
-        );
-        return true;
+        const res = spawnSync('powershell', [
+          '-NoProfile',
+          '-NonInteractive',
+          '-Command',
+          'Expand-Archive',
+          '-LiteralPath',
+          zipPath,
+          '-DestinationPath',
+          targetDir,
+          '-Force',
+        ], { stdio: 'ignore' });
+        return res.status === 0;
       } catch (err) {
         console.error('Erreur extraction PowerShell:', err);
         return false;
       }
     } else {
       try {
-        execSync(`unzip -o -q "${zipPath}" -d "${targetDir}"`, { stdio: 'ignore' });
-        return true;
-      } catch {
-        try {
-          execSync(`7z x -y -o"${targetDir}" "${zipPath}"`, { stdio: 'ignore' });
-          return true;
-        } catch (err2) {
-          console.error('Erreur extraction unzip/7z:', err2);
-          return false;
-        }
+        const res = spawnSync('unzip', ['-o', '-q', zipPath, '-d', targetDir], { stdio: 'ignore' });
+        if (res.status === 0) return true;
+      } catch {}
+      try {
+        const res7z = spawnSync('7z', ['x', '-y', `-o${targetDir}`, zipPath], { stdio: 'ignore' });
+        return res7z.status === 0;
+      } catch (err2) {
+        console.error('Erreur extraction unzip/7z:', err2);
+        return false;
       }
     }
   }
 
   /**
-   * Installe une extension (cœur Libretro) spécifique
+   * Installe une extension (cœur Libretro) spécifique avec validation stricte du nom
    */
   async installExtension(coreName: string): Promise<boolean> {
+    if (!coreName || !/^[a-zA-Z0-9_-]+$/.test(coreName)) {
+      console.error(`[ExtensionInstaller] Nom de cœur invalide ou suspect rejeté : "${coreName}"`);
+      return false;
+    }
     const isWindows = process.platform === 'win32';
     const coresDir = this.getCoresDir();
     const ext = isWindows ? '.dll' : '.so';
@@ -240,7 +251,7 @@ export class ExtensionInstallerService {
 
       // Nettoyer le zip temporaire
       try {
-        fs.unlinkSync(tempZip);
+        if (fs.existsSync(tempZip)) fs.unlinkSync(tempZip);
       } catch {
         // Ignore
       }

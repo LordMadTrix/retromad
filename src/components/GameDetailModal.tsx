@@ -62,10 +62,10 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
   const sizeMb = (game.size / (1024 * 1024)).toFixed(2);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 select-none animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-retro-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="retromad-modal-overlay">
+      <div className="retromad-modal-card max-w-4xl max-h-[90vh]">
         {/* En-tête avec bouton fermer */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-retro-800/60">
+        <div className="retromad-modal-header">
           <div className="flex items-center space-x-3.5">
             {system && (
               <div
@@ -97,9 +97,10 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-slate-700/60 text-slate-400 hover:text-white transition"
+              className="retromad-modal-close-btn"
+              title="Fermer (Échap)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

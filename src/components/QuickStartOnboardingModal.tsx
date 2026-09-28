@@ -82,23 +82,23 @@ export const QuickStartOnboardingModal: React.FC<QuickStartOnboardingModalProps>
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900 border-2 border-retro-accent/60 rounded-3xl shadow-[0_0_50px_rgba(0,242,254,0.3)] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="retromad-modal-overlay">
+      <div className="retromad-modal-card max-w-2xl max-h-[92vh]">
         {/* En-tête avec barre de progression */}
-        <div className="px-6 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-retro-accent via-retro-purple to-retro-pink flex items-center justify-center text-white shadow-neon">
-              <Sparkles className="w-5 h-5 text-retro-900 animate-spin-slow" />
+        <div className="retromad-modal-header">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+              <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
                 <span>Assistant Premier Démarrage</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-retro-accent/20 text-retro-accent border border-retro-accent/40">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
                   Étape {currentStep}/4
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
-                Configurez votre expérience RetroMAD en moins d'une minute
+              <p className="text-[11px] text-slate-400">
+                Configurez votre expérience RetroMad en moins d'une minute
               </p>
             </div>
           </div>
@@ -108,10 +108,10 @@ export const QuickStartOnboardingModal: React.FC<QuickStartOnboardingModalProps>
               onPlaySound?.('move');
               onClose();
             }}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            title="Passer et fermer"
+            className="retromad-modal-close-btn"
+            title="Passer et fermer (Échap)"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
