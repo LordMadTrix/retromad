@@ -63,8 +63,22 @@ function createWindow() {
   // YouTube rejette les lecteurs intégrés depuis une origine nulle (file://)
   // avec « Erreur 153 ». On présente une origine https personnalisée via le
   // header Referer pour que l'embed soit accepté.
+  // NB : les flux vidéo réels viennent de sous-domaines variable
+  // (rr1---sn-xxxx.googlevideo.com…) — sans le joker *.googlevideo.com,
+  // les streams partaient sans Origine usurpée et le player affichait
+  // « Vidéo pas disponible » malgré un embed d'iframe accepté.
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
-    { urls: ['https://www.youtube.com/*', 'https://www.youtube-nocookie.com/*', 'https://googlevideo.com/*'] },
+    {
+      urls: [
+        'https://www.youtube.com/*',
+        'https://youtube.com/*',
+        'https://www.youtube-nocookie.com/*',
+        'https://youtube-nocookie.com/*',
+        'https://googlevideo.com/*',
+        'https://*.googlevideo.com/*',
+        'https://*.ytimg.com/*',
+      ],
+    },
     (details, callback) => {
       const headers = { ...details.requestHeaders };
       headers['Origin'] = 'https://www.youtube.com';
