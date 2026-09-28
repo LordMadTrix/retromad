@@ -53,6 +53,7 @@ import { JsonRawEditor } from './admin/JsonRawEditor';
 import { BiosAdminView } from './admin/BiosAdminView';
 import { CoresAdminView } from './admin/CoresAdminView';
 import { BatchGamesToolbar } from './admin/BatchGamesToolbar';
+import { CollectionHealthReport } from './admin/CollectionHealthReport';
 import { BackupsAdminView } from './admin/BackupsAdminView';
 import { KioskCustomizeView } from './admin/KioskCustomizeView';
 
@@ -843,6 +844,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             {/* ======================================================== */}
             {activeTab === 'games' && (
               <div className="space-y-4">
+                {/* Rapport santé de la collection (jaquettes, BIOS, doublons, disque) */}
+                <CollectionHealthReport
+                  games={games}
+                  biosStatuses={biosStatuses}
+                  isCheckingBios={isCheckingBios}
+                  onCheckBios={onCheckBios}
+                />
+
                 {/* Barre d'outils Batch au-dessus de la recherche */}
                 <BatchGamesToolbar
                   games={games}

@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 /**
  * Mapping systemId RetroMad -> coeur Libretro/EmulatorJS
  */
-const EJS_CORE_BY_SYSTEM: Record<string, string> = {
+export const EJS_CORE_BY_SYSTEM: Record<string, string> = {
   nes: 'nes',
   snes: 'snes',
   n64: 'n64',

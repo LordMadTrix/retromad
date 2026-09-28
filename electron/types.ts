@@ -192,7 +192,7 @@ export interface AppSettings {
   kioskFullscreen: boolean;
   kioskOnlyFavorites: boolean;
   // Personnalisation du Kiosque (réglée dans Centre Admin → Kiosque)
-  kioskWidgets?: Record<string, boolean>; // widget id -> visible (music, videos, roulette…)
+  kioskWidgets?: Record<string, boolean | string>; // widget id -> visible (music, videos, roulette…) ; '__theme' = thème saisonnier
   kioskHiddenCompanies?: string[]; // firmes masquées de la borne
   kioskHiddenSystems?: string[]; // machines masquées de la borne
   kioskCompanyOrder?: string[]; // ordre d'affichage des firmes (glisser-déposer)

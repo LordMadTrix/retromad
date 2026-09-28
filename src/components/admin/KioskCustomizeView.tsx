@@ -12,6 +12,8 @@ interface KioskCustomizeViewProps {
 
 const WIDGETS: { id: string; label: string; desc: string }[] = [
   { id: 'featured', label: '⭐ Mes Vedettes', desc: 'Carrousel des jeux épinglés sur l’accueil de la borne' },
+  { id: 'daily', label: '📅 Le défi du jour', desc: 'Un jeu élu chaque matin, lancé en un clic' },
+  { id: 'preview', label: '▶️ Aperçu en direct', desc: 'Démo silencieuse après 2 s de survol d’une jaquette' },
   { id: 'credits', label: '🪙 Crédits Arcade', desc: 'Compteur « CRÉDITS : 99 » (monnayeur sonore)' },
   { id: 'random', label: '🎲 Jeu au Hasard', desc: 'Bouton de tirage aléatoire (touche R)' },
   { id: 'music', label: '🎵 Jukebox Chiptune', desc: 'Musique 8/16-bit dans la borne' },
@@ -135,6 +137,42 @@ export const KioskCustomizeView: React.FC<KioskCustomizeViewProps> = ({
           <Check className="w-4 h-4" /> {savedFlash}
         </div>
       )}
+
+      {/* ── 0. THÈME SAISONNIER ── */}
+      <section className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+        <h3 className="text-sm font-black text-white uppercase tracking-wider mb-1">Thème d'ambiance de la borne</h3>
+        <p className="text-[11px] text-slate-400 mb-3">
+          « Auto » suit les saisons (Halloween fin octobre, Noël fin décembre), sinon force un thème.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { id: 'auto', label: '🗓️ Auto (saisons)' },
+            { id: 'neon', label: '⚡ Néon (par défaut)' },
+            { id: 'halloween', label: '🎃 Halloween' },
+            { id: 'noel', label: '🎄 Noël' },
+          ].map((t) => {
+            const current = widgets['__theme'] || 'auto';
+            const on = current === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => {
+                  onSaveSettings({ kioskWidgets: { ...widgets, __theme: t.id } });
+                  flash(`Thème ${t.label.replace(/^[^ ]+ /, '')} appliqué`);
+                }}
+                className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-left transition ${
+                  on
+                    ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-200'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-600'
+                }`}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* ── 1. WIDGETS ── */}
       <section className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">

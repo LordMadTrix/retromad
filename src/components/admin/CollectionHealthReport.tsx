@@ -1,0 +1,213 @@
+import React, { useMemo } from 'react';
+import { HeartPulse, ImageOff, Cpu, Copy, HardDrive, AlertTriangle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Game, BiosStatus } from '../../types';
+
+interface CollectionHealthReportProps {
+  games: Game[];
+  biosStatuses: BiosStatus[];
+  isCheckingBios?: boolean;
+  onCheckBios?: () => Promise<void>;
+}
+
+const formatBytes = (bytes: number): string => {
+  if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(2)} Go`;
+  if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} Mo`;
+  return `${(bytes / 1024).toFixed(0)} Ko`;
+};
+
+/**
+ * Rapport santé de la collection : d'un coup d'œil, tout ce qui mérite
+ * une action — ROMs sans jaquette, BIOS manquants, doublons, poids disque.
+ */
+export const CollectionHealthReport: React.FC<CollectionHealthReportProps> = ({
+  games,
+  biosStatuses,
+  isCheckingBios = false,
+  onCheckBios,
+}) => {
+  // ROMs sans jaquette
+  const gamesWithoutBoxart = useMemo(
+    () => games.filter((g) => !g.media?.boxart2d && !g.media?.boxart3d && !g.media?.wheel),
+    [games]
+  );
+
+  // BIOS manquants (obligatoires d'abord)
+  const missingBios = useMemo(() => biosStatuses.filter((b) => !b.found), [biosStatuses]);
+  const missingRequiredBios = useMemo(() => missingBios.filter((b) => !b.optional), [missingBios]);
+
+  // Doublons : même cleanTitle sur le même système
+  const duplicates = useMemo(() => {
+    const seen = new Map<string, Game[]>();
+    games.forEach((g) => {
+      const key = `${g.systemId}::${(g.cleanTitle || '').toLowerCase()}`;
+      const list = seen.get(key) || [];
+      list.push(g);
+      seen.set(key, list);
+    });
+    return [...seen.values()].filter((list) => list.length > 1);
+  }, [games]);
+
+  // Poids disque total + par système (top 5)
+  const totalSize = useMemo(() => games.reduce((acc, g) => acc + (g.size || 0), 0), [games]);
+  const sizeBySystem = useMemo(() => {
+    const map = new Map<string, number>();
+    games.forEach((g) => map.set(g.systemId, (map.get(g.systemId) || 0) + (g.size || 0)));
+    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [games]);
+
+  const issuesCount =
+    gamesWithoutBoxart.length + missingBios.length + duplicates.reduce((a, d) => a + d.length - 1, 0);
+
+  const cardCls = 'p-4 rounded-2xl bg-slate-950/60 border border-slate-800';
+  const statNumber = 'text-2xl font-black';
+
+  return (
+    <div className="space-y-5 max-w-4xl">
+      {/* En-tête santé globale */}
+      <div className={`${cardCls} flex items-center justify-between`}>
+        <div className="flex items-center gap-3">
+          <div className={`p-2.5 rounded-2xl border ${issuesCount === 0 ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-amber-500/10 border-amber-500/40 text-amber-400'}`}>
+            <HeartPulse className="w-6 h-6" />
+          </div>
+          <div>
+            <span className="text-sm font-black text-white block">
+              {issuesCount === 0 ? 'Collection en parfaite santé !' : `${issuesCount} point(s) à améliorer`}
+            </span>
+            <span className="text-[11px] text-slate-400">
+              {games.length} jeux · {new Set(games.map((g) => g.systemId)).size} systèmes
+            </span>
+          </div>
+        </div>
+        {onCheckBios && (
+          <button
+            type="button"
+            onClick={() => onCheckBios()}
+            disabled={isCheckingBios}
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 transition flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isCheckingBios ? 'animate-spin' : ''}`} />
+            Revérifier les BIOS
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* 1. Jaquettes manquantes */}
+        <section className={cardCls}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-black text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <ImageOff className="w-4 h-4 text-cyan-400" /> Jaquettes manquantes
+            </h4>
+            <span className={`${statNumber} ${gamesWithoutBoxart.length === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {gamesWithoutBoxart.length}
+            </span>
+          </div>
+          {gamesWithoutBoxart.length === 0 ? (
+            <p className="text-[11px] text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Toutes les ROMs ont une jaquette.
+            </p>
+          ) : (
+            <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+              {gamesWithoutBoxart.slice(0, 20).map((g) => (
+                <div key={g.id} className="text-[11px] text-slate-400 truncate">
+                  • {g.cleanTitle || g.title} <span className="text-slate-600 font-mono">({g.systemId})</span>
+                </div>
+              ))}
+              {gamesWithoutBoxart.length > 20 && (
+                <div className="text-[10px] text-slate-500 italic">… et {gamesWithoutBoxart.length - 20} autres</div>
+              )}
+            </div>
+          )}
+          <p className="text-[10px] text-slate-500 mt-2">
+            Lance le Scraper pour récupérer les jaquettes manquantes.
+          </p>
+        </section>
+
+        {/* 2. BIOS manquants */}
+        <section className={cardCls}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-black text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-purple-400" /> BIOS manquants
+            </h4>
+            <span className={`${statNumber} ${missingBios.length === 0 ? 'text-emerald-400' : missingRequiredBios.length > 0 ? 'text-rose-400' : 'text-amber-400'}`}>
+              {missingBios.length}
+            </span>
+          </div>
+          {missingBios.length === 0 ? (
+            <p className="text-[11px] text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Tous les BIOS requis sont présents.
+            </p>
+          ) : (
+            <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+              {missingBios.slice(0, 12).map((b) => (
+                <div key={`${b.systemId}-${b.filename}`} className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                  <AlertTriangle className={`w-3 h-3 shrink-0 ${b.optional ? 'text-slate-600' : 'text-rose-400'}`} />
+                  <span className="truncate">
+                    {b.systemName} — {b.filename} {b.optional ? <span className="text-slate-600">(optionnel)</span> : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] text-slate-500 mt-2">
+            Dépose les fichiers dans {`public/bios/<système>/`} puis « Revérifier ».
+          </p>
+        </section>
+
+        {/* 3. Doublons */}
+        <section className={cardCls}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-black text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <Copy className="w-4 h-4 text-pink-400" /> Doublons
+            </h4>
+            <span className={`${statNumber} ${duplicates.length === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {duplicates.reduce((a, d) => a + d.length - 1, 0)}
+            </span>
+          </div>
+          {duplicates.length === 0 ? (
+            <p className="text-[11px] text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Aucun doublon détecté.
+            </p>
+          ) : (
+            <div className="max-h-32 overflow-y-auto custom-scrollbar space-y-1 pr-1">
+              {duplicates.slice(0, 8).map((group) => (
+                <div key={group[0].id} className="text-[11px]">
+                  <span className="text-slate-300 font-bold truncate block">{group[0].cleanTitle}</span>
+                  <span className="text-slate-500 font-mono text-[10px]">
+                    {group.map((g) => g.filename).join(' · ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] text-slate-500 mt-2">Même titre sur le même système (régions différentes…).</p>
+        </section>
+
+        {/* 4. Poids disque */}
+        <section className={cardCls}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-black text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-emerald-400" /> Poids disque
+            </h4>
+            <span className={`${statNumber} text-slate-100`}>{formatBytes(totalSize)}</span>
+          </div>
+          <div className="space-y-1.5">
+            {sizeBySystem.map(([systemId, size]) => {
+              const pct = totalSize > 0 ? Math.round((size / totalSize) * 100) : 0;
+              return (
+                <div key={systemId} className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-slate-400 w-20 shrink-0 truncate">{systemId}</span>
+                  <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div className="h-full rounded-full bg-slate-500" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="text-[10px] text-slate-500 w-16 text-right font-mono">{formatBytes(size)}</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2">Top 5 des systèmes les plus gourmands.</p>
+        </section>
+      </div>
+    </div>
+  );
+};

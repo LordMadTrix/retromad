@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Game, System, Company, EmulatorProfile } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
@@ -39,6 +39,7 @@ import {
 import { useAudio } from '../hooks/useAudio';
 import { useGamepad } from '../hooks/useGamepad';
 import { resolveMediaUrl } from '../utils/media';
+import { GamePreviewPlayer } from './GamePreviewPlayer';
 
 interface KioskArcadeViewProps {
   games: Game[];
@@ -63,7 +64,7 @@ interface KioskArcadeViewProps {
   neonGlows?: boolean;
   animations?: boolean;
   /** Personnalisation Kiosque (Centre Admin → Kiosque) */
-  kioskWidgets?: Record<string, boolean>;
+  kioskWidgets?: Record<string, boolean | string>;
   hiddenCompanyIds?: string[];
   hiddenSystemIds?: string[];
   companyOrder?: string[];
@@ -334,12 +335,32 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     (id: string) => kioskWidgets[id] !== false,
     [kioskWidgets]
   );
+  // (le thème saisonnier '__theme' est stocké dans kioskWidgets comme string)
 
   // ── Glisser-déposer des firmes (réordonnancement mémorisé dans les réglages) ──
   // Le composant reçoit onReorderCompanies (optionnel) : présent uniquement
   // quand la régie admin est déverrouillée — les joueurs ne déplacent rien.
   const [dragCompanyId, setDragCompanyId] = useState<string | null>(null);
   const [dragOverCompanyId, setDragOverCompanyId] = useState<string | null>(null);
+
+  // ── APERÇU EN DIRECT : démo silencieuse après 2 s de survol d'une jaquette ──
+  const [previewGame, setPreviewGame] = useState<Game | null>(null);
+  const previewTimerRef = useRef<any>(null);
+  const isWidgetPreviewOn = kioskWidgets['preview'] !== false;
+
+  const startPreviewTimer = useCallback(
+    (game: Game) => {
+      if (!isWidgetPreviewOn) return;
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = setTimeout(() => setPreviewGame(game), 2000);
+    },
+    [isWidgetPreviewOn]
+  );
+  const cancelPreviewTimer = useCallback(() => {
+    clearTimeout(previewTimerRef.current);
+    setPreviewGame(null);
+  }, []);
+  useEffect(() => () => clearTimeout(previewTimerRef.current), []);
 
   // Firmes filtrées : masquage personnalisé + cadre (PC / Consoles) + ordre glisser-déposer
   const visibleCompanies = useMemo(() => {
@@ -446,6 +467,35 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
     const byId = new Map(games.map((g) => [g.id, g]));
     return featuredGameIds.map((id) => byId.get(id)).filter((g): g is Game => !!g);
   }, [featuredGameIds, games]);
+
+  // ── JEU DU JOUR : un jeu différent chaque jour, tiré de façon déterministe ──
+  // (même jeu toute la journée pour tous les postes ; change à minuit)
+  const dailyGame = useMemo(() => {
+    if (!isWidgetOn('daily')) return null;
+    const pool = games.filter((g) => g.favorite).length > 0 ? games.filter((g) => g.favorite) : games;
+    if (pool.length === 0) return null;
+    const today = new Date();
+    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    return pool[seed % pool.length];
+  }, [games, isWidgetOn]);
+
+  // ── THÈME SAISONNIER : teinte d'ambiance de la borne (réglable) ──
+  const seasonTheme = String(kioskWidgets['__theme'] ?? 'auto');
+  const activeTheme = useMemo(() => {
+    if (seasonTheme !== 'auto') return seasonTheme;
+    const d = new Date();
+    const md = (d.getMonth() + 1) * 100 + d.getDate();
+    if (md >= 1225 || md <= 106) return 'noel';
+    if (md >= 1020 && md <= 1103) return 'halloween';
+    return 'neon';
+  }, [seasonTheme]);
+  const THEME_ACCENT: Record<string, { ring: string; glow: string; label: string }> = {
+    neon: { ring: 'border-cyan-400', glow: 'rgba(0,242,254,0.4)', label: '' },
+    halloween: { ring: 'border-orange-500', glow: 'rgba(249,115,22,0.45)', label: '🎃' },
+    noel: { ring: 'border-red-500', glow: 'rgba(239,68,68,0.45)', label: '🎄' },
+    off: { ring: 'border-slate-400', glow: 'rgba(148,163,184,0.3)', label: '' },
+  };
+  const themeAccent = THEME_ACCENT[activeTheme] || THEME_ACCENT.neon;
 
   // Lettres disponibles pour saut alphabétique rapide
   const availableLetters = useMemo(() => {
@@ -1074,6 +1124,49 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
             </p>
           </div>
 
+          {/* ── JEU DU JOUR : élu chaque matin parmi les favoris (ou tout le catalogue) ── */}
+          {dailyGame && (() => {
+            const dsys = systems.find((s) => s.id === dailyGame.systemId);
+            return (
+              <button
+                type="button"
+                onClick={() => onLaunchGame(dailyGame)}
+                onMouseEnter={() => playMove()}
+                className={`group relative max-w-6xl w-full mx-auto mb-4 rounded-2xl border-2 ${themeAccent.ring} bg-slate-900/85 p-3 sm:p-4 flex items-center gap-4 text-left overflow-hidden transition-all duration-300 hover:scale-[1.01]`}
+                style={{ boxShadow: `0 0 30px ${themeAccent.glow}` }}
+                title={`Lancer le jeu du jour : ${dailyGame.cleanTitle}`}
+              >
+                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden bg-slate-950/80 border border-slate-700/60 shrink-0 flex items-center justify-center">
+                  {dailyGame.media?.boxart2d ? (
+                    <img
+                      src={resolveMediaUrl(dailyGame.media.boxart2d)}
+                      alt={dailyGame.cleanTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  ) : (
+                    <Gamepad2 className="w-8 h-8 text-slate-600" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-3.5 h-3.5 text-amber-300" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-200">
+                      Le défi du jour {themeAccent.label}
+                    </span>
+                  </div>
+                  <div className="text-base sm:text-xl font-black text-white truncate">{dailyGame.cleanTitle}</div>
+                  <div className="text-[10px] sm:text-xs text-slate-400 truncate font-bold uppercase tracking-wider">
+                    {dsys?.name || dailyGame.systemId}
+                  </div>
+                </div>
+                <span className="hidden sm:flex p-2.5 rounded-xl bg-amber-500 text-slate-950 group-hover:brightness-110 transition shrink-0">
+                  <Play className="w-5 h-5 fill-current" />
+                </span>
+              </button>
+            );
+          })()}
+
           {/* ── CARROUSEL « MES VEDETTES » : jeux épinglés depuis le Centre Admin ── */}
           {featuredGames.length > 0 && isWidgetOn('featured') && (
             <div className="max-w-6xl w-full mx-auto mb-4">
@@ -1643,7 +1736,20 @@ export const KioskArcadeView: React.FC<KioskArcadeViewProps> = ({
                     />
                   )}
 
-                  <div className={`relative aspect-[3/4] ${isCompactFit ? 'w-32 sm:w-44 max-h-[20vh] sm:max-h-[24vh] p-1.5' : 'w-36 sm:w-48 md:w-56 lg:w-64 max-h-[24vh] sm:max-h-[30vh] md:max-h-[36vh] p-2 sm:p-3'} rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105`}>
+                  <div
+                  className={`relative aspect-[3/4] ${isCompactFit ? 'w-32 sm:w-44 max-h-[20vh] sm:max-h-[24vh] p-1.5' : 'w-36 sm:w-48 md:w-56 lg:w-64 max-h-[24vh] sm:max-h-[30vh] md:max-h-[36vh] p-2 sm:p-3'} rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-slate-700/80 shadow-2xl flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105`}
+                  onMouseEnter={() => currentGame && startPreviewTimer(currentGame)}
+                  onMouseLeave={cancelPreviewTimer}
+                >
+                  {/* Aperçu en direct : démo silencieuse après 2 s de survol */}
+                  {previewGame?.id === currentGame.id && (
+                    <div className="absolute inset-0 z-20 bg-black">
+                      <GamePreviewPlayer game={previewGame} className="w-full h-full" />
+                      <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-black/80 border border-amber-500/50 text-amber-300 text-[9px] font-black uppercase tracking-wider">
+                        Aperçu en direct
+                      </span>
+                    </div>
+                  )}
                     {currentGame.media?.boxart2d && !failedImageIds.has(currentGame.id) ? (
                       <img
                         src={resolveMediaUrl(currentGame.media.boxart2d)}
