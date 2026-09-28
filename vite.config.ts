@@ -63,11 +63,29 @@ function romIndexPlugin(): Plugin {
   };
 }
 
+/** Hash court du commit git courant ('' si indisponible, hors dépôt). */
+function getGitHash(): string {
+  try {
+    return require('child_process').execSync('git rev-parse --short HEAD', {
+      cwd: __dirname,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString().trim();
+  } catch {
+    return '';
+  }
+}
+
 export default defineConfig({
   plugins: [react(), romIndexPlugin()],
 // Chemins relatifs : indispensables pour le mode bureau Electron (file://).
 // Avec '/', le build référence /assets/... qui ne se résout pas en file:// → écran noir.
   base: './',
+  // Indicateur de version : hash court du commit + date, lus au lancement du
+  // build. Permet de repérer immédiatement une instance sur un ancien bundle.
+  define: {
+    'import.meta.env.VITE_APP_BUILD_HASH': JSON.stringify(getGitHash()),
+    'import.meta.env.VITE_APP_BUILD_DATE': JSON.stringify(new Date().toISOString()),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

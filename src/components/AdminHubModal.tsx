@@ -36,6 +36,11 @@ import {
   FileJson,
 } from 'lucide-react';
 import { GameEditModal } from './GameEditModal';
+
+// Version du bundle : injectée par Vite (define) au moment du build — hash court
+// du commit git + date. Un bundle construit hors dépôt git affiche « build ? ».
+const APP_BUILD_HASH = (import.meta.env.VITE_APP_BUILD_HASH as string | undefined) ?? '';
+const APP_BUILD_DATE = import.meta.env.VITE_APP_BUILD_DATE as string | undefined;
 import { SystemEditModal } from './SystemEditModal';
 import { CompanyEditModal } from './CompanyEditModal';
 import { EmulatorEditModal } from './EmulatorEditModal';
@@ -627,6 +632,22 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   <span>Centre d'Administration RetroMad</span>
                   <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                     Contrôle & Gestion Universelle
+                  </span>
+                  {/* Indicateur de build : hash court du commit, injecté par Vite.
+                      « build ? » rouge = bundle périmé (relancer npm run build + redémarrer). */}
+                  <span
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${
+                      APP_BUILD_HASH
+                        ? 'bg-slate-800/80 text-slate-400 border-slate-700'
+                        : 'bg-rose-500/20 text-rose-300 border-rose-500/50 animate-pulse'
+                    }`}
+                    title={
+                      APP_BUILD_HASH
+                        ? `Bundle construit sur le commit ${APP_BUILD_HASH}\n${APP_BUILD_DATE ? 'Date : ' + new Date(APP_BUILD_DATE).toLocaleString('fr-FR') : ''}`
+                        : 'Bundle périmé : le hash de version est absent. Lancez npm run build puis relancez RetroMad.'
+                    }
+                  >
+                    {APP_BUILD_HASH ? `build ${APP_BUILD_HASH}` : '⚠ build périmé'}
                   </span>
                 </h2>
                 <span className="text-xs text-slate-400 block -mt-0.5">
