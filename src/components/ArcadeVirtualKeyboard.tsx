@@ -27,7 +27,6 @@ export const ArcadeVirtualKeyboard: React.FC<ArcadeVirtualKeyboardProps> = ({
   onClose,
   onConfirm,
   onChange,
-  soundEnabled = true,
 }) => {
   const [text, setText] = useState(initialValue);
   const [currentRow, setCurrentRow] = useState(1);

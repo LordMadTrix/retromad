@@ -42,32 +42,15 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({
   currentTab,
   onTabChange,
-  onScan,
-  onScrape,
-  onOpenExtensions,
   onOpenSearch,
-  isScanning,
   soundEnabled,
   onToggleSound,
   crtEnabled = false,
   onToggleCrt,
-  totalGames,
   isKioskMode,
   isAdminUnlocked = false,
   onEnterKiosk,
   onUnlockKiosk,
-  onOpenQuickStart,
-  selectedGenre = 'all',
-  onSelectGenre,
-  availableGenres = [],
-  onOpenBezelStudio,
-  onOpenThemeStudio,
-  onOpenCentralizedStorage,
-  onOpenLanManager,
-  onOpenProjectorModal,
-  onOpenUserManualPdf,
-  onOpenShaderProfiles,
-  onOpenSaveStateSync,
 }) => {
 
   return (
@@ -136,10 +119,7 @@ export const Navigation: React.FC<NavigationProps> = ({
 
         <button
           type="button"
-          onClick={() => {
-            if (onOpenSettings) onOpenSettings();
-            else onTabChange('settings');
-          }}
+          onClick={() => onTabChange('settings')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm shrink-0 cursor-pointer ${
             currentTab === 'settings'
               ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]'

@@ -10,7 +10,6 @@ import {
   Play,
   Heart,
   Eye,
-  Lock,
   Settings,
   Sparkles,
   ChevronLeft,

@@ -43,7 +43,6 @@ import { GameEditModal } from './GameEditModal';
 // Version du bundle : injectée par Vite (define) au moment du build — hash court
 // du commit git + date. Un bundle construit hors dépôt git affiche « build ? ».
 const APP_BUILD_HASH = (import.meta.env.VITE_APP_BUILD_HASH as string | undefined) ?? '';
-const APP_BUILD_DATE = import.meta.env.VITE_APP_BUILD_DATE as string | undefined;
 import { SystemEditModal } from './SystemEditModal';
 import { CompanyEditModal } from './CompanyEditModal';
 import { EmulatorEditModal } from './EmulatorEditModal';

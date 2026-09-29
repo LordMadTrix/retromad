@@ -8,7 +8,6 @@ import { SystemSelector } from './components/SystemSelector';
 import { GameGrid } from './components/GameGrid';
 import { CompanyView } from './components/CompanyView';
 import { BiosManager } from './components/BiosManager';
-import { AdminLockScreen } from './components/AdminLockScreen';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { ComputingView } from './components/extended/ComputingView';
 import { KioskAttractMode } from './components/KioskAttractMode';
