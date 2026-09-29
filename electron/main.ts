@@ -10,6 +10,11 @@ import { SYSTEMS } from './data/systems';
 import { COMPANIES } from './data/companies';
 import { extensionInstaller } from './services/extensionInstaller';
 import { Game } from './types';
+import {
+  startPhoneGamepadServer,
+  stopPhoneGamepadServer,
+  getPhoneGamepadStatus,
+} from './services/phoneGamepadServer';
 
 // Enregistrer les schémas personnalisés :
 //  - retromad-media : médias locaux mis en cache (boxarts…)
@@ -530,6 +535,11 @@ app.whenReady().then(async () => {
     console.error('[RetroMad] Échec auto-scan initial :', e);
   }
 });
+
+// ─── Manette Smartphone (GSM/Wi-Fi local) ───
+ipcMain.handle('phone-gamepad-start', async () => startPhoneGamepadServer());
+ipcMain.handle('phone-gamepad-stop', async () => stopPhoneGamepadServer());
+ipcMain.handle('phone-gamepad-status', async () => getPhoneGamepadStatus());
 
 ipcMain.handle('scrape-game', async (_, game: Game) => {
   const updated = await scraper.scrapeGame(game);

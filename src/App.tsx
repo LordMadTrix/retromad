@@ -8,6 +8,7 @@ import { SystemSelector } from './components/SystemSelector';
 import { GameGrid } from './components/GameGrid';
 import { KioskArcadeView } from './components/KioskArcadeView';
 import { useGamepad } from './hooks/useGamepad';
+import { usePhoneGamepad } from './hooks/usePhoneGamepad';
 import { useAudio } from './hooks/useAudio';
 import { syncNewRoms } from './services/romScanner';
 import type { CrtShaderProfileId } from './components/retro/RetroShaderProfilesModal';
@@ -1411,6 +1412,9 @@ export const App: React.FC = () => {
     if (window.api?.saveEmulators) await window.api.saveEmulators(BUILTIN_EMULATORS);
     showNotification('Consoles, firmes et émulateurs réinitialisés aux valeurs d\'usine.', 'success');
   };
+
+  // Manette Smartphone : entrées du téléphone → clavier injecté (émulateur web)
+  usePhoneGamepad();
 
   // Navigation manette
   useGamepad({

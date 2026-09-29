@@ -256,6 +256,40 @@ async function runTests() {
     'Shaders et filtres écran CRT (Scanlines, Vignette, Phosphore) intégrés'
   );
 
+  // Test 12: Manette Smartphone (Wi-Fi local) — serveur intégré
+  console.log('\n--- Test Manette Smartphone (GSM/Wi-Fi) ---');
+  const phoneServer = await import('../electron/services/phoneGamepadServer');
+
+  const statusOff = phoneServer.getPhoneGamepadStatus();
+  assert(statusOff.running === false, 'Serveur manette smartphone : arrêté au repos');
+
+  const statusOn = await phoneServer.startPhoneGamepadServer();
+  assert(statusOn.running === true, 'Serveur manette smartphone démarre (HTTP + WebSocket)');
+  assert(statusOn.port >= 8090 && statusOn.port <= 8099, `Port d\'écoute dans la plage dédiée (${statusOn.port})`);
+  assert(/^http:\/\/\d+\.\d+\.\d+\.\d+:\d+\/\?pin=[A-Z2-9]{4}$/.test(statusOn.url), `URL de connexion valide avec code PIN (${statusOn.url})`);
+  assert(statusOn.pin.length === 4, 'Code PIN de 4 caractères généré');
+  assert(statusOn.qrDataUrl.startsWith('data:image/png;base64,'), 'QR code de connexion généré (data URL PNG)');
+
+  // La page du téléphone est servie et contient les contrôles attendus
+  const pageRes = await fetch(`http://127.0.0.1:${statusOn.port}/?pin=${statusOn.pin}`);
+  const pageHtml = await pageRes.text();
+  assert(pageRes.status === 200, 'Page manette servie sur le réseau local');
+  assert(
+    ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].every((k) => pageHtml.includes(k)),
+    'Page manette : D-pad + Start/Select présents'
+  );
+  assert(
+    ['z', 'x', 'a', 's', 'q', 'e', 'v'].every((k) => pageHtml.includes(`data-key="${k}"`)),
+    'Page manette : boutons A/B/X/Y, L/R, Select mappés sur les touches EJS'
+  );
+
+  // Cycle de vie propre : redémarrage après arrêt
+  const statusStopped = await phoneServer.stopPhoneGamepadServer();
+  assert(statusStopped.running === false, 'Serveur manette smartphone s\'arrête proprement');
+  const statusRestarted = await phoneServer.startPhoneGamepadServer();
+  assert(statusRestarted.running === true, 'Serveur manette smartphone redémarre après arrêt');
+  await phoneServer.stopPhoneGamepadServer();
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);

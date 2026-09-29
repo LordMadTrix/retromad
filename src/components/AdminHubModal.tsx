@@ -51,6 +51,7 @@ import { CompanyLogo } from './CompanyLogo';
 import { resolveMediaUrl } from '../utils/media';
 import { useAudio } from '../hooks/useAudio';
 import { GamepadDiagnostics } from './admin/GamepadDiagnostics';
+import { PhoneGamepadAdmin } from './admin/PhoneGamepadAdmin';
 import { JsonRawEditor } from './admin/JsonRawEditor';
 import { BiosAdminView } from './admin/BiosAdminView';
 import { CoresAdminView } from './admin/CoresAdminView';
@@ -2029,7 +2030,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             {/* ======================================================== */}
             {/* NOUVEL ONGLET: DIAGNOSTIC CONTRÔLEURS & MANETTES */}
             {/* ======================================================== */}
-            {activeTab === 'gamepad' && <GamepadDiagnostics />}
+            {activeTab === 'gamepad' && (
+              <div className="space-y-6">
+                <PhoneGamepadAdmin />
+                <GamepadDiagnostics />
+                <div className="pt-2" />
+              </div>
+            )}
 
             {/* ======================================================== */}
             {/* ONGLET: DOSSIERS & RÉPERTOIRES */}

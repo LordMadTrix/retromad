@@ -99,6 +99,21 @@ export const API = {
   // Détection & Import automatique Clé USB
   detectUsbDrives: (): Promise<{ path: string; label: string; romsCount: number }[]> =>
     ipcRenderer.invoke('detect-usb-drives'),
+
+  // ─── Manette Smartphone (GSM/Wi-Fi local) ───
+  phoneGamepadStart: (): Promise<unknown> => ipcRenderer.invoke('phone-gamepad-start'),
+  phoneGamepadStop: (): Promise<unknown> => ipcRenderer.invoke('phone-gamepad-stop'),
+  phoneGamepadStatus: (): Promise<unknown> => ipcRenderer.invoke('phone-gamepad-status'),
+  onPhoneGamepadInput: (handler: (payload: { key: string; pressed: boolean }) => void): (() => void) => {
+    const listener = (_event: IpcRendererEvent, payload: { key: string; pressed: boolean }) => handler(payload);
+    ipcRenderer.on('phone-gamepad-input', listener);
+    return () => ipcRenderer.removeListener('phone-gamepad-input', listener);
+  },
+  onPhoneGamepadClients: (handler: (count: number) => void): (() => void) => {
+    const listener = (_event: IpcRendererEvent, count: number) => handler(count);
+    ipcRenderer.on('phone-gamepad-clients', listener);
+    return () => ipcRenderer.removeListener('phone-gamepad-clients', listener);
+  },
   importFromUsb: (usbPath: string): Promise<{ success: boolean; imported: number; total?: number; games?: Game[]; message?: string }> =>
     ipcRenderer.invoke('import-from-usb', usbPath),
 };
