@@ -6,13 +6,7 @@ import { BUILTIN_EMULATORS } from '../electron/data/emulators';
 import { Navigation, NavTab } from './components/Navigation';
 import { SystemSelector } from './components/SystemSelector';
 import { GameGrid } from './components/GameGrid';
-import { CompanyView } from './components/CompanyView';
-import { BiosManager } from './components/BiosManager';
 import { KioskArcadeView } from './components/KioskArcadeView';
-import { ComputingView } from './components/extended/ComputingView';
-import { KioskAttractMode } from './components/KioskAttractMode';
-import { GamepadHint } from './components/GamepadHint';
-import { RetroJukeboxFloatingPlayer } from './components/retro/RetroJukeboxFloatingPlayer';
 import { useGamepad } from './hooks/useGamepad';
 import { useAudio } from './hooks/useAudio';
 import { syncNewRoms } from './services/romScanner';
@@ -59,6 +53,15 @@ import {
   INITIAL_CENTRALIZED_CORES,
   INITIAL_CENTRALIZED_SAVES,
 } from './data/centralizedStorageData';
+
+// Vues secondaires chargées à la demande (code splitting : allègent le chunk
+// principal et ne se chargent que sur leur onglet / leur condition d'affichage).
+const CompanyView = React.lazy(() => import('./components/CompanyView').then((m) => ({ default: m.CompanyView })));
+const BiosManager = React.lazy(() => import('./components/BiosManager').then((m) => ({ default: m.BiosManager })));
+const ComputingView = React.lazy(() => import('./components/extended/ComputingView').then((m) => ({ default: m.ComputingView })));
+const KioskAttractMode = React.lazy(() => import('./components/KioskAttractMode').then((m) => ({ default: m.KioskAttractMode })));
+const GamepadHint = React.lazy(() => import('./components/GamepadHint').then((m) => ({ default: m.GamepadHint })));
+const RetroJukeboxFloatingPlayer = React.lazy(() => import('./components/retro/RetroJukeboxFloatingPlayer').then((m) => ({ default: m.RetroJukeboxFloatingPlayer })));
 import { CentralizedRomItem, CentralizedThemeItem } from './types/extendedFeatures';
 
 // Modales chargées à la demande (Code-Splitting / Lazy-Loading)
@@ -1700,7 +1703,8 @@ export const App: React.FC = () => {
             }}
           />
 
-          {/* Vues principales */}
+          {/* Vues principales (Suspense : certains onglets sont chargés à la demande) */}
+          <Suspense fallback={null}>
           {currentTab === 'games' && (
             <div className="flex-1 flex flex-col overflow-hidden">
               {/* Sélecteur de consoles */}
@@ -1789,6 +1793,7 @@ export const App: React.FC = () => {
               onOpenSettings={() => setIsSettingsOpen(true)}
             />
           )}
+          </Suspense>
         </>
       )}
 
