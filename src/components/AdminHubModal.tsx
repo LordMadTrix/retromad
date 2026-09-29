@@ -37,6 +37,7 @@ import {
   LayoutDashboard,
   Activity,
   ChevronRight,
+  BarChart3,
 } from 'lucide-react';
 import { GameEditModal } from './GameEditModal';
 
@@ -60,6 +61,7 @@ import { CollectionHealthReport } from './admin/CollectionHealthReport';
 import { BackupsAdminView } from './admin/BackupsAdminView';
 import { KioskCustomizeView } from './admin/KioskCustomizeView';
 import { AdminDashboard } from './admin/AdminDashboard';
+import { GameStatsView } from './admin/GameStatsView';
 import { AdminLogsView } from './admin/AdminLogsView';
 import { ConfirmDialog, useConfirmDialog } from './admin/ConfirmDialog';
 import { useAdminLogs } from '../hooks/useAdminLogs';
@@ -73,6 +75,7 @@ export type AdminTab =
   | 'bios'
   | 'extensions'
   | 'scraper'
+  | 'stats'
   | 'storage'
   | 'gamepad'
   | 'kiosk'
@@ -732,6 +735,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   const tabToCategoryMap: Record<AdminTab, MasterCategory> = {
     dashboard: 'dashboard',
     games: 'library',
+    stats: 'library',
     systems: 'library',
     companies: 'library',
     scraper: 'library',
@@ -781,6 +785,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
       bgActive: 'bg-emerald-500/15 text-emerald-200 border-emerald-500/50 shadow-emerald-500/10',
       subTabs: [
         { id: 'games', label: 'Catalogue Jeux', icon: Gamepad2, badge: games.length },
+        { id: 'stats', label: 'Statistiques', icon: BarChart3 },
         { id: 'systems', label: 'Consoles', icon: Cpu, badge: systems.length },
         { id: 'companies', label: 'Constructeurs', icon: Landmark, badge: companies.length },
         { id: 'scraper', label: 'Scraping & Jaquettes', icon: Globe },
@@ -834,6 +839,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   const searchIndex = [
     { label: 'Scanner & Ajouter des ROMs', tab: 'storage' as AdminTab, keywords: 'scan roms rom dossier importer jeux' },
     { label: 'Catalogue des Jeux & Favoris', tab: 'games' as AdminTab, keywords: 'jeux catalogue roms titres jaquettes favoris supprimer modifier' },
+    { label: 'Statistiques de jeu (temps, lancements, favoris)', tab: 'stats' as AdminTab, keywords: 'statistiques stats temps jeu lancements parties favoris top 10 heures jouées' },
     { label: 'Consoles & Systèmes (119 machines)', tab: 'systems' as AdminTab, keywords: 'consoles snes nes psx megadrive machines plateformes' },
     { label: 'Constructeurs (Nintendo, Sega, Sony...)', tab: 'companies' as AdminTab, keywords: 'firmes constructeurs fabricants nintendo sega sony' },
     { label: 'Scraping des Jaquettes & Vidéos', tab: 'scraper' as AdminTab, keywords: 'scrap scraper jaquettes boxart fanart screenscraper libretro images vidéos' },
@@ -884,6 +890,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
       label: 'Bibliothèque',
       items: [
         { id: 'games', label: 'Catalogue Jeux', icon: Gamepad2, badge: games.length, color: 'text-cyan-400' },
+        { id: 'stats', label: 'Statistiques', icon: BarChart3, color: 'text-emerald-400' },
         { id: 'systems', label: 'Consoles', icon: Cpu, badge: systems.length, color: 'text-amber-400' },
         { id: 'companies', label: 'Constructeurs', icon: Landmark, badge: companies.length, color: 'text-violet-400' },
         { id: 'emulators', label: 'Émulateurs', icon: Terminal, color: 'text-emerald-400' },
@@ -1187,6 +1194,11 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   onNavigate={(tab) => setActiveTab(tab as AdminTab)}
                 />
               )}
+
+              {/* ======================================================== */}
+              {/* STATISTIQUES DE JEU */}
+              {/* ======================================================== */}
+              {activeTab === 'stats' && <GameStatsView games={games} systems={systems} />}
 
               {/* ======================================================== */}
               {/* JOURNAL DES ACTIONS */}

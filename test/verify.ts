@@ -318,6 +318,38 @@ async function runTests() {
     'File de préchargement démarrée au montage de App (après le premier rendu)'
   );
 
+  // Test 14: Statistiques de jeu (Centre Admin)
+  console.log('\n--- Test Statistiques de jeu ---');
+  const statsViewPath = path.join(__dirname, '../src/components/admin/GameStatsView.tsx');
+  const statsContent = fs.readFileSync(statsViewPath, 'utf-8');
+  assert(
+    statsContent.includes('topByTime') &&
+    statsContent.includes("slice(0, 10)") &&
+    statsContent.includes('playTimeMinutes'),
+    'Statistiques : top 10 des jeux par temps de jeu'
+  );
+  assert(
+    statsContent.includes('timeBySystem') &&
+    statsContent.includes("sort((a, b) => b[1].minutes - a[1].minutes)"),
+    'Statistiques : temps de jeu total agrégé par console'
+  );
+  assert(
+    statsContent.includes('topByLaunches') &&
+    statsContent.includes('playCount'),
+    'Statistiques : classement des lancements (playCount)'
+  );
+  assert(
+    statsContent.includes('topFavorites') &&
+    statsContent.includes('g.favorite'),
+    'Statistiques : favoris les plus joués'
+  );
+  const hubStats = fs.readFileSync(path.join(__dirname, '../src/components/AdminHubModal.tsx'), 'utf-8');
+  assert(
+    hubStats.includes("activeTab === 'stats'") &&
+    hubStats.includes("<GameStatsView games={games} systems={systems} />"),
+    'Onglet Statistiques branché dans le Centre Admin'
+  );
+
   // Comportement : la file s'exécute séquentiellement et survit à un échec
   const { scheduleChunkPreload } = await import('../src/utils/chunkPreloader');
   const g = globalThis as unknown as { window?: unknown };
