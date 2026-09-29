@@ -11,6 +11,7 @@ import { useGamepad } from './hooks/useGamepad';
 import { usePhoneGamepad } from './hooks/usePhoneGamepad';
 import { useAudio } from './hooks/useAudio';
 import { syncNewRoms } from './services/romScanner';
+import { scheduleChunkPreload } from './utils/chunkPreloader';
 import type { CrtShaderProfileId } from './components/retro/RetroShaderProfilesModal';
 import {
   RetroAchievement,
@@ -54,63 +55,178 @@ import {
   INITIAL_CENTRALIZED_CORES,
   INITIAL_CENTRALIZED_SAVES,
 } from './data/centralizedStorageData';
-
-// Vues secondaires chargées à la demande (code splitting : allègent le chunk
-// principal et ne se chargent que sur leur onglet / leur condition d'affichage).
-const CompanyView = React.lazy(() => import('./components/CompanyView').then((m) => ({ default: m.CompanyView })));
-const BiosManager = React.lazy(() => import('./components/BiosManager').then((m) => ({ default: m.BiosManager })));
-const ComputingView = React.lazy(() => import('./components/extended/ComputingView').then((m) => ({ default: m.ComputingView })));
-const KioskAttractMode = React.lazy(() => import('./components/KioskAttractMode').then((m) => ({ default: m.KioskAttractMode })));
-const GamepadHint = React.lazy(() => import('./components/GamepadHint').then((m) => ({ default: m.GamepadHint })));
-const RetroJukeboxFloatingPlayer = React.lazy(() => import('./components/retro/RetroJukeboxFloatingPlayer').then((m) => ({ default: m.RetroJukeboxFloatingPlayer })));
 import { CentralizedRomItem, CentralizedThemeItem } from './types/extendedFeatures';
 
-// Modales chargées à la demande (Code-Splitting / Lazy-Loading)
-const GameDetailModal = React.lazy(() => import('./components/GameDetailModal').then((m) => ({ default: m.GameDetailModal })));
-const AdminHubModal = React.lazy(() => import('./components/AdminHubModal').then((m) => ({ default: m.AdminHubModal })));
-const GameEditModal = React.lazy(() => import('./components/GameEditModal').then((m) => ({ default: m.GameEditModal })));
-const SystemEditModal = React.lazy(() => import('./components/SystemEditModal').then((m) => ({ default: m.SystemEditModal })));
-const CompanyEditModal = React.lazy(() => import('./components/CompanyEditModal').then((m) => ({ default: m.CompanyEditModal })));
-const ScraperModal = React.lazy(() => import('./components/ScraperModal').then((m) => ({ default: m.ScraperModal })));
-const ScrapeCandidateModal = React.lazy(() => import('./components/ScrapeCandidateModal').then((m) => ({ default: m.ScrapeCandidateModal })));
+// Modales et vues chargées à la demande (Code-Splitting / Lazy-Loading).
+// Chaque chunk est défini par un thunk d'import partagé : React.lazy l'utilise
+// pour le rendu, le préchargeur d'arrière-plan le réchauffe pendant les temps
+// morts → un premier accès ne télécharge plus rien.
+const loadGameDetailModal = () => import('./components/GameDetailModal').then((m) => ({ default: m.GameDetailModal }));
+const loadAdminHubModal = () => import('./components/AdminHubModal').then((m) => ({ default: m.AdminHubModal }));
+const loadGameEditModal = () => import('./components/GameEditModal').then((m) => ({ default: m.GameEditModal }));
+const loadSystemEditModal = () => import('./components/SystemEditModal').then((m) => ({ default: m.SystemEditModal }));
+const loadCompanyEditModal = () => import('./components/CompanyEditModal').then((m) => ({ default: m.CompanyEditModal }));
+const loadScraperModal = () => import('./components/ScraperModal').then((m) => ({ default: m.ScraperModal }));
+const loadScrapeCandidateModal = () => import('./components/ScrapeCandidateModal').then((m) => ({ default: m.ScrapeCandidateModal }));
+const loadCompanyView = () => import('./components/CompanyView').then((m) => ({ default: m.CompanyView }));
+const loadBiosManager = () => import('./components/BiosManager').then((m) => ({ default: m.BiosManager }));
+const loadComputingView = () => import('./components/extended/ComputingView').then((m) => ({ default: m.ComputingView }));
+const loadKioskAttractMode = () => import('./components/KioskAttractMode').then((m) => ({ default: m.KioskAttractMode }));
+const loadGamepadHint = () => import('./components/GamepadHint').then((m) => ({ default: m.GamepadHint }));
+const loadJukeboxFloatingPlayer = () => import('./components/retro/RetroJukeboxFloatingPlayer').then((m) => ({ default: m.RetroJukeboxFloatingPlayer }));
+const loadExtensionsDownloaderModal = () => import('./components/ExtensionsDownloaderModal').then((m) => ({ default: m.ExtensionsDownloaderModal }));
+const loadKioskPinModal = () => import('./components/KioskPinModal').then((m) => ({ default: m.KioskPinModal }));
+const loadConsoleExhibitionModal = () => import('./components/ConsoleExhibitionModal').then((m) => ({ default: m.ConsoleExhibitionModal }));
+const loadCompanyExhibitionModal = () => import('./components/CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal }));
+const loadGlobalSearchModal = () => import('./components/GlobalSearchModal').then((m) => ({ default: m.GlobalSearchModal }));
+const loadRomScannerModal = () => import('./components/RomScannerModal').then((m) => ({ default: m.RomScannerModal }));
+const loadQuickStartOnboardingModal = () => import('./components/QuickStartOnboardingModal').then((m) => ({ default: m.QuickStartOnboardingModal }));
+const loadWebEmulatorModal = () => import('./components/WebEmulatorModal').then((m) => ({ default: m.WebEmulatorModal }));
+const loadRetroAchievementsModal = () => import('./components/retro/RetroAchievementsModal').then((m) => ({ default: m.RetroAchievementsModal }));
+const loadRetroCheatsModal = () => import('./components/retro/RetroCheatsModal').then((m) => ({ default: m.RetroCheatsModal }));
+const loadRetroSaveStatesModal = () => import('./components/retro/RetroSaveStatesModal').then((m) => ({ default: m.RetroSaveStatesModal }));
+const loadRetroJukeboxModal = () => import('./components/retro/RetroJukeboxModal').then((m) => ({ default: m.RetroJukeboxModal }));
+const loadArcadeTournamentModal = () => import('./components/retro/ArcadeTournamentModal').then((m) => ({ default: m.ArcadeTournamentModal }));
+const loadRetroManualsViewerModal = () => import('./components/retro/RetroManualsViewerModal').then((m) => ({ default: m.RetroManualsViewerModal }));
+const loadBezelStudioModal = () => import('./components/retro/BezelStudioModal').then((m) => ({ default: m.BezelStudioModal }));
+const loadRetroRouletteModal = () => import('./components/retro/RetroRouletteDailyChallengeModal').then((m) => ({ default: m.RetroRouletteDailyChallengeModal }));
+const loadRetroAnalyticsModal = () => import('./components/extended/RetroAnalyticsModal').then((m) => ({ default: m.RetroAnalyticsModal }));
+const loadGamepadTesterModal = () => import('./components/extended/GamepadTesterModal').then((m) => ({ default: m.GamepadTesterModal }));
+const loadMultiProfileModal = () => import('./components/extended/MultiProfileModal').then((m) => ({ default: m.MultiProfileModal }));
+const loadHistoryTimelineModal = () => import('./components/extended/HistoryTimelineModal').then((m) => ({ default: m.HistoryTimelineModal }));
+const loadPrintStudioModal = () => import('./components/extended/PrintStudioModal').then((m) => ({ default: m.PrintStudioModal }));
+const loadNomadBackupModal = () => import('./components/extended/NomadBackupModal').then((m) => ({ default: m.NomadBackupModal }));
+const loadHandheldOverlaysModal = () => import('./components/extended/HandheldOverlaysModal').then((m) => ({ default: m.HandheldOverlaysModal }));
+const loadArcadePartyModal = () => import('./components/extended/ArcadePartyModal').then((m) => ({ default: m.ArcadePartyModal }));
+const loadMusicManagerModal = () => import('./components/extended/MusicManagerModal').then((m) => ({ default: m.MusicManagerModal }));
+const loadCentralizedStorageModal = () => import('./components/extended/CentralizedStorageModal').then((m) => ({ default: m.CentralizedStorageModal }));
+const loadCommunityThemeStudioModal = () => import('./components/extended/CommunityThemeStudioModal').then((m) => ({ default: m.CommunityThemeStudioModal }));
+const loadRetroAttractModeModal = () => import('./components/retro/RetroAttractModeModal').then((m) => ({ default: m.RetroAttractModeModal }));
+const loadRetroPasswordNotebookModal = () => import('./components/retro/RetroPasswordNotebookModal').then((m) => ({ default: m.RetroPasswordNotebookModal }));
+const loadLanNetworkManagerModal = () => import('./components/extended/LanNetworkManagerModal').then((m) => ({ default: m.LanNetworkManagerModal }));
+const loadProjectorKioskManagerModal = () => import('./components/retro/ProjectorKioskManagerModal').then((m) => ({ default: m.ProjectorKioskManagerModal }));
+const loadRetroManualPdfGuideModal = () => import('./components/manual/RetroManualPdfGuideModal').then((m) => ({ default: m.RetroManualPdfGuideModal }));
+const loadRetroShaderProfilesModal = () => import('./components/retro/RetroShaderProfilesModal').then((m) => ({ default: m.RetroShaderProfilesModal }));
+const loadArcadeSpeedrunModal = () => import('./components/retro/ArcadeSpeedrunModal').then((m) => ({ default: m.ArcadeSpeedrunModal }));
+const loadVirtualCartridgeShelfModal = () => import('./components/retro/VirtualCartridgeShelfModal').then((m) => ({ default: m.VirtualCartridgeShelfModal }));
+const loadSaveStateSyncModal = () => import('./components/extended/SaveStateSyncModal').then((m) => ({ default: m.SaveStateSyncModal }));
+const loadArcadeHotkeysGuideModal = () => import('./components/ArcadeHotkeysGuideModal').then((m) => ({ default: m.ArcadeHotkeysGuideModal }));
 
-const ExtensionsDownloaderModal = React.lazy(() => import('./components/ExtensionsDownloaderModal').then((m) => ({ default: m.ExtensionsDownloaderModal })));
-const KioskPinModal = React.lazy(() => import('./components/KioskPinModal').then((m) => ({ default: m.KioskPinModal })));
-const ConsoleExhibitionModal = React.lazy(() => import('./components/ConsoleExhibitionModal').then((m) => ({ default: m.ConsoleExhibitionModal })));
-const CompanyExhibitionModal = React.lazy(() => import('./components/CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal })));
-const GlobalSearchModal = React.lazy(() => import('./components/GlobalSearchModal').then((m) => ({ default: m.GlobalSearchModal })));
-const RomScannerModal = React.lazy(() => import('./components/RomScannerModal').then((m) => ({ default: m.RomScannerModal })));
-const QuickStartOnboardingModal = React.lazy(() => import('./components/QuickStartOnboardingModal').then((m) => ({ default: m.QuickStartOnboardingModal })));
-const WebEmulatorModal = React.lazy(() => import('./components/WebEmulatorModal').then((m) => ({ default: m.WebEmulatorModal })));
-const RetroAchievementsModal = React.lazy(() => import('./components/retro/RetroAchievementsModal').then((m) => ({ default: m.RetroAchievementsModal })));
-const RetroCheatsModal = React.lazy(() => import('./components/retro/RetroCheatsModal').then((m) => ({ default: m.RetroCheatsModal })));
-const RetroSaveStatesModal = React.lazy(() => import('./components/retro/RetroSaveStatesModal').then((m) => ({ default: m.RetroSaveStatesModal })));
-const RetroJukeboxModal = React.lazy(() => import('./components/retro/RetroJukeboxModal').then((m) => ({ default: m.RetroJukeboxModal })));
-const ArcadeTournamentModal = React.lazy(() => import('./components/retro/ArcadeTournamentModal').then((m) => ({ default: m.ArcadeTournamentModal })));
-const RetroManualsViewerModal = React.lazy(() => import('./components/retro/RetroManualsViewerModal').then((m) => ({ default: m.RetroManualsViewerModal })));
-const BezelStudioModal = React.lazy(() => import('./components/retro/BezelStudioModal').then((m) => ({ default: m.BezelStudioModal })));
-const RetroRouletteDailyChallengeModal = React.lazy(() => import('./components/retro/RetroRouletteDailyChallengeModal').then((m) => ({ default: m.RetroRouletteDailyChallengeModal })));
-const RetroAnalyticsModal = React.lazy(() => import('./components/extended/RetroAnalyticsModal').then((m) => ({ default: m.RetroAnalyticsModal })));
-const GamepadTesterModal = React.lazy(() => import('./components/extended/GamepadTesterModal').then((m) => ({ default: m.GamepadTesterModal })));
-const MultiProfileModal = React.lazy(() => import('./components/extended/MultiProfileModal').then((m) => ({ default: m.MultiProfileModal })));
-const HistoryTimelineModal = React.lazy(() => import('./components/extended/HistoryTimelineModal').then((m) => ({ default: m.HistoryTimelineModal })));
-const PrintStudioModal = React.lazy(() => import('./components/extended/PrintStudioModal').then((m) => ({ default: m.PrintStudioModal })));
-const NomadBackupModal = React.lazy(() => import('./components/extended/NomadBackupModal').then((m) => ({ default: m.NomadBackupModal })));
-const HandheldOverlaysModal = React.lazy(() => import('./components/extended/HandheldOverlaysModal').then((m) => ({ default: m.HandheldOverlaysModal })));
-const ArcadePartyModal = React.lazy(() => import('./components/extended/ArcadePartyModal').then((m) => ({ default: m.ArcadePartyModal })));
-const MusicManagerModal = React.lazy(() => import('./components/extended/MusicManagerModal').then((m) => ({ default: m.MusicManagerModal })));
-const CentralizedStorageModal = React.lazy(() => import('./components/extended/CentralizedStorageModal').then((m) => ({ default: m.CentralizedStorageModal })));
-const CommunityThemeStudioModal = React.lazy(() => import('./components/extended/CommunityThemeStudioModal').then((m) => ({ default: m.CommunityThemeStudioModal })));
-const RetroAttractModeModal = React.lazy(() => import('./components/retro/RetroAttractModeModal').then((m) => ({ default: m.RetroAttractModeModal })));
-const RetroPasswordNotebookModal = React.lazy(() => import('./components/retro/RetroPasswordNotebookModal').then((m) => ({ default: m.RetroPasswordNotebookModal })));
-const LanNetworkManagerModal = React.lazy(() => import('./components/extended/LanNetworkManagerModal').then((m) => ({ default: m.LanNetworkManagerModal })));
-const ProjectorKioskManagerModal = React.lazy(() => import('./components/retro/ProjectorKioskManagerModal').then((m) => ({ default: m.ProjectorKioskManagerModal })));
-const RetroManualPdfGuideModal = React.lazy(() => import('./components/manual/RetroManualPdfGuideModal').then((m) => ({ default: m.RetroManualPdfGuideModal })));
-const RetroShaderProfilesModal = React.lazy(() => import('./components/retro/RetroShaderProfilesModal').then((m) => ({ default: m.RetroShaderProfilesModal })));
-const ArcadeSpeedrunModal = React.lazy(() => import('./components/retro/ArcadeSpeedrunModal').then((m) => ({ default: m.ArcadeSpeedrunModal })));
-const VirtualCartridgeShelfModal = React.lazy(() => import('./components/retro/VirtualCartridgeShelfModal').then((m) => ({ default: m.VirtualCartridgeShelfModal })));
-const SaveStateSyncModal = React.lazy(() => import('./components/extended/SaveStateSyncModal').then((m) => ({ default: m.SaveStateSyncModal })));
-const ArcadeHotkeysGuideModal = React.lazy(() => import('./components/ArcadeHotkeysGuideModal').then((m) => ({ default: m.ArcadeHotkeysGuideModal })));
+const GameDetailModal = React.lazy(loadGameDetailModal);
+const AdminHubModal = React.lazy(loadAdminHubModal);
+const GameEditModal = React.lazy(loadGameEditModal);
+const SystemEditModal = React.lazy(loadSystemEditModal);
+const CompanyEditModal = React.lazy(loadCompanyEditModal);
+const ScraperModal = React.lazy(loadScraperModal);
+const ScrapeCandidateModal = React.lazy(loadScrapeCandidateModal);
+
+const ExtensionsDownloaderModal = React.lazy(loadExtensionsDownloaderModal);
+const KioskPinModal = React.lazy(loadKioskPinModal);
+const ConsoleExhibitionModal = React.lazy(loadConsoleExhibitionModal);
+const CompanyExhibitionModal = React.lazy(loadCompanyExhibitionModal);
+const GlobalSearchModal = React.lazy(loadGlobalSearchModal);
+const RomScannerModal = React.lazy(loadRomScannerModal);
+const QuickStartOnboardingModal = React.lazy(loadQuickStartOnboardingModal);
+const WebEmulatorModal = React.lazy(loadWebEmulatorModal);
+const RetroAchievementsModal = React.lazy(loadRetroAchievementsModal);
+const RetroCheatsModal = React.lazy(loadRetroCheatsModal);
+const RetroSaveStatesModal = React.lazy(loadRetroSaveStatesModal);
+const RetroJukeboxModal = React.lazy(loadRetroJukeboxModal);
+const ArcadeTournamentModal = React.lazy(loadArcadeTournamentModal);
+const RetroManualsViewerModal = React.lazy(loadRetroManualsViewerModal);
+const BezelStudioModal = React.lazy(loadBezelStudioModal);
+const RetroRouletteDailyChallengeModal = React.lazy(loadRetroRouletteModal);
+const RetroAnalyticsModal = React.lazy(loadRetroAnalyticsModal);
+const GamepadTesterModal = React.lazy(loadGamepadTesterModal);
+const MultiProfileModal = React.lazy(loadMultiProfileModal);
+const HistoryTimelineModal = React.lazy(loadHistoryTimelineModal);
+const PrintStudioModal = React.lazy(loadPrintStudioModal);
+const NomadBackupModal = React.lazy(loadNomadBackupModal);
+const HandheldOverlaysModal = React.lazy(loadHandheldOverlaysModal);
+const ArcadePartyModal = React.lazy(loadArcadePartyModal);
+const MusicManagerModal = React.lazy(loadMusicManagerModal);
+const CentralizedStorageModal = React.lazy(loadCentralizedStorageModal);
+const CommunityThemeStudioModal = React.lazy(loadCommunityThemeStudioModal);
+const RetroAttractModeModal = React.lazy(loadRetroAttractModeModal);
+const RetroPasswordNotebookModal = React.lazy(loadRetroPasswordNotebookModal);
+const LanNetworkManagerModal = React.lazy(loadLanNetworkManagerModal);
+const ProjectorKioskManagerModal = React.lazy(loadProjectorKioskManagerModal);
+const RetroManualPdfGuideModal = React.lazy(loadRetroManualPdfGuideModal);
+const RetroShaderProfilesModal = React.lazy(loadRetroShaderProfilesModal);
+const ArcadeSpeedrunModal = React.lazy(loadArcadeSpeedrunModal);
+const VirtualCartridgeShelfModal = React.lazy(loadVirtualCartridgeShelfModal);
+const SaveStateSyncModal = React.lazy(loadSaveStateSyncModal);
+const ArcadeHotkeysGuideModal = React.lazy(loadArcadeHotkeysGuideModal);
+// Vues secondaires chargées à la demande (thunks définis plus haut, partagés
+// avec le préchargeur d'arrière-plan).
+const CompanyView = React.lazy(loadCompanyView);
+const BiosManager = React.lazy(loadBiosManager);
+const ComputingView = React.lazy(loadComputingView);
+const KioskAttractMode = React.lazy(loadKioskAttractMode);
+const GamepadHint = React.lazy(loadGamepadHint);
+const RetroJukeboxFloatingPlayer = React.lazy(loadJukeboxFloatingPlayer);
+
+
+/**
+ * File de préchargement d'arrière-plan, par ordre d'utilité :
+ * 1. les onglets de navigation (firmes, informatique, BIOS) → changements
+ *    d'onglet instantanés ;
+ * 2. les écrans exposés dès l'accueil (musées, fiche jeu, Admin, PIN,
+ *    recherche, émulateur, attract mode, hints) ;
+ * 3. le reste des modules rétro.
+ */
+const PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager];
+const PRELOAD_PRIMARY_OVERLAYS = [
+  loadConsoleExhibitionModal,
+  loadCompanyExhibitionModal,
+  loadGameDetailModal,
+  loadAdminHubModal,
+  loadKioskPinModal,
+  loadGlobalSearchModal,
+  loadWebEmulatorModal,
+  loadQuickStartOnboardingModal,
+  loadArcadeHotkeysGuideModal,
+  loadKioskAttractMode,
+  loadGamepadHint,
+  loadJukeboxFloatingPlayer,
+];
+const PRELOAD_SECONDARY_MODULES = [
+  loadRetroManualPdfGuideModal,
+  loadRetroShaderProfilesModal,
+  loadRetroJukeboxModal,
+  loadRetroRouletteModal,
+  loadArcadeTournamentModal,
+  loadRetroAchievementsModal,
+  loadRetroManualsViewerModal,
+  loadVirtualCartridgeShelfModal,
+  loadArcadeSpeedrunModal,
+  loadRomScannerModal,
+  loadScraperModal,
+  loadScrapeCandidateModal,
+  loadGameEditModal,
+  loadSystemEditModal,
+  loadCompanyEditModal,
+  loadExtensionsDownloaderModal,
+  loadRetroSaveStatesModal,
+  loadRetroCheatsModal,
+  loadRetroAttractModeModal,
+  loadRetroAnalyticsModal,
+  loadGamepadTesterModal,
+  loadMultiProfileModal,
+  loadHistoryTimelineModal,
+  loadPrintStudioModal,
+  loadNomadBackupModal,
+  loadHandheldOverlaysModal,
+  loadArcadePartyModal,
+  loadMusicManagerModal,
+  loadCentralizedStorageModal,
+  loadCommunityThemeStudioModal,
+  loadRetroPasswordNotebookModal,
+  loadLanNetworkManagerModal,
+  loadProjectorKioskManagerModal,
+  loadSaveStateSyncModal,
+  loadBezelStudioModal,
+];
 import {
   getStoredGames,
   saveStoredGames,
@@ -1415,6 +1531,12 @@ export const App: React.FC = () => {
 
   // Manette Smartphone : entrées du téléphone → clavier injecté (émulateur web)
   usePhoneGamepad();
+
+  // Préchargement d'arrière-plan des chunks lazy : onglets d'abord, puis les
+  // écrans principaux, puis le reste — changements d'onglet instantanés.
+  useEffect(() => {
+    return scheduleChunkPreload([...PRELOAD_NAV_TABS, ...PRELOAD_PRIMARY_OVERLAYS, ...PRELOAD_SECONDARY_MODULES], 3000);
+  }, []);
 
   // Navigation manette
   useGamepad({

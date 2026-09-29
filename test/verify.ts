@@ -290,6 +290,59 @@ async function runTests() {
   assert(statusRestarted.running === true, 'Serveur manette smartphone redémarre après arrêt');
   await phoneServer.stopPhoneGamepadServer();
 
+  // Test 13: Préchargement d'arrière-plan des chunks (onglets instantanés)
+  console.log('\n--- Test Préchargement Chunks ---');
+  const appContent = fs.readFileSync(path.join(__dirname, '../src/App.tsx'), 'utf-8');
+  const preloaderContent = fs.readFileSync(path.join(__dirname, '../src/utils/chunkPreloader.ts'), 'utf-8');
+
+  assert(
+    preloaderContent.includes('requestIdleCallback') && preloaderContent.includes('scheduleChunkPreload'),
+    'Préchargeur : planification pendant les temps morts (requestIdleCallback + repli setTimeout)'
+  );
+  assert(
+    preloaderContent.includes("cancelled") && preloaderContent.includes('.catch('),
+    'Préchargeur : échecs isolés et annulation propre de la file'
+  );
+
+  const navIdx = appContent.indexOf('PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager]');
+  assert(navIdx > -1, 'Onglets Firmes / Informatique / BIOS dans la file de préchargement');
+
+  const primaryIdx = appContent.indexOf('PRELOAD_PRIMARY_OVERLAYS = [');
+  const secondaryIdx = appContent.indexOf('PRELOAD_SECONDARY_MODULES = [');
+  assert(
+    primaryIdx > -1 && secondaryIdx > -1 && primaryIdx < secondaryIdx,
+    'Ordre de préchargement : onglets → écrans principaux → modules rétro secondaires'
+  );
+  assert(
+    appContent.includes('scheduleChunkPreload([...PRELOAD_NAV_TABS'),
+    'File de préchargement démarrée au montage de App (après le premier rendu)'
+  );
+
+  // Comportement : la file s'exécute séquentiellement et survit à un échec
+  const { scheduleChunkPreload } = await import('../src/utils/chunkPreloader');
+  const g = globalThis as unknown as { window?: unknown };
+  const fakeWindow: Record<string, unknown> = {
+    setTimeout: (fn: () => void, ms?: number) => setTimeout(fn, Math.min(ms ?? 0, 5)),
+    clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+  };
+  g.window = fakeWindow;
+  try {
+    let executed = 0;
+    const cancel = scheduleChunkPreload(
+      [
+        async () => { executed++; },
+        async () => { executed++; throw new Error('chunk manquant (simulé)'); },
+        async () => { executed++; },
+      ],
+      5
+    );
+    await new Promise((r) => setTimeout(r, 150));
+    assert(executed === 3, `File de préchargement : toutes les tâches exécutées malgré un échec intermédiaire (${executed}/3)`);
+    cancel();
+  } finally {
+    delete g.window;
+  }
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);
