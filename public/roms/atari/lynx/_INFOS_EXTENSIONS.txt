@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : ATARI LYNX (Lynx)
+  Hiérarchie      : Roms / ATARI / lynx
+  Constructeur    : Atari (1989)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .lnx  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - lynxboot.img : Atari Lynx Boot ROM
+
+RetroMad Frontend Retrogaming
+============================================================

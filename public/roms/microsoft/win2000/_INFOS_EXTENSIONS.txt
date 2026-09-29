@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : WINDOWS 2000 (Win 2000)
+  Hiérarchie      : Roms / MICROSOFT / win2000
+  Constructeur    : Microsoft (2000)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .exe  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

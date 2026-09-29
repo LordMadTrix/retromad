@@ -27,7 +27,7 @@ export const ConsoleLogo: React.FC<ConsoleLogoProps> = ({
     sm: 'h-8 max-w-[150px]',
     md: 'h-11 max-w-[200px]',
     lg: 'h-16 max-w-[280px]',
-    xl: 'h-24 max-w-[360px]',
+    xl: 'h-20 sm:h-24 max-w-[360px]',
   }[size];
 
   if (!id) return null;
@@ -73,7 +73,7 @@ export const ConsoleLogo: React.FC<ConsoleLogoProps> = ({
       alt={alt || displayName}
       loading="eager"
       onError={handleError}
-      className={`${sizeClasses} ${className} max-w-full shrink-0 object-contain object-center inline-block transition-[filter] duration-200 group-hover:brightness-110`}
+      className={`${sizeClasses} ${className} max-w-full max-h-full shrink-0 object-contain object-center inline-block transition-[filter] duration-200 group-hover:brightness-110`}
     />
   );
 };

@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE 16 (C16)
+  Hiérarchie      : Roms / COMMODORE / c16
+  Constructeur    : Commodore (1984)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .d64  .t64  .prg  .tap  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

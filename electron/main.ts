@@ -23,6 +23,7 @@ protocol.registerSchemesAsPrivileged([
       standard: true,
       secure: true,
       supportFetchAPI: true,
+      corsEnabled: true,
       bypassCSP: true,
     },
   },
@@ -32,6 +33,7 @@ protocol.registerSchemesAsPrivileged([
       standard: true,
       secure: true,
       supportFetchAPI: true,
+      corsEnabled: true,
       bypassCSP: true,
       stream: true,
     },
@@ -128,13 +130,67 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Protocole pour charger les images mises en cache localement
-  protocol.handle('retromad-media', (request) => {
-    const parsed = new URL(request.url);
-    // Ex: retromad-media://media/boxarts/xxx.png
-    const relativePath = parsed.pathname.replace(/^\//, '');
-    const fullPath = path.join(storage.getDataDir(), relativePath);
-    return net.fetch(`file://${fullPath}`);
+  // Protocole pour charger les images et médias mis en cache localement
+  protocol.handle('retromad-media', async (request) => {
+    try {
+      const parsed = new URL(request.url);
+      // Gère les formes : retromad-media://media/boxarts/xxx.png ou retromad-media:///media/boxarts/xxx.png
+      let relativePath = parsed.host
+        ? path.join(parsed.host, parsed.pathname.replace(/^\//, ''))
+        : parsed.pathname.replace(/^\//, '');
+
+      relativePath = decodeURIComponent(relativePath);
+
+      // Résolution du fichier : tester dataDir, mediaDir, et public
+      let fullPath = path.join(storage.getDataDir(), relativePath);
+      if (!fs.existsSync(fullPath)) {
+        // Si relativePath commence par "media/", tester sous mediaDir sans le préfixe
+        const strippedMedia = relativePath.replace(/^media[\\/]/, '');
+        const altPath = path.join(storage.mediaDir, strippedMedia);
+        if (fs.existsSync(altPath)) {
+          fullPath = altPath;
+        } else {
+          // Essayer dans public/
+          const publicPath = path.join(process.cwd(), 'public', relativePath);
+          if (fs.existsSync(publicPath)) {
+            fullPath = publicPath;
+          }
+        }
+      }
+
+      if (!fs.existsSync(fullPath)) {
+        return new Response('Not found', { status: 404 });
+      }
+
+      const ext = path.extname(fullPath).toLowerCase();
+      const mimeTypes: Record<string, string> = {
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.webp': 'image/webp',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.mp4': 'video/mp4',
+        '.webm': 'video/webm',
+        '.pdf': 'application/pdf',
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav',
+        '.ogg': 'audio/ogg',
+      };
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+      const fileBuffer = await fs.promises.readFile(fullPath);
+
+      return new Response(fileBuffer, {
+        headers: {
+          'Content-Type': contentType,
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=86400',
+        },
+      });
+    } catch (err) {
+      console.error('[retromad-media] Erreur:', err);
+      return new Response('Internal Server Error', { status: 500 });
+    }
   });
 
   // Protocole de l'application de production : sert dist/ comme un site.
@@ -237,7 +293,11 @@ ipcMain.handle('get-settings', async () => {
 });
 
 ipcMain.handle('save-settings', async (_, newSettings) => {
-  return storage.saveSettings(newSettings);
+  const updated = storage.saveSettings(newSettings);
+  if (newSettings && newSettings.romsDir) {
+    setupRomsWatcher();
+  }
+  return updated;
 });
 
 ipcMain.handle('select-directory', async () => {
@@ -300,6 +360,23 @@ ipcMain.handle('save-companies', async (_, companies) => {
 });
 
 ipcMain.handle('get-games', async () => {
+  // Synchronisation incrémentale automatique : si de nouvelles ROMs sont présentes
+  // sur le disque (ex: ajout de ROM dans public/roms sans scan manuel préalable), on les fusionne.
+  try {
+    const settings = storage.getSettings();
+    if (settings.romsDir && fs.existsSync(settings.romsDir)) {
+      const existingGames = storage.getGames();
+      const existingPaths = new Set(existingGames.map((g) => g.path));
+      const scannedGames = await scanner.scanDirectory(settings.romsDir);
+      const newFiles = scannedGames.filter((g) => !existingPaths.has(g.path));
+      if (newFiles.length > 0 || existingGames.length === 0) {
+        console.log(`[RetroMad] Détection automatique : ${newFiles.length} nouvelle(s) ROM(s) trouvée(s).`);
+        return await scanAndMergeRoms();
+      }
+    }
+  } catch (err) {
+    console.warn('[RetroMad] Auto-sync get-games ignoré :', err);
+  }
   return storage.getGames();
 });
 
@@ -318,6 +395,43 @@ ipcMain.handle('toggle-favorite', async (_, gameId: string) => {
   }
   return false;
 });
+
+function updateRomsIndexJson(scannedGames: Game[]) {
+  try {
+    const projectRoot = process.cwd();
+    const publicRomsDir = path.join(projectRoot, 'public', 'roms');
+    const distRomsDir = path.join(projectRoot, 'dist', 'roms');
+    const indexData = {
+      generated: new Date().toISOString(),
+      count: scannedGames.length,
+      files: scannedGames.map((g) => {
+        let rel = g.path;
+        if (g.path.startsWith(publicRomsDir)) {
+          rel = path.relative(publicRomsDir, g.path);
+        } else {
+          const settings = storage.getSettings();
+          if (settings.romsDir && g.path.startsWith(settings.romsDir)) {
+            rel = path.relative(settings.romsDir, g.path);
+          }
+        }
+        return {
+          path: '/' + rel.replace(/\\/g, '/').replace(/^\//, ''),
+          filename: g.filename,
+          size: g.size,
+        };
+      }),
+    };
+    const content = JSON.stringify(indexData, null, 2);
+    if (fs.existsSync(publicRomsDir)) {
+      fs.writeFileSync(path.join(publicRomsDir, '_index.json'), content, 'utf-8');
+    }
+    if (fs.existsSync(distRomsDir)) {
+      fs.writeFileSync(path.join(distRomsDir, '_index.json'), content, 'utf-8');
+    }
+  } catch (e) {
+    console.warn('[RetroMad] Échec mise à jour _index.json:', e);
+  }
+}
 
 async function scanAndMergeRoms(): Promise<Game[]> {
   const settings = storage.getSettings();
@@ -347,6 +461,7 @@ async function scanAndMergeRoms(): Promise<Game[]> {
   });
 
   storage.saveGames(mergedGames);
+  updateRomsIndexJson(mergedGames);
   return mergedGames;
 }
 
@@ -354,18 +469,61 @@ ipcMain.handle('scan-roms', async () => {
   return scanAndMergeRoms();
 });
 
-// Auto-scan au démarrage : si la bibliothèque desktop est vide alors que le
-// dossier ROMs contient des fichiers, on la peuple automatiquement (sinon
-// l'utilisateur voit une collection vide et "aucun jeu ne se lance").
+let romsWatcher: fs.FSWatcher | null = null;
+let romsWatchTimeout: NodeJS.Timeout | null = null;
+
+function setupRomsWatcher() {
+  try {
+    if (romsWatcher) {
+      romsWatcher.close();
+      romsWatcher = null;
+    }
+    const settings = storage.getSettings();
+    if (!settings.romsDir || !fs.existsSync(settings.romsDir)) return;
+
+    romsWatcher = fs.watch(settings.romsDir, { recursive: true }, (eventType, filename) => {
+      if (!filename || filename.startsWith('.') || filename.endsWith('_index.json') || filename.endsWith('.tmp')) return;
+      if (romsWatchTimeout) clearTimeout(romsWatchTimeout);
+      romsWatchTimeout = setTimeout(async () => {
+        try {
+          console.log(`[RetroMad Watcher] Modification détectée dans le dossier ROMs (${filename})...`);
+          const existingGames = storage.getGames();
+          const existingPaths = new Set(existingGames.map((g) => g.path));
+          const scanned = await scanner.scanDirectory(settings.romsDir);
+          const newGames = scanned.filter((g) => !existingPaths.has(g.path));
+          if (newGames.length > 0) {
+            console.log(`[RetroMad Watcher] ${newGames.length} nouvelle(s) ROM(s) intégrée(s) automatiquement.`);
+            const merged = await scanAndMergeRoms();
+            if (mainWindow && !mainWindow.isDestroyed()) {
+              mainWindow.webContents.send('games-auto-imported', newGames.length);
+            }
+          }
+        } catch (err) {
+          console.warn('[RetroMad Watcher] Erreur traitement watcher:', err);
+        }
+      }, 1500);
+    });
+  } catch (err) {
+    console.warn('[RetroMad Watcher] Surveillance dossier ROMs non supportée ou échouée:', err);
+  }
+}
+
+// Auto-scan et surveillance continue au démarrage
 app.whenReady().then(async () => {
   try {
-    const games = storage.getGames();
+    setupRomsWatcher();
     const settings = storage.getSettings();
-    if (games.length === 0 && settings.romsDir && fs.existsSync(settings.romsDir)) {
-      const scanned = await scanAndMergeRoms();
-      console.log(`[RetroMad] Auto-scan initial : ${scanned.length} jeu(x) importé(s) depuis ${settings.romsDir}`);
-      if (mainWindow && scanned.length > 0) {
-        mainWindow.webContents.send('games-auto-imported', scanned.length);
+    if (settings.romsDir && fs.existsSync(settings.romsDir)) {
+      const existingGames = storage.getGames();
+      const existingPaths = new Set(existingGames.map((g) => g.path));
+      const scanned = await scanner.scanDirectory(settings.romsDir);
+      const newGames = scanned.filter((g) => !existingPaths.has(g.path));
+      if (newGames.length > 0 || existingGames.length === 0) {
+        const merged = await scanAndMergeRoms();
+        console.log(`[RetroMad] Auto-scan initial : ${merged.length} jeu(x) au total (${newGames.length} nouveau(x)) importé(s)`);
+        if (mainWindow && !mainWindow.isDestroyed() && newGames.length > 0) {
+          mainWindow.webContents.send('games-auto-imported', newGames.length);
+        }
       }
     }
   } catch (e) {
@@ -384,28 +542,90 @@ ipcMain.handle('scrape-game', async (_, game: Game) => {
   return updated;
 });
 
+ipcMain.handle('search-scrape-candidates', async (_, game: Game, query?: string) => {
+  return scraper.searchCandidates(game, query);
+});
+
+ipcMain.handle('scrape-game-with-title', async (_, game: Game, chosenTitle: string) => {
+  const updated = await scraper.scrapeGameWithTitle(game, chosenTitle);
+  const games = storage.getGames();
+  const idx = games.findIndex((g) => g.id === updated.id);
+  if (idx >= 0) {
+    games[idx] = updated;
+    storage.saveGames(games);
+  }
+  return updated;
+});
+
+
 ipcMain.handle('scrape-all', async () => {
   const games = storage.getGames();
   const total = games.length;
   const updatedGames: Game[] = [];
+  let found = 0;
+  let notFound = 0;
+  let skipped = 0;
 
   for (let i = 0; i < total; i++) {
     const game = games[i];
+    let currentBoxartUrl: string | undefined = undefined;
+
+    // Notifier le démarrage du jeu en cours
     if (mainWindow) {
       mainWindow.webContents.send('scrape-progress', {
         total,
         current: i + 1,
         currentGameTitle: game.cleanTitle,
         systemId: game.systemId,
+        found,
+        notFound,
+        skipped,
+        currentBoxartUrl: undefined,
       });
     }
 
     try {
+      const localBoxart = path.join(storage.mediaDir, 'boxarts', `${game.id}.png`);
+      const hadLocalBefore = fs.existsSync(localBoxart);
+
       const updated = await scraper.scrapeGame(game);
       updatedGames.push(updated);
+
+      const hasLocalNow = fs.existsSync(localBoxart);
+      if (hasLocalNow && !hadLocalBefore) {
+        found++;
+        currentBoxartUrl = updated.media?.boxart2d || `media/boxarts/${game.id}.png`;
+      } else if (hasLocalNow && hadLocalBefore) {
+        skipped++;
+        currentBoxartUrl = updated.media?.boxart2d || game.media?.boxart2d || `media/boxarts/${game.id}.png`;
+      } else if (updated.media?.boxart2d && updated.media.boxart2d !== game.media?.boxart2d) {
+        found++;
+        currentBoxartUrl = updated.media.boxart2d;
+      } else if (game.media?.boxart2d) {
+        skipped++;
+        currentBoxartUrl = game.media.boxart2d;
+      } else {
+        notFound++;
+        currentBoxartUrl = undefined;
+      }
     } catch (e) {
       console.error(`Erreur scrape pour ${game.title}:`, e);
       updatedGames.push(game);
+      notFound++;
+    }
+
+    // Notifier le résultat du jeu après scraping
+    if (mainWindow) {
+      mainWindow.webContents.send('scrape-progress', {
+        total,
+        current: i + 1,
+        currentGameTitle: game.cleanTitle,
+        systemId: game.systemId,
+        found,
+        notFound,
+        skipped,
+        currentBoxartUrl,
+      });
     }
   }
 
@@ -518,6 +738,77 @@ ipcMain.handle('set-kiosk-mode', async (_, enabled: boolean) => {
   return true;
 });
 
+ipcMain.handle('detect-usb-drives', async () => {
+  const detectedDrives: { path: string; label: string; romsCount: number }[] = [];
+  try {
+    const candidateDirs: string[] = [];
+    const user = process.env.USER || process.env.USERNAME || 'madtrix';
+    const mediaPaths = [
+      path.join('/media', user),
+      '/media',
+      path.join('/run/media', user),
+    ];
+
+    for (const mPath of mediaPaths) {
+      if (fs.existsSync(mPath)) {
+        const entries = fs.readdirSync(mPath, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            candidateDirs.push(path.join(mPath, entry.name));
+          }
+        }
+      }
+    }
+
+    for (const drivePath of candidateDirs) {
+      try {
+        const scanned = await scanner.scanDirectory(drivePath);
+        if (scanned.length > 0) {
+          detectedDrives.push({
+            path: drivePath,
+            label: path.basename(drivePath),
+            romsCount: scanned.length,
+          });
+        }
+      } catch {}
+    }
+  } catch (err) {
+    console.warn('[RetroMad USB] Erreur détection clés USB:', err);
+  }
+  return detectedDrives;
+});
+
+ipcMain.handle('import-from-usb', async (_, usbPath: string) => {
+  if (!usbPath || !fs.existsSync(usbPath)) {
+    return { success: false, imported: 0, message: 'Chemin USB invalide' };
+  }
+
+  const settings = storage.getSettings();
+  const romsDir = settings.romsDir || path.join(process.cwd(), 'public', 'roms');
+  let importedCount = 0;
+
+  try {
+    const scanned = await scanner.scanDirectory(usbPath);
+    for (const game of scanned) {
+      const targetDir = path.join(romsDir, game.systemId);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      const targetPath = path.join(targetDir, path.basename(game.path));
+      if (!fs.existsSync(targetPath)) {
+        fs.copyFileSync(game.path, targetPath);
+        importedCount++;
+      }
+    }
+
+    const updatedGames = await scanAndMergeRoms();
+    return { success: true, imported: importedCount, total: scanned.length, games: updatedGames };
+  } catch (err) {
+    console.error('[RetroMad USB] Erreur import USB:', err);
+    return { success: false, imported: importedCount, message: String(err) };
+  }
+});
+
 ipcMain.on('window-minimize', () => {
   mainWindow?.minimize();
 });
@@ -533,3 +824,4 @@ ipcMain.on('window-maximize', () => {
 ipcMain.on('window-close', () => {
   mainWindow?.close();
 });
+

@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : SEGA SG-1000 (SG-1000)
+  Hiérarchie      : Roms / SEGA / sg1000
+  Constructeur    : SEGA (1983)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .sg  .bin  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

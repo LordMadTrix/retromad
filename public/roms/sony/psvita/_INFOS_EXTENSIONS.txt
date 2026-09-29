@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : SONY PLAYSTATION VITA (PS Vita)
+  Hiérarchie      : Roms / SONY / psvita
+  Constructeur    : Sony (2011)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .vpk  .zip  .pkg
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - PSP2UPDAT.PUP : Firmware officiel PlayStation Vita (Pour Vita3K)
+
+RetroMad Frontend Retrogaming
+============================================================

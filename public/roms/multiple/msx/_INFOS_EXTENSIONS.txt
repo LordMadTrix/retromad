@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : MSX (STANDARD MICROSOFT / ASCII) (MSX)
+  Hiérarchie      : Roms / MULTIPLE / msx
+  Constructeur    : Multi-fabricants (1983)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .rom  .mx1  .dsk  .cas  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - MSX.ROM : MSX BIOS ROM (Requis)
+  - DISK.ROM : MSX Disk ROM (Pour les disquettes)
+
+RetroMad Frontend Retrogaming
+============================================================

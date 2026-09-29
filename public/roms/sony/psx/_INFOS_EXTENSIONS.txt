@@ -1,0 +1,20 @@
+============================================================
+  DOSSIER DE ROMS : SONY PLAYSTATION (PlayStation (PS1))
+  Hiérarchie      : Roms / SONY / psx
+  Constructeur    : Sony (1994)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .cue  .iso  .chd  .pbp  .bin  .mdf
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - scph5501.bin : PlayStation USA BIOS SCPH-5501 (Recommandé)
+  - scph5502.bin : PlayStation Europe BIOS SCPH-5502 (PAL)
+  - scph5500.bin : PlayStation Japon BIOS SCPH-5500 (NTSC-J)
+
+RetroMad Frontend Retrogaming
+============================================================

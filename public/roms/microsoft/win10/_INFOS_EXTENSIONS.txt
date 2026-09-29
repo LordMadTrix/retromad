@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : WINDOWS 10 (Win 10)
+  Hiérarchie      : Roms / MICROSOFT / win10
+  Constructeur    : Microsoft (2015)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .exe  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

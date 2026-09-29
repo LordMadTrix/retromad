@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : GAME BOY ADVANCE (GBA)
+  Hiérarchie      : Roms / NINTENDO / gba
+  Constructeur    : Nintendo (2001)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .gba  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - gba_bios.bin : Game Boy Advance Official BIOS
+
+RetroMad Frontend Retrogaming
+============================================================

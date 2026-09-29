@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : NINTENDO 3DS (Nintendo 3DS)
+  Hiérarchie      : Roms / NINTENDO / 3ds
+  Constructeur    : Nintendo (2011)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .3ds  .cia  .cxi  .app  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

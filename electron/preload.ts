@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company } from './types';
+import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company, ScrapeCandidate } from './types';
+
 
 export interface ScrapeProgressData {
   total: number;
@@ -48,6 +49,10 @@ export const API = {
 
   // Scraping
   scrapeGame: (game: Game): Promise<Game> => ipcRenderer.invoke('scrape-game', game),
+  searchScrapeCandidates: (game: Game, query?: string): Promise<ScrapeCandidate[]> =>
+    ipcRenderer.invoke('search-scrape-candidates', game, query),
+  scrapeGameWithTitle: (game: Game, chosenTitle: string): Promise<Game> =>
+    ipcRenderer.invoke('scrape-game-with-title', game, chosenTitle),
   scrapeAll: (): Promise<Game[]> => ipcRenderer.invoke('scrape-all'),
   onScrapeProgress: (callback: (data: ScrapeProgressData) => void) => {
     const handler = (_: IpcRendererEvent, data: ScrapeProgressData) => callback(data);
@@ -56,6 +61,7 @@ export const API = {
       ipcRenderer.removeListener('scrape-progress', handler);
     };
   },
+
 
   // BIOS & Lancement
   checkBios: () => ipcRenderer.invoke('check-bios'),
@@ -89,6 +95,12 @@ export const API = {
   minimizeWindow: () => ipcRenderer.send('window-minimize'),
   maximizeWindow: () => ipcRenderer.send('window-maximize'),
   closeWindow: () => ipcRenderer.send('window-close'),
+
+  // Détection & Import automatique Clé USB
+  detectUsbDrives: (): Promise<{ path: string; label: string; romsCount: number }[]> =>
+    ipcRenderer.invoke('detect-usb-drives'),
+  importFromUsb: (usbPath: string): Promise<{ success: boolean; imported: number; total?: number; games?: Game[]; message?: string }> =>
+    ipcRenderer.invoke('import-from-usb', usbPath),
 };
 
 contextBridge.exposeInMainWorld('api', API);

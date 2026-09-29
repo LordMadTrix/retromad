@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
-import { System, Company, Game, AppSettings, BiosStatus, EmulatorProfile } from './types';
+import { System, Company, Game, AppSettings, BiosStatus, EmulatorProfile, ScrapeCandidate } from './types';
 import { SYSTEMS as DEFAULT_SYSTEMS } from '../electron/data/systems';
 import { COMPANIES as DEFAULT_COMPANIES } from '../electron/data/companies';
 import { BUILTIN_EMULATORS } from '../electron/data/emulators';
@@ -69,6 +69,8 @@ const GameEditModal = React.lazy(() => import('./components/GameEditModal').then
 const SystemEditModal = React.lazy(() => import('./components/SystemEditModal').then((m) => ({ default: m.SystemEditModal })));
 const CompanyEditModal = React.lazy(() => import('./components/CompanyEditModal').then((m) => ({ default: m.CompanyEditModal })));
 const ScraperModal = React.lazy(() => import('./components/ScraperModal').then((m) => ({ default: m.ScraperModal })));
+const ScrapeCandidateModal = React.lazy(() => import('./components/ScrapeCandidateModal').then((m) => ({ default: m.ScrapeCandidateModal })));
+
 const ExtensionsDownloaderModal = React.lazy(() => import('./components/ExtensionsDownloaderModal').then((m) => ({ default: m.ExtensionsDownloaderModal })));
 const KioskPinModal = React.lazy(() => import('./components/KioskPinModal').then((m) => ({ default: m.KioskPinModal })));
 const ConsoleExhibitionModal = React.lazy(() => import('./components/ConsoleExhibitionModal').then((m) => ({ default: m.ConsoleExhibitionModal })));
@@ -105,6 +107,7 @@ const RetroShaderProfilesModal = React.lazy(() => import('./components/retro/Ret
 const ArcadeSpeedrunModal = React.lazy(() => import('./components/retro/ArcadeSpeedrunModal').then((m) => ({ default: m.ArcadeSpeedrunModal })));
 const VirtualCartridgeShelfModal = React.lazy(() => import('./components/retro/VirtualCartridgeShelfModal').then((m) => ({ default: m.VirtualCartridgeShelfModal })));
 const SaveStateSyncModal = React.lazy(() => import('./components/extended/SaveStateSyncModal').then((m) => ({ default: m.SaveStateSyncModal })));
+const ArcadeHotkeysGuideModal = React.lazy(() => import('./components/ArcadeHotkeysGuideModal').then((m) => ({ default: m.ArcadeHotkeysGuideModal })));
 import {
   getStoredGames,
   saveStoredGames,
@@ -145,15 +148,14 @@ const convertCentralizedRomsToGames = (romList: CentralizedRomItem[]): Game[] =>
 };
 
 export const App: React.FC = () => {
-  // Navigation & Vues (Par défaut sur 'companies' pour afficher immédiatement les firmes et vidéos)
-  const [currentTab, setCurrentTab] = useState<NavTab>('companies');
+  // Navigation & Vues (Par défaut sur 'games' pour afficher immédiatement les jeux)
+  const [currentTab, setCurrentTab] = useState<NavTab>('games');
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
 
-  // Profil Kiosk vs Admin : la régie (administration) est verrouillée par PIN
-  // tant qu'elle n'a pas été déverrouillée — le Kiosque (jeu) reste libre.
-  const [isKioskMode, setIsKioskMode] = useState(false);
-  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
+  // Profil Kiosk vs Admin (Kiosk en 1er par défaut)
+  const [isKioskMode, setIsKioskMode] = useState(true);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(true);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
   // Données
@@ -238,13 +240,31 @@ export const App: React.FC = () => {
     current: number;
     currentGameTitle: string;
     isComplete: boolean;
+    found: number;
+    notFound: number;
+    skipped: number;
+    currentBoxartUrl?: string;
   }>({
     isOpen: false,
     total: 0,
     current: 0,
     currentGameTitle: '',
     isComplete: false,
+    found: 0,
+    notFound: 0,
+    skipped: 0,
+    currentBoxartUrl: undefined,
   });
+
+  // Correspondances et choix de titres similaires pour le scraping
+  const [isCandidateModalOpen, setIsCandidateModalOpen] = useState(false);
+  const [candidateGame, setCandidateGame] = useState<Game | null>(null);
+  const [scrapeCandidates, setScrapeCandidates] = useState<ScrapeCandidate[]>([]);
+  const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
+  const [isApplyingCandidate, setIsApplyingCandidate] = useState(false);
+  const [isSingleScraping, setIsSingleScraping] = useState(false);
+
+
 
   // Audio Rétro avec Volume, Sons Spéciaux et BGM Chiptune
   const { playMove, playSelect, playBack, playLaunch, playCoin, playFavorite, playUnlock, playDice } = useAudio(
@@ -373,6 +393,7 @@ export const App: React.FC = () => {
   const [isSpeedrunModalOpen, setIsSpeedrunModalOpen] = useState(false);
   const [isCartridgeShelfModalOpen, setIsCartridgeShelfModalOpen] = useState(false);
   const [isSaveStateSyncModalOpen, setIsSaveStateSyncModalOpen] = useState(false);
+  const [isHotkeysGuideOpen, setIsHotkeysGuideOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
     try {
       const completed = localStorage.getItem('retromad_onboarding_completed');
@@ -687,10 +708,8 @@ export const App: React.FC = () => {
         setIsUserManualPdfOpen(true);
       } else if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') || e.key === 'F12') {
         e.preventDefault();
-        if (isKioskMode) {
-          playSelect();
-          setIsPinModalOpen(true);
-        }
+        playSelect();
+        setIsSettingsOpen(true);
       } else if ((e.ctrlKey && (e.key === 'k' || e.key === 'K')) || (e.ctrlKey && (e.key === 'f' || e.key === 'F'))) {
         e.preventDefault();
         playSelect();
@@ -865,10 +884,6 @@ export const App: React.FC = () => {
   const handleStartScrapeBatch = async () => {
     if (isKioskMode) return;
     playSelect();
-    if (!window.api) {
-      showNotification("Mode démo : Lancez l'application Electron pour scraper", 'info');
-      return;
-    }
 
     if (games.length === 0) {
       showNotification('Veuillez scanner des ROMs avant de lancer le scraping.', 'error');
@@ -879,16 +894,59 @@ export const App: React.FC = () => {
       isOpen: true,
       total: games.length,
       current: 0,
-      currentGameTitle: 'Initialisation du scraper...',
+      currentGameTitle: 'Initialisation du scraper…',
       isComplete: false,
+      found: 0,
+      notFound: 0,
+      skipped: 0,
+      currentBoxartUrl: undefined,
     });
     setIsScrapingBatch(true);
 
     try {
-      const updated = await window.api.scrapeAll();
-      setGames(updated);
-      setScrapeState((prev) => ({ ...prev, isComplete: true }));
-      showNotification('Scraping terminé avec succès !', 'success');
+      if (window.api?.scrapeAll) {
+        // ── Mode Electron ou Web avec API ──
+        // Écouter les événements de progression enrichis
+        const unsubProgress = window.api.onScrapeProgress?.((data: any) => {
+          setScrapeState((prev) => ({
+            ...prev,
+            current: data.current ?? prev.current,
+            currentGameTitle: data.currentGameTitle ?? prev.currentGameTitle,
+            found: data.found ?? prev.found,
+            notFound: data.notFound ?? prev.notFound,
+            skipped: data.skipped ?? prev.skipped,
+            currentBoxartUrl: data.currentBoxartUrl ?? prev.currentBoxartUrl,
+          }));
+        });
+
+        const updated = await window.api.scrapeAll();
+        if (typeof unsubProgress === 'function') unsubProgress();
+
+        setGames(updated);
+        setScrapeState((prev) => ({ ...prev, isComplete: true, current: prev.total }));
+        showNotification(`Scraping terminé ! ${updated.filter(g => g.media?.boxart2d).length} jaquettes récupérées.`, 'success');
+      } else {
+        // ── Mode web pur sans API (fallback démo) ──
+        const { scrapeAllGamesWeb } = await import('./services/scraper');
+        const results = await scrapeAllGamesWeb(
+          games,
+          (stats) => {
+            setScrapeState((prev) => ({
+              ...prev,
+              current: stats.done,
+              total: stats.total,
+              currentGameTitle: stats.currentGame || prev.currentGameTitle,
+              found: stats.found,
+              notFound: stats.notFound,
+              skipped: stats.skipped,
+              currentBoxartUrl: stats.currentBoxartUrl,
+            }));
+          }
+        );
+        setGames(results);
+        setScrapeState((prev) => ({ ...prev, isComplete: true, current: prev.total }));
+        showNotification(`Scraping terminé ! ${results.filter(g => g.media?.boxart2d).length} jaquettes récupérées.`, 'success');
+      }
     } catch (err: any) {
       showNotification(`Erreur lors du scraping : ${err.message}`, 'error');
     } finally {
@@ -896,11 +954,50 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleOpenCandidateSearch = async (game: Game, customQuery?: string) => {
+    playSelect();
+    setCandidateGame(game);
+    setIsCandidateModalOpen(true);
+    setIsSearchingCandidates(true);
+    try {
+      if (window.api?.searchScrapeCandidates) {
+        const list = await window.api.searchScrapeCandidates(game, customQuery);
+        setScrapeCandidates(list);
+      } else {
+        setScrapeCandidates([]);
+      }
+    } catch (err: any) {
+      showNotification(`Erreur lors de la recherche des suggestions : ${err.message}`, 'error');
+    } finally {
+      setIsSearchingCandidates(false);
+    }
+  };
+
+  const handleSelectCandidate = async (candidate: ScrapeCandidate) => {
+    if (!candidateGame || !window.api?.scrapeGameWithTitle) return;
+    setIsApplyingCandidate(true);
+    try {
+      const updated = await window.api.scrapeGameWithTitle(candidateGame, candidate.title);
+      setGames((prev) => prev.map((g) => (g.id === updated.id ? updated : g)));
+      if (selectedGame?.id === updated.id) {
+        setSelectedGame(updated);
+      }
+      playUnlock();
+      showNotification(`Jaquettes et données appliquées pour « ${candidate.cleanTitle} » !`, 'success');
+      setIsCandidateModalOpen(false);
+    } catch (err: any) {
+      playDice();
+      showNotification(`Erreur lors du scraping du titre : ${err.message}`, 'error');
+    } finally {
+      setIsApplyingCandidate(false);
+    }
+  };
+
   const handleScrapeSingleGame = async (game: Game) => {
-    if (isKioskMode) return;
     playSelect();
     if (!window.api) return;
 
+    setIsSingleScraping(true);
     showNotification(`Recherche des médias pour "${game.cleanTitle}"...`, 'info');
     try {
       const updated = await window.api.scrapeGame(game);
@@ -908,11 +1005,31 @@ export const App: React.FC = () => {
       if (selectedGame?.id === updated.id) {
         setSelectedGame(updated);
       }
-      showNotification(`Jaquette et données mises à jour !`, 'success');
+
+      // En cas de non trouvé : donner le choix avec des noms qui y ressemblent !
+      const hasMedia = !!(
+        updated.media?.boxart2d ||
+        updated.media?.boxart3d ||
+        updated.media?.snap ||
+        updated.media?.video ||
+        updated.media?.titleScreen
+      );
+
+      if (!hasMedia) {
+        showNotification(`Aucun média trouvé directement. Recherche de correspondances...`, 'info');
+        await handleOpenCandidateSearch(game);
+      } else {
+        showNotification(`Jaquette et données mises à jour !`, 'success');
+      }
     } catch (err: any) {
-      showNotification(`Erreur de scraping : ${err.message}`, 'error');
+      showNotification(`Erreur de scraping : ${err.message}. Recherche de correspondances...`, 'info');
+      await handleOpenCandidateSearch(game);
+    } finally {
+      setIsSingleScraping(false);
     }
   };
+
+
 
   // Lance le lecteur intégré (EmulatorJS). En mode bureau, la ROM est lue
   // depuis le disque via IPC et passée en blob: au lecteur (il n'y a pas de
@@ -1002,7 +1119,7 @@ export const App: React.FC = () => {
     try {
       const result = await window.api.launchGame(game, emulatorId);
       if (result.success) {
-        showNotification(result.message, 'success');
+        showNotification(`${result.message} — (Maintenez SELECT + START pour quitter)`, 'success');
         return;
       }
       // Aucun émulateur externe fonctionnel (ex. RetroArch non installé) :
@@ -1441,7 +1558,10 @@ export const App: React.FC = () => {
             playSelect();
             setSelectedGame(g);
           }}
-          onUnlockAdmin={() => setIsPinModalOpen(true)}
+          onUnlockAdmin={() => {
+            playSelect();
+            setIsSettingsOpen(true);
+          }}
           onOpenShaderProfiles={() => {
             playSelect();
             setIsShaderProfilesModalOpen(true);
@@ -1496,27 +1616,32 @@ export const App: React.FC = () => {
             playSelect();
             setIsCartridgeShelfModalOpen(true);
           }}
-        />
-      ) : !isAdminUnlocked ? (
-        /* RÉGIE VERROUILLÉE : aucun outil d'administration accessible sans PIN.
-           Le Kiosque (jeu) reste libre d'accès depuis cet écran. */
-        <AdminLockScreen
-          correctPin={settings.kioskPin || '1234'}
-          onUnlock={() => {
-            setIsAdminUnlocked(true);
-            showNotification('Régie admin déverrouillée 🛡️ — administration du système autorisée.', 'success');
+          onOpenThemeStudio={() => {
+            playSelect();
+            setIsCommunityThemeStudioOpen(true);
           }}
-          onEnterKiosk={handleEnterKiosk}
-          soundEnabled={settings.soundEnabled}
+          onTriggerAttractMode={() => {
+            playSelect();
+            setIsAttractMode(true);
+          }}
+          onReloadGames={handleScanRoms}
         />
       ) : (
         <>
           {/* Barre de navigation principale */}
           <Navigation
-            currentTab={currentTab}
+            currentTab={isSettingsOpen ? 'settings' : currentTab}
             onTabChange={(tab) => {
               playSelect();
-              setCurrentTab(tab);
+              if (tab === 'settings') {
+                setIsSettingsOpen(true);
+              } else {
+                setCurrentTab(tab);
+              }
+            }}
+            onOpenSettings={() => {
+              playSelect();
+              setIsSettingsOpen(true);
             }}
             onScan={handleScanRoms}
             onScrape={handleStartScrapeBatch}
@@ -1665,58 +1790,6 @@ export const App: React.FC = () => {
               onOpenSettings={() => setIsSettingsOpen(true)}
             />
           )}
-
-          {currentTab === 'settings' && (
-            <Suspense fallback={null}>
-              <AdminHubModal
-                isOpen={currentTab === 'settings'}
-                onClose={() => setCurrentTab('games')}
-                settings={settings}
-                onSaveSettings={handleSaveSettings}
-                games={games}
-                onSaveGames={handleSaveGames}
-                systems={systems}
-                onSaveSystems={handleSaveSystems}
-                companies={companies}
-                onSaveCompanies={handleSaveCompanies}
-                emulators={emulators}
-                onSaveEmulators={handleSaveEmulators}
-                onSelectDirectory={async () => {
-                  if (window.api) return window.api.selectDirectory();
-                  return null;
-                }}
-                onOpenExtensions={() => {
-                  playSelect();
-                  setIsExtensionsModalOpen(true);
-                }}
-                onDetectEmulators={async () => {
-                  if (window.api?.detectEmulators) return window.api.detectEmulators();
-                  return emulators;
-                }}
-                onResetDefaults={handleResetDefaults}
-                onOpenSystemExhibition={(sys) => {
-                  setCurrentTab('games');
-                  setExhibitionSystem(sys);
-                }}
-                onOpenCompanyExhibition={(comp) => {
-                  setCurrentTab('companies');
-                  setExhibitionCompany(comp);
-                }}
-                onScanRoms={handleScanRoms}
-                isScanningRoms={isScanning}
-                onStartScrapeBatch={handleStartScrapeBatch}
-                onScrapeGame={handleScrapeSingleGame}
-                isScrapingBatch={isScrapingBatch}
-                scrapeProgress={scrapeState}
-                onLaunchGame={handleLaunchGame}
-                onToggleFavorite={handleToggleFavorite}
-                biosStatuses={biosStatuses}
-                isCheckingBios={isCheckingBios}
-                onCheckBios={handleRefreshBios}
-                onCreateRomsFolders={window.api?.createRomsFolders}
-              />
-            </Suspense>
-          )}
         </>
       )}
 
@@ -1734,14 +1807,17 @@ export const App: React.FC = () => {
         onLaunch={handleLaunchGame}
         onToggleFavorite={handleToggleFavorite}
         onScrapeGame={handleScrapeSingleGame}
+        onOpenCandidateSearch={handleOpenCandidateSearch}
         onEdit={(game) => {
+
           if (!isKioskMode && isAdminUnlocked) {
             setDirectEditingGame(game);
           }
         }}
         onDeleteGame={handleDeleteGame}
         isKioskMode={isKioskMode}
-        isScraping={isScrapingBatch}
+        isScraping={isScrapingBatch || isSingleScraping}
+
         onOpenAchievements={(_g) => {
           playSelect();
           setIsAchievementsModalOpen(true);
@@ -1766,8 +1842,8 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Centre d'Administration en superposition (régie déverrouillée uniquement) */}
-      {!isKioskMode && isAdminUnlocked && isSettingsOpen && (
+      {/* Centre d'Administration en superposition */}
+      {isSettingsOpen && (
         <AdminHubModal
           isOpen={isSettingsOpen}
           onClose={() => {
@@ -1791,6 +1867,10 @@ export const App: React.FC = () => {
           onOpenExtensions={() => {
             playSelect();
             setIsExtensionsModalOpen(true);
+          }}
+          onOpenThemeStudio={() => {
+            playSelect();
+            setIsCommunityThemeStudioOpen(true);
           }}
           onDetectEmulators={async () => {
             if (window.api?.detectEmulators) return window.api.detectEmulators();
@@ -1839,8 +1919,29 @@ export const App: React.FC = () => {
         current={scrapeState.current}
         currentGameTitle={scrapeState.currentGameTitle}
         isComplete={scrapeState.isComplete}
+        found={scrapeState.found}
+        notFound={scrapeState.notFound}
+        skipped={scrapeState.skipped}
+        currentBoxartUrl={scrapeState.currentBoxartUrl}
         onClose={() => setScrapeState((prev) => ({ ...prev, isOpen: false }))}
       />
+
+      {/* Modale de Choix des Titres Similaires (en cas de jeu non trouvé ou correction) */}
+      <ScrapeCandidateModal
+        isOpen={isCandidateModalOpen}
+        game={candidateGame}
+        candidates={scrapeCandidates}
+        isSearching={isSearchingCandidates}
+        isApplying={isApplyingCandidate}
+        onClose={() => setIsCandidateModalOpen(false)}
+        onSearch={(query) => {
+          if (candidateGame) {
+            handleOpenCandidateSearch(candidateGame, query);
+          }
+        }}
+        onSelectCandidate={handleSelectCandidate}
+      />
+
 
       {/* Modale de Déverrouillage Code PIN Kiosk */}
       <KioskPinModal
@@ -1957,7 +2058,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Pied de page touches manette */}
-      {!isKioskMode && <GamepadHint />}
+      {!isKioskMode && <GamepadHint onOpenHotkeysGuide={() => setIsHotkeysGuideOpen(true)} />}
 
       {/* Recherche Globale Spotlight (Ctrl+K) */}
       <GlobalSearchModal
@@ -1986,6 +2087,7 @@ export const App: React.FC = () => {
         games={games}
         systems={systems}
         onWakeUp={() => {
+          playCoin();
           setIsAttractMode(false);
           resetAttractTimer();
         }}
@@ -2475,6 +2577,12 @@ export const App: React.FC = () => {
           if (type === 'click') playMove();
           if (type === 'success') playUnlock();
         }}
+      />
+
+      {/* 5. GUIDE DES RACCOURCIS ARCADE UNIVERSELS */}
+      <ArcadeHotkeysGuideModal
+        isOpen={isHotkeysGuideOpen}
+        onClose={() => setIsHotkeysGuideOpen(false)}
       />
 
       {/* ASSISTANT DE DÉMARRAGE RAPIDE & PREMIER LANCEMENT (régie déverrouillée) */}

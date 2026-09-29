@@ -127,12 +127,37 @@ export class LauncherService {
       .replace(/\{corePath\}/g, fs.existsSync(corePath) ? corePath : coreName)
       .replace(/\{coreName\}/g, coreName)
       .replace(/\{core\}/g, corePath)
-      .replace(/\{system\}/g, system.shortName);
-
     const args = this.parseArgs(resolvedTemplate);
+
+    // Configuration automatique des raccourcis arcade universels (Select+Start = Quitter)
+    if (emuProfile.id === 'retroarch') {
+      try {
+        const hotkeysCfgPath = path.join(storage.mediaDir, 'arcade_hotkeys.cfg');
+        const cfgContent = [
+          '# Raccourcis Arcade Universels RetroMad (Sortie directe et ergonomie Kiosk)',
+          'input_enable_hotkey_btn = "8"',
+          'input_exit_emulator_btn = "9"',
+          'input_exit_emulator = "escape"',
+          'input_menu_toggle_btn = "3"',
+          'input_save_state_btn = "5"',
+          'input_load_state_btn = "4"',
+          'input_rewind_btn = "2"',
+          'input_pause_toggle_btn = "0"',
+          'quit_press_twice = "false"',
+        ].join('\n');
+        fs.writeFileSync(hotkeysCfgPath, cfgContent, 'utf-8');
+
+        if (!args.includes('--appendconfig') && fs.existsSync(hotkeysCfgPath)) {
+          args.push('--appendconfig', hotkeysCfgPath);
+        }
+      } catch (e) {
+        console.warn('[Launcher] Échec configuration hotkeys arcade :', e);
+      }
+    }
 
     try {
       console.log(`[Launcher] Lancement via ${emuProfile.name} : ${executable} ${args.join(' ')}`);
+
 
       // Vérification préventive si le chemin est absolu
       if (path.isAbsolute(executable) && !fs.existsSync(executable)) {

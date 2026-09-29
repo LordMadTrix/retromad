@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : MSX2 (STANDARD JAPONAIS) (MSX2)
+  Hiérarchie      : Roms / MULTIPLE / msx2
+  Constructeur    : Multi-fabricants (1985)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .rom  .ri  .mx1  .mx2  .dsk  .cas  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - MSX2.ROM : MSX2 BIOS ROM (indispensable)
+  - MSX2EXT.ROM : MSX2 Extended BIOS ROM
+
+RetroMad Frontend Retrogaming
+============================================================

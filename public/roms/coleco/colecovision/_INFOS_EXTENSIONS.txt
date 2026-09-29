@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : COLECOVISION (ColecoVision)
+  Hiérarchie      : Roms / COLECO / colecovision
+  Constructeur    : Coleco Industries (1982)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .col  .bin  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - colecovision.rom : ColecoVision BIOS (Requis)
+
+RetroMad Frontend Retrogaming
+============================================================

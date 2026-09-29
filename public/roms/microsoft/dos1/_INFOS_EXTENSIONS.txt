@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : MS-DOS 1.0 (PC-DOS) (DOS 1.0)
+  Hiérarchie      : Roms / MICROSOFT / dos1
+  Constructeur    : Microsoft / IBM (1981)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .exe  .com  .bat
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

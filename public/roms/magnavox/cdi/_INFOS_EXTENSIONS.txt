@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : PHILIPS CD-I (CD-i)
+  Hiérarchie      : Roms / MAGNAVOX / cdi
+  Constructeur    : Philips (1991)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .chd  .cue  .bin  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - zx32950b.bin : BIOS CD-i 220/450 (flash IC1)
+
+RetroMad Frontend Retrogaming
+============================================================

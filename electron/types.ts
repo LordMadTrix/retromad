@@ -117,6 +117,8 @@ export interface GameMetadata {
   players?: string;
   rating?: number; // 0 to 100
   synopsis?: string;
+  esrbOrPegi?: string; // Classification d'âge (ex: PEGI 3, ESRB E)
+  coop?: boolean;
 }
 
 export interface GameMedia {
@@ -125,6 +127,9 @@ export interface GameMedia {
   snap?: string;
   titleScreen?: string;
   wheel?: string;
+  video?: string;   // Clip vidéo MP4 de gameplay
+  manual?: string;  // Notice / Manuel d'époque au format PDF
+  fanart?: string;  // Artwork d'arrière-plan HD
 }
 
 export interface Game {
@@ -143,6 +148,7 @@ export interface Game {
   playCount: number;
   lastPlayed?: string;
   playTimeMinutes?: number; // Temps de jeu total accumulé en minutes
+  scrapedAt?: string;       // Date du dernier scraping (ISO 8601)
   metadata: GameMetadata;
   media: GameMedia;
 }
@@ -241,3 +247,20 @@ export interface ExtensionProgress {
   status: 'downloading' | 'extracting' | 'configuring' | 'complete' | 'error';
   message: string;
 }
+
+export interface ScrapeCandidate {
+  title: string;
+  cleanTitle: string;
+  systemId: string;
+  score: number; // 0 à 100 (% de ressemblance)
+  boxartUrl?: string;
+  source: 'libretro' | 'screenscraper' | 'local';
+  region?: string;
+  extra?: {
+    year?: string;
+    developer?: string;
+    publisher?: string;
+    genre?: string;
+  };
+}
+

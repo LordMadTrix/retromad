@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : NINTENDO VIRTUAL BOY (Virtual Boy)
+  Hiérarchie      : Roms / NINTENDO / virtualboy
+  Constructeur    : Nintendo (1995)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .vb  .vboy  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

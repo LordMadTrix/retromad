@@ -2,8 +2,13 @@ import React from 'react';
 import { useGamepadStatus } from '../hooks/useGamepad';
 import { Gamepad2 } from 'lucide-react';
 
-export const GamepadHint: React.FC = () => {
+interface GamepadHintProps {
+  onOpenHotkeysGuide?: () => void;
+}
+
+export const GamepadHint: React.FC<GamepadHintProps> = ({ onOpenHotkeysGuide }) => {
   const gp = useGamepadStatus();
+
 
   // Configuration des symboles et couleurs selon la marque détectée
   const buttons = (() => {
@@ -79,7 +84,19 @@ export const GamepadHint: React.FC = () => {
           </span>
           <span>Jeu au hasard</span>
         </div>
+
+        {onOpenHotkeysGuide && (
+          <button
+            onClick={onOpenHotkeysGuide}
+            className="flex items-center space-x-1.5 px-2 py-0.5 rounded bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-white transition active:scale-95"
+            title="Afficher les combinaisons de touches de la borne"
+          >
+            <span className="font-mono font-bold text-[10px] text-cyan-400">SELECT+START</span>
+            <span className="text-[10px]">Raccourcis Borne</span>
+          </button>
+        )}
       </div>
+
 
       <div className="flex items-center space-x-2 text-[11px] text-slate-400">
         {gp.connected ? (

@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : GAME BOY COLOR (GBC)
+  Hiérarchie      : Roms / NINTENDO / gbc
+  Constructeur    : Nintendo (1998)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .gbc  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - gbc_bios.bin : Game Boy Color Boot ROM
+
+RetroMad Frontend Retrogaming
+============================================================

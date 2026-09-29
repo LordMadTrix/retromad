@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : MATTEL INTELLIVISION (Intellivision)
+  Hiérarchie      : Roms / MATTEL / intellivision
+  Constructeur    : Mattel Electronics (1979)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .int  .bin  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - exec.bin : Intellivision Executive ROM (Requis)
+  - grom.bin : Intellivision GROM (Graphics ROM, Requis)
+
+RetroMad Frontend Retrogaming
+============================================================

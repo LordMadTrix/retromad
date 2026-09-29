@@ -312,13 +312,13 @@ export const ComputingView: React.FC<ComputingViewProps> = ({
                     />
 
                     {/* Vrai Logo Haute Définition de la Machine EN GRAND */}
-                    <div className="relative z-10 w-full h-14 sm:h-18 flex items-center justify-center my-1 p-1 transition-transform duration-300 group-hover:scale-110">
-                      <ConsoleLogo system={sys} size="xl" />
+                    <div className="relative z-10 w-full h-16 sm:h-20 flex items-center justify-center my-1 p-1 sm:p-1.5 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                      <ConsoleLogo system={sys} size="xl" className="max-h-full w-auto" />
                     </div>
 
                     {/* Titre & Année */}
-                    <div className="relative z-10">
-                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                    <div className="relative z-10 w-full px-1 min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col justify-center items-center">
+                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider leading-tight line-clamp-2">
                         {sys.name}
                       </h3>
                       <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono mt-0.5 block">

@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : NEC PC-8001 (PC-8001)
+  Hiérarchie      : Roms / NEC / pc8000
+  Constructeur    : NEC (1979)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .d88  .t88  .cmt  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - n80.rom : BIOS N80-BASIC (recommandé)
+
+RetroMad Frontend Retrogaming
+============================================================

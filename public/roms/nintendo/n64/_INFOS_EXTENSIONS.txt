@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : NINTENDO 64 (N64)
+  Hiérarchie      : Roms / NINTENDO / n64
+  Constructeur    : Nintendo (1996)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .n64  .z64  .v64  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

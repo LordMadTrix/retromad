@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : ATARI 7800 PROSYSTEM (Atari 7800)
+  Hiérarchie      : Roms / ATARI / atari7800
+  Constructeur    : Atari (1986)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .a78  .bin  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - 7800 BIOS (U).rom : Atari 7800 BIOS US
+
+RetroMad Frontend Retrogaming
+============================================================

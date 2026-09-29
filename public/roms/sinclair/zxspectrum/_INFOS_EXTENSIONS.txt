@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : SINCLAIR ZX SPECTRUM (ZX Spectrum)
+  Hiérarchie      : Roms / SINCLAIR / zxspectrum
+  Constructeur    : Sinclair Research (1982)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .tzx  .tap  .z80  .sna  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

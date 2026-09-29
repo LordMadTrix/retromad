@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : MAGNAVOX ODYSSEY² / VIDEOPAC (Odyssey²)
+  Hiérarchie      : Roms / MAGNAVOX / odyssey2
+  Constructeur    : Magnavox / Philips (1978)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .bin  .o2  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - o2rom.bin : BIOS Odyssey² (obligatoire)
+
+RetroMad Frontend Retrogaming
+============================================================

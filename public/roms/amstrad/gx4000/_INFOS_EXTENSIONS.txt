@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : AMSTRAD GX4000 (GX4000)
+  Hiérarchie      : Roms / AMSTRAD / gx4000
+  Constructeur    : Amstrad (1990)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .cpt  .dsk  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

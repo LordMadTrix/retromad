@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE PET 2001 (PET)
+  Hiérarchie      : Roms / COMMODORE / pet
+  Constructeur    : Commodore (1977)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .prg  .t64  .d64  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

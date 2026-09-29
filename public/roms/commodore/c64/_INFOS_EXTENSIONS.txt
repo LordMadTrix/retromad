@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE 64 (C64)
+  Hiérarchie      : Roms / COMMODORE / c64
+  Constructeur    : Commodore (1982)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .d64  .t64  .tap  .prg  .crt  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

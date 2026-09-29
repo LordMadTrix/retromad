@@ -174,6 +174,118 @@ export function useAudio(
     });
   }, [getAudioContext]);
 
+  // ── Ambiance Salle d'Arcade Années 90 (Brouhaha lointain, flippers, bleeps vintage) ──
+  const [isArcadeAmbienceActive, setIsArcadeAmbienceActive] = useState(false);
+  const arcadeAmbienceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const playArcadeAmbienceChime = useCallback(() => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx || ctx.state === 'suspended') return;
+
+      const baseVol = Math.max(0, Math.min(1, volume * 0.05));
+      const randType = Math.floor(Math.random() * 4);
+
+      if (randType === 0) {
+        // Cloche de flipper lointaine
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1480, ctx.currentTime);
+        gain.gain.setValueAtTime(baseVol * 0.7, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.42);
+      } else if (randType === 1) {
+        // Bleep arpégé arcade (type Pacman / Galaga lointain)
+        const freqs = [587, 659, 880, 1046];
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(f, ctx.currentTime + i * 0.05);
+          gain.gain.setValueAtTime(baseVol * 0.35, ctx.currentTime + i * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.05 + 0.08);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.05);
+          osc.stop(ctx.currentTime + i * 0.05 + 0.09);
+        });
+      } else if (randType === 2) {
+        // Tintement métallique de pièce dans le monnayeur
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(2200, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1800, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(baseVol * 0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.16);
+      } else {
+        // Laser 8-bit lointain (Space Invaders)
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(baseVol * 0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.13);
+      }
+    } catch {
+      // Ignorer
+    }
+  }, [getAudioContext, volume]);
+
+  useEffect(() => {
+    if (isArcadeAmbienceActive) {
+      if (!arcadeAmbienceIntervalRef.current) {
+        arcadeAmbienceIntervalRef.current = setInterval(() => {
+          playArcadeAmbienceChime();
+        }, 2400);
+      }
+    } else {
+      if (arcadeAmbienceIntervalRef.current) {
+        clearInterval(arcadeAmbienceIntervalRef.current);
+        arcadeAmbienceIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (arcadeAmbienceIntervalRef.current) {
+        clearInterval(arcadeAmbienceIntervalRef.current);
+        arcadeAmbienceIntervalRef.current = null;
+      }
+    };
+  }, [isArcadeAmbienceActive, playArcadeAmbienceChime]);
+
+  const startArcadeAmbience = useCallback(() => {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+    setIsArcadeAmbienceActive(true);
+  }, [getAudioContext]);
+
+  const stopArcadeAmbience = useCallback(() => {
+    setIsArcadeAmbienceActive(false);
+  }, []);
+
+  const toggleArcadeAmbience = useCallback(() => {
+    setIsArcadeAmbienceActive(prev => {
+      if (!prev) {
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+      return !prev;
+    });
+  }, [getAudioContext]);
+
   // Bruit de déplacement / curseur
   const playMove = useCallback(() => {
     if (!enabled || volume <= 0) return;
@@ -400,5 +512,9 @@ export function useAudio(
     stopBgm,
     toggleBgm,
     isBgmActive,
+    startArcadeAmbience,
+    stopArcadeAmbience,
+    toggleArcadeAmbience,
+    isArcadeAmbienceActive,
   };
 }

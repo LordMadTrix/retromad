@@ -1,10 +1,13 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Game, System } from '../types';
 import { GameCard } from './GameCard';
-import { Search, SlidersHorizontal, FolderPlus, Dices, X, Upload, Tag } from 'lucide-react';
+import { Search, SlidersHorizontal, FolderPlus, Dices, X, Upload, Tag, Gamepad2 } from 'lucide-react';
 import { scanFilesList } from '../services/romScanner';
+import { ArcadeVirtualKeyboard } from './ArcadeVirtualKeyboard';
 
-type Collection = 'all' | 'favorites' | 'recent' | 'topplayed' | 'gems' | 'multiplayer';
+
+type Collection = 'all' | 'favorites' | 'recent' | 'topplayed' | 'gems' | 'multiplayer' | 'french' | 'video';
+
 
 interface GameGridProps {
   games: Game[];
@@ -49,6 +52,8 @@ export const GameGrid: React.FC<GameGridProps> = ({
   }, [onSelectGenreProp]);
   const [sortBy, setSortBy] = useState<'alpha' | 'recent' | 'played'>('alpha');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isVirtualKeyboardOpen, setIsVirtualKeyboardOpen] = useState(false);
+
 
   const systemsMap = useMemo(() => {
     return new Map(systems.map((s) => [s.id, s]));
@@ -118,6 +123,18 @@ export const GameGrid: React.FC<GameGridProps> = ({
             );
           if (!isMulti) return false;
         }
+        if (collection === 'french') {
+          const isFr =
+            game.region === 'France' ||
+            /\b(France|French|FRA|FR)\b/i.test(game.filename || '') ||
+            /\((?:Fra|Fr|VF)\b/i.test(game.title || '') ||
+            game.metadata?.genres?.some((x) => /français|vf/i.test(x));
+          if (!isFr) return false;
+        }
+        if (collection === 'video') {
+          if (!game.media?.video) return false;
+        }
+
         // Filtre par genre
         if (selectedGenre !== 'all') {
           const target = selectedGenre.toLowerCase();
@@ -220,8 +237,8 @@ export const GameGrid: React.FC<GameGridProps> = ({
               </p>
             </div>
 
-            {/* Recherche locale */}
-            <div className="relative flex-1 max-w-xs min-w-[140px]">
+            {/* Recherche locale avec bouton Clavier Arcade */}
+            <div className="relative flex-1 max-w-xs min-w-[140px] flex items-center">
               <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input
                 type="search"
@@ -229,10 +246,19 @@ export const GameGrid: React.FC<GameGridProps> = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Rechercher un jeu…"
                 aria-label="Rechercher un jeu ou un studio"
-                className="w-full bg-slate-950/70 border border-slate-700/60 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-retro-accent/60 focus:ring-1 focus:ring-retro-accent/20 transition"
+                className="w-full bg-slate-950/70 border border-slate-700/60 rounded-lg pl-8 pr-8 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-retro-accent/60 focus:ring-1 focus:ring-retro-accent/20 transition"
               />
+              <button
+                type="button"
+                onClick={() => setIsVirtualKeyboardOpen(true)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300 transition"
+                title="Ouvrir le clavier arcade virtuel (support manette)"
+              >
+                <Gamepad2 className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
+
 
           {/* Bloc Droit : Filtres & Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -324,7 +350,10 @@ export const GameGrid: React.FC<GameGridProps> = ({
             { id: 'topplayed', label: 'Top Joués', emoji: '🔥', count: games.filter(g => g.playCount > 0 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
             { id: 'gems', label: 'Pépites', emoji: '🏆', count: games.filter(g => (g.metadata?.rating || 0) >= 80 && (!selectedSystemId || g.systemId === selectedSystemId)).length },
             { id: 'multiplayer', label: 'Multijoueur', emoji: '👥', count: games.filter(g => (!selectedSystemId || g.systemId === selectedSystemId) && (parseInt(String(g.metadata?.players || '1'), 10) > 1 || g.metadata?.genres?.some(x => /combat|fight|course|race|versus|party|sport/i.test(x)))).length },
+            { id: 'french', label: 'En Français', emoji: '🇫🇷', count: games.filter(g => (!selectedSystemId || g.systemId === selectedSystemId) && (g.region === 'France' || /\b(France|French|FRA|FR)\b/i.test(g.filename || '') || /\((?:Fra|Fr|VF)\b/i.test(g.title || '') || g.metadata?.genres?.some(x => /français|vf/i.test(x)))).length },
+            { id: 'video', label: 'Avec Vidéo', emoji: '🎬', count: games.filter(g => (!selectedSystemId || g.systemId === selectedSystemId) && !!g.media?.video).length },
           ] as const).map((col) => (
+
             <button
               key={col.id}
               onClick={() => setCollection(col.id as Collection)}
@@ -403,6 +432,16 @@ export const GameGrid: React.FC<GameGridProps> = ({
           </div>
         )}
       </div>
+      {/* Clavier Virtuel Arcade pour recherche manette */}
+      <ArcadeVirtualKeyboard
+        isOpen={isVirtualKeyboardOpen}
+        initialValue={searchTerm}
+        placeholder="Tapez le nom d'un jeu..."
+        title="Recherche Arcade à la Manette"
+        onClose={() => setIsVirtualKeyboardOpen(false)}
+        onConfirm={(text) => setSearchTerm(text)}
+      />
     </div>
   );
 };
+

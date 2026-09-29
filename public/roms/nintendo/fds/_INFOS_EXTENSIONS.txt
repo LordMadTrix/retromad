@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : FAMICOM DISK SYSTEM (FDS)
+  Hiérarchie      : Roms / NINTENDO / fds
+  Constructeur    : Nintendo (1986)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .fds  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - disksys.rom : BIOS Famicom Disk System (obligatoire)
+
+RetroMad Frontend Retrogaming
+============================================================

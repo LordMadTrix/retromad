@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : ATARI 2600 (VCS) (Atari 2600)
+  Hiérarchie      : Roms / ATARI / atari2600
+  Constructeur    : Atari (1977)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .a26  .bin  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

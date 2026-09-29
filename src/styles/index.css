@@ -93,13 +93,6 @@ button {
     linear-gradient(90deg, rgba(121, 40, 202, 0.1) 1px, transparent 1px);
   background-position: 0 0, 0 0, 0 0, 0 0;
   background-size: auto, auto, 36px 36px, 36px 36px;
-  animation: kiosk-background-drift 12s linear infinite;
-}
-
-@keyframes kiosk-background-drift {
-  to {
-    background-position: 90px -50px, -70px 60px, 36px -36px, -36px 36px;
-  }
 }
 
 .arcade-card::after {

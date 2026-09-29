@@ -1,138 +1,192 @@
-# RetroMad 🕹️
+# 🕹️ RetroMad — Frontend Retrogaming & Borne d'Arcade
 
-Frontend retrogaming moderne, fluide et élégant, compatible nativement avec **Windows** et **Linux**. Conçu pour une utilisation sur bureau (clavier/souris) comme sur TV/Canapé (manettes Xbox, PlayStation, 8BitDo, Switch Pro).
+<p align="center">
+  <img src="public/media/companies/nintendo.svg" width="90" alt="Nintendo" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="public/media/companies/sega.svg" width="90" alt="Sega" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="public/media/companies/sony.svg" width="90" alt="Sony" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="public/media/companies/snk.svg" width="90" alt="SNK" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="public/media/companies/atari.svg" width="70" alt="Atari" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="public/media/companies/nec.svg" width="70" alt="NEC" />
+</p>
 
-![RetroMad Banner](https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Super_Nintendo_Entertainment_System/master/Named_Boxarts/Super%20Mario%20World%20(USA).png)
+<p align="center">
+  <strong>Frontend retrogaming moderne, fluide et 100 % arcade pour PC, TV et bornes d'arcade dédiées.</strong><br>
+  Compatible nativement avec <strong>Linux</strong> et <strong>Windows</strong> • Navigation à la manette et au joystick • Émulation fluide via RetroArch & Standalone.
+</p>
 
----
-
-## ✨ Fonctionnalités Principales
-
-### 1. 📂 Gestionnaire de ROMs
-- **Arborescence multi-consoles** : Détecte vos ROMs rangées par sous-dossiers (`snes/`, `megadrive/`, `psx/`, `n64/`, `gba/`, etc.) ou dans un dossier personnalisé.
-- **Nettoyage automatique des noms** : Supprime les tags No-Intro / GoodTools (`(USA)`, `[!].sfc`, etc.) pour obtenir un titre propre, tout en identifiant la région (🇺🇸 USA, 🇪🇺 Europe/France, 🇯🇵 Japon).
-- **Calcul d'empreintes** : Calcul des sommes CRC32 et MD5 pour identification précise.
-
-### 2. 🎨 Scraping Automatique des Jaquettes & Métadonnées
-- **Source Libretro CDN (Sans clé & Gratuit)** : Téléchargement instantané des jaquettes 2D haute définition (`Named_Boxarts`) et captures d'écran de jeu (`Named_Snaps`).
-- **Source ScreenScraper.fr** : Récupération des résumés en français, dates de sortie, studios/éditeurs, notes et genres (avec support de compte utilisateur).
-- **Cache local hors-ligne** : Tous les médias téléchargés sont stockés sur le disque local pour une consultation 100% hors-ligne ultra rapide.
-- **Scraping unitaire ou par lot** : Bouton pour rescraper un jeu spécifique ou l'intégralité de la collection avec barre de progression en direct.
-
-### 3. 🏛️ Encyclopédie des Firmes & Histoire
-- Fiches documentées des constructeurs mythiques du jeu vidéo : **Nintendo**, **SEGA**, **Sony**, **SNK**, **Atari**, **NEC**.
-- Histoire de la marque, pays et année de création, franchises légendaires.
-- Spécifications complètes de chaque console (processeur, audio, résolution, type de média, unités vendues).
-- Bouton interactif pour basculer directement sur les jeux de la console sélectionnée.
-
-### 4. 💾 Gestionnaire de BIOS & Firmwares
-- Indispensable pour l'émulation (PS1, PS2, Saturn, Dreamcast, Neo-Geo, GBA, PC Engine CD...).
-- Analyse votre dossier `bios/` et affiche un tableau de conformité :
-  - 🟢 **Valide** : Fichier présent et somme MD5 officielle certifiée.
-  - 🟡 **Présent** : Fichier détecté avec MD5 différent (dump alternatif).
-  - 🔴 **Manquant** : Fichier absent (avec indication du rôle et nom attendu).
-
-### 5. 🎮 Contrôle à la Manette & Rétro Audio
-- Prise en charge native des manettes (D-Pad, Stick analogique, A/B/X/Y, LB/RB).
-- Répétition fluide et navigation conçue pour grand écran ("10-foot UI").
-- Bruitages rétro générés en temps réel par Web Audio API (désactivables).
-
-### 6. 🚀 Lanceur d'Émulateurs Cross-Platform
-- Compatible **RetroArch** sous Linux (`/usr/bin/retroarch`) et Windows (`C:\RetroArch-Win64\retroarch.exe`).
-- Détection des cœurs appropriés (`snes9x`, `genesis_plus_gx`, `flycast`, `beetle_psx`, etc.).
-- Suivi du nombre de parties jouées et date de dernière session.
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-blue?style=for-the-badge&logo=linux" alt="Linux & Windows" />
+  <img src="https://img.shields.io/badge/Stack-React%2018%20%7C%20TypeScript%20%7C%20Vite%20%7C%20Electron-61dafb?style=for-the-badge&logo=react" alt="Tech Stack" />
+  <img src="https://img.shields.io/badge/Tests-58%20Pass%C3%A9s-emerald?style=for-the-badge&logo=checkmarx" alt="58 Tests Passed" />
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License MIT" />
+</p>
 
 ---
 
-## 🛠️ Installation & Démarrage
+## 🌟 Philosophie : Kiosque en 1er & Administration Unique
+
+RetroMad a été spécialement conçu pour éliminer toute la friction des interfaces complexes :
+
+1. **Démarrage direct sur le Kiosque Arcade** : Allumez votre PC ou votre borne et plongez directement dans votre ludothèque plein écran, avec la roue des firmes, les musiques de fond, les aperçus vidéo et vos jaquettes HD.
+2. **Une seule et unique page d'Administration** : Un bouton direct **`[⚙️ Administration]`** (ou touche **F12**) regroupe l'intégralité de vos réglages (scrapers, cœurs, BIOS, manettes, dossiers, backups) dans un centre de contrôle unique et puissant. Fermez l'administration et vous êtes de retour à vos jeux instantanément.
+
+---
+
+## ✨ Les 6 Innovations Majeures de RetroMad
+
+### 1. 🕹️ Mode Démo « Attract Mode » avec « INSERT COIN »
+- **Écran de veille arcade automatique** : Après 60 secondes d'inactivité (ou en cliquant sur `[✨ Démo]`), la borne s'anime toute seule.
+- Défilement de jeux en vedette, jaquettes et extraits vidéo avec scanlines CRT et citations cultes de l'histoire du jeu vidéo.
+- Enseigne néon clignotante **« INSERT COIN / APPUYEZ SUR UN BOUTON »**.
+- **Effet sonore de monnayeur réaliste** : Toucher la manette ou le clavier déclenche un son authentique de pièce de monnaie insérée (*« Clink ! »*) et réveille la sélection de jeux.
+
+### 2. 🎮 Raccourci Universel « Quitter le jeu » (Select + Start)
+- Plus besoin de chercher son clavier en pleine partie : maintenir **Select + Start** sur n'importe quelle manette quitte instantanément l'émulateur et vous ramène au Kiosque.
+- Prise en charge native de la touche **Échap** sur clavier d'arcade.
+
+### 3. 💾 Détection Plug & Play Clé USB (Import en 1 clic)
+- Branchez une clé USB ou un disque externe contenant des ROMs : RetroMad la détecte automatiquement sous Linux (`/media`, `/run/media`) ou Windows.
+- Une bannière néon apparaît en haut du Kiosque indiquant le nom de la clé et le nombre de ROMs trouvées.
+- Le bouton **`[📥 Importer tout]`** copie automatiquement les jeux dans les dossiers des consoles appropriées et lance le scraping en arrière-plan sans quitter la borne.
+
+### 4. 🎲 « Roulette Rétro » / Défi Soirée entre amis
+- Accessible via le bouton **`[🎲 Roulette Défi]`** ou la touche **R** (ou bouton dédié sur manette).
+- Fini les hésitations devant des centaines de jeux : anime une roulette visuelle et sonore qui sélectionne un jeu au hasard dans la ludothèque.
+- Filtres rapides : *Tous les jeux*, *Jeux 2 Joueurs (Combat, Coop)* ou *Par Genre*.
+
+### 5. 📦 Inspection 3D Boîte & Cartouche Physique
+- Accessible sur la fiche de chaque jeu (bouton `[📦 Boîte 3D]` ou touches **B** / **S**).
+- Rendu 3D interactif pivotant à 180° : admirez le recto, la tranche et le dos de boîte d'époque avec résumé et captures d'écran.
+- Vue cartouche physique réaliste adaptée à chaque machine (cartouche grise SNES, noire Genesis/Megadrive, Game Boy, boîtier CD PS1...) avec précautions d'époque et sceau officiel.
+- Bouton **« Insérer la cartouche & Jouer »** pour lancer la partie directement.
+
+### 6. 📻 Ambiance Sonore « Salle d'Arcade Années 90 »
+- Activez l'ambiance via le bouton **`[📻 Ambiance Arcade]`** dans la barre du Kiosque.
+- Synthèse acoustique en temps réel (Web Audio API) reproduisant le brouhaha authentique des salles d'arcade : cloches de flipper lointaines, bleeps 8-bit Pac-Man/Galaga et tintements de pièces.
+- S'estompe automatiquement au lancement d'un jeu et reprend à votre retour au Kiosque.
+
+---
+
+## 🏛️ Encyclopédie des 119 Consoles & Firmes Mythiques
+
+RetroMad intègre une encyclopédie patrimoniale complète couvrant l'histoire du jeu vidéo depuis 1972 jusqu'aux générations modernes :
+
+| Constructeur | Consoles & Micro-ordinateurs documentés |
+| :--- | :--- |
+| **Nintendo 🇯🇵** | NES, Famicom Disk System, Game Boy, Super Nintendo, Virtual Boy, N64, Game Boy Color, Game Boy Advance, GameCube, Nintendo DS, Wii, Pokémon Mini, Nintendo 3DS, Wii U, Nintendo Switch |
+| **SEGA 🇯🇵** | SG-1000, Master System, Mega Drive / Genesis, Game Gear, Mega-CD, 32X, Saturn, Nomad, Dreamcast |
+| **Sony 🇯🇵** | PlayStation 1, PlayStation 2, PSP, PlayStation 3, PS Vita, PlayStation 4 |
+| **SNK 🇯🇵** | Neo-Geo MVS, Neo-Geo AES, Neo-Geo CD, Neo-Geo Pocket, Neo-Geo Pocket Color |
+| **NEC 🇯🇵** | PC Engine, SuperGrafx, PC Engine CD-ROM², PC-FX |
+| **Microsoft 🇺🇸** | Xbox, Xbox 360, Écosystème PC MS-DOS & Windows (de Windows 1.0 à Windows 11) |
+| **Micro-informatique Rétro 💻** | Amiga (500, 1200), Commodore 64, Amstrad CPC, Atari ST, MSX, MSX2, Apple II, ZX Spectrum, Sharp X68000, FM Towns, Thomson TO8 |
+| **Pionniers & Arcade 🕹️** | Atari (2600, 5200, 7800, Lynx, Jaguar), ColecoVision, Intellivision, Magnavox Odyssey², Vectrex |
+
+---
+
+## 🎨 Shaders CRT & Immersion Rétro
+
+Basculez à tout moment entre plusieurs filtres graphiques haute fidélité (touche **C** ou raccourci **Alt+C**) :
+- **Trinitron PVM** : Phosphore authentique, scanlines horizontales nettes et grille d'ouverture.
+- **Arcade 15 kHz** : Balayage cathodique chaud et légère vignette d'écran bombé.
+- **DMG Matrix** : Teinte verte matricielle rétro Game Boy avec rémanence d'écran.
+- **GBA TFT** : Restitution des couleurs vives de la Game Boy Advance.
+- **Vectrex** : Affichage vectoriel lumineux à phosphore bleu/vert.
+
+---
+
+## ⚡ Scraping Flou & Choix des Titres Similaires
+
+- **CDN Libretro officiel (sans clé & gratuit)** : Téléchargement instantané des jaquettes 2D, 3D et captures d'écran.
+- **ScreenScraper.fr** : Résumés officiels en français, éditeurs, développeurs, dates de sortie et notes.
+- **Détection des titres approchants** : En cas de ROM au nom atypique ou non trouvée, RetroMad propose une modale de sélection avec les correspondances les plus proches (score de ressemblance Levenshtein).
+
+---
+
+## 🚀 Démarrage Rapide
 
 ### Prérequis
-- Node.js 18+ (Node 22 recommandé)
-- npm
+- **Node.js 18+** (Node 20 ou 22 recommandé)
+- **Linux** (Ubuntu, Debian, Arch, Fedora...) ou **Windows 10/11**
+- **RetroArch** (ou vos émulateurs favoris) installé sur votre système
 
-### Installation des dépendances
+### Lancement en 1 clic
+
+#### Sur Linux :
 ```bash
+./launch.sh
+```
+
+#### Sur Windows :
+```cmd
+launch.bat
+```
+
+### Installation manuelle & Développement :
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/LordMadTrix/retromad.git
+cd retromad
+
+# 2. Installer les dépendances
 npm install
-```
 
-### Lancement en mode développement
-```bash
+# 3. Lancer en mode développement
 npm run dev
-```
 
-### Exécution des tests automatisés
-```bash
+# 4. Exécuter la suite de tests automatisés (58 tests)
 npm test
-```
 
-### Compilation pour distribution (Linux & Windows)
-```bash
-# Compiler l'application de production
+# 5. Compiler l'exécutable de production
 npm run build
-
-# Générer les paquets installables (AppImage/deb sous Linux, exe sous Windows)
 npm run dist
 ```
 
 ---
 
-## 📁 Organisation Recommandée des ROMs
+## 🎮 Raccourcis Clavier & Manette
 
-Dans votre dossier configuré (`~/RetroMad/Roms` par défaut) :
+| Action | Raccourci Manette | Raccourci Clavier |
+| :--- | :--- | :--- |
+| **Naviguer** | D-Pad / Stick Gauche | Flèches Directionnelles |
+| **Choisir / Lancer le jeu** | Bouton A (Sud) / Cross | Entrée |
+| **Retour / Niveau supérieur** | Bouton B (Est) / Circle | Échap / Retour Arrière |
+| **Quitter le jeu (Émulateur)** | **Select + Start (1s)** | **Échap** |
+| **Ouvrir l'Administration** | Bouton Menu / Guide | **F12** / **Ctrl+Shift+A** |
+| **Roulette Défi Rétro** | Bouton Random | **R** |
+| **Inspecter la Boîte 3D** | Bouton Y (Nord) | **B** ou **S** |
+| **Consulter le Musée de la console** | Bouton X (Ouest) | **M** |
+| **Ajouter / Retirer des Favoris** | Bouton R3 (Stick Droit) | **F** |
+| **Activer le filtre CRT Scanlines** | Bouton L3 (Stick Gauche) | **C** / **Alt+C** |
+| **Manuel Utilisateur PDF & Aide** | — | **F1** |
+| **Recherche Spotlight Rapide** | — | **Ctrl+K** / **⌘K** |
+
+---
+
+## 📁 Structure des Dossiers de ROMs
+
+RetroMad utilise par défaut le dossier `public/roms/` (ou un dossier personnalisé défini dans le Centre d'Administration) :
 
 ```text
-RetroMad/
-├── Roms/
-│   ├── snes/          # Super Nintendo (.sfc, .smc, .zip)
-│   ├── nes/           # Nintendo NES (.nes, .zip)
-│   ├── megadrive/     # Sega Mega Drive (.md, .gen, .bin)
-│   ├── mastersystem/  # Sega Master System (.sms)
-│   ├── n64/           # Nintendo 64 (.z64, .n64)
-│   ├── gb/            # Game Boy (.gb)
-│   ├── gbc/           # Game Boy Color (.gbc)
-│   ├── gba/           # Game Boy Advance (.gba)
-│   ├── psx/           # PlayStation 1 (.cue, .chd, .iso)
-│   ├── ps2/           # PlayStation 2 (.iso, .chd)
-│   ├── saturn/        # Sega Saturn (.chd, .cue)
-│   ├── dreamcast/     # Sega Dreamcast (.chd, .cdi)
-│   ├── neogeo/        # Neo-Geo MVS (.zip)
-│   └── pcengine/      # PC Engine (.pce, .cue)
-└── Bios/              # scph5501.bin, neogeo.zip, dc_boot.bin, etc.
+roms/
+├── snes/          # Super Nintendo (.sfc, .smc)
+├── nes/           # Nintendo NES (.nes)
+├── megadrive/     # Sega Mega Drive (.md, .gen, .bin)
+├── n64/           # Nintendo 64 (.z64, .n64)
+├── psx/           # PlayStation 1 (.chd, .cue, .iso)
+├── ps2/           # PlayStation 2 (.chd, .iso)
+├── gba/           # Game Boy Advance (.gba)
+├── dreamcast/     # Sega Dreamcast (.chd, .cdi)
+└── ...            # 119 consoles prises en charge
 ```
 
 ---
 
-## 🔒 Mode Kiosk & Mode Administration
-
-RetroMad intègre un système de double profil conçu pour les bornes d'arcade, les événements publics et les enfants :
-
-### 1. Mode Kiosk (Verrouillé)
-- **Sécurisé pour le public** : Masque les onglets sensibles (*Paramètres*, *BIOS & Firmwares*) et désactive les boutons de modification (*Scanner*, *Scraper*).
-- **Plein écran exclusif** : Mode sans bordure pour éviter la sortie accidentelle de l'application.
-- **Option "Favoris uniquement"** : Permet de restreindre la borne aux seuls jeux approuvés par l'administrateur.
-
-### 2. Déverrouillage vers le Mode Administration
-- **Code PIN par défaut** : `1234` (modifiable dans les paramètres).
-- **Moyens de déverrouillage** :
-  - **À la souris** : Clic sur le bouton **"Déverrouiller Admin"** dans l'en-tête.
-  - **À la manette** : Appui sur la touche **Start** pour ouvrir le pavé numérique virtuel (saisie D-Pad + validation).
-  - **Au clavier** : Raccourci `Ctrl + Shift + A` ou touche `F12`.
-
----
-
-## 🎮 Raccourcis Manette
-
-| Touche Manette | Action |
-|---|---|
-| **D-Pad / Stick Gauche** | Naviguer dans la grille des jeux |
-| **Bouton A** (Xbox) / **Croix** (PS) | Lancer le jeu / Valider |
-| **Bouton B** (Xbox) / **Rond** (PS) | Retour / Fermer la fenêtre |
-| **Bouton X** (Xbox) / **Carré** (PS) | Ouvrir la fiche détaillée du jeu |
-| **Bouton Y** (Xbox) / **Triangle** (PS) | Ajouter / Retirer des favoris |
-| **Gâchettes LB / RB** | Changer rapidement de console |
-| **Touche Start** | Ouvrir paramètres (Admin) / Déverrouiller (Kiosk) |
-
----
-
 ## 📄 Licence
-Projet open-source sous licence MIT.
+
+Ce projet est sous licence **MIT**. Libre d'utilisation, de modification et de distribution pour tout projet personnel ou associatif.

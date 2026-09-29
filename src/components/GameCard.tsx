@@ -25,12 +25,41 @@ export const GameCard: React.FC<GameCardProps> = React.memo(({
   onFilterByGenre,
 }) => {
   const [isBoxartUnavailable, setIsBoxartUnavailable] = useState(false);
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const hoverTimeoutRef = useRef<any>(null);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
+  const videoUrl = resolveMediaUrl(game.media?.video) || null;
+
+  const handleMouseEnter = () => {
+    if (!videoUrl) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsPlayingVideo(true);
+    }, 450);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsPlayingVideo(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     setIsBoxartUnavailable(false);
-  }, [game.media?.boxart2d]);
+    setIsPlayingVideo(false);
+  }, [game.media?.boxart2d, game.media?.video]);
+
 
   useEffect(() => {
     if (!isContextMenuOpen) return;
@@ -74,12 +103,15 @@ export const GameCard: React.FC<GameCardProps> = React.memo(({
     <div
       onClick={() => onSelect(game)}
       onDoubleClick={() => onLaunch(game)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsContextMenuOpen(true);
       }}
       className={`arcade-card group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900/90 border transition-[transform,border-color,box-shadow] duration-200 cursor-pointer select-none ${
+
         isSelected
           ? 'border-retro-accent shadow-[0_0_20px_rgba(0,242,254,0.45)] scale-[1.03] z-10'
           : 'border-slate-800 hover:border-retro-accent/60 hover:shadow-[0_0_18px_rgba(0,242,254,0.22)] hover:scale-[1.02]'
@@ -179,7 +211,26 @@ export const GameCard: React.FC<GameCardProps> = React.memo(({
 
       {/* Zone Jaquette / Image */}
       <div className="relative aspect-[3/4] w-full bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 flex items-center justify-center overflow-hidden">
+        {/* Aperçu vidéo au survol */}
+        {isPlayingVideo && videoUrl && (
+          <div className="absolute inset-0 z-20 bg-black flex items-center justify-center animate-in fade-in duration-200">
+            <video
+              src={videoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-sm border border-cyan-400/40 text-[9px] font-mono text-cyan-300 flex items-center gap-1 shadow-lg pointer-events-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+              <span>CLIP</span>
+            </div>
+          </div>
+        )}
+
         {boxartUrl && !isBoxartUnavailable ? (
+
           <img
             src={boxartUrl}
             alt={game.title}

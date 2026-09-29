@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : NEC PC-8801 (PC-88)
+  Hiérarchie      : Roms / NEC / pc8801
+  Constructeur    : NEC (1979)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .d88  .88d  .cmt  .t88  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - n88.rom : BIOS N88-BASIC v3 (obligatoire)
+
+RetroMad Frontend Retrogaming
+============================================================

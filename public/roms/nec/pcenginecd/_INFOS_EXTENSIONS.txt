@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : NEC PC ENGINE CD-ROM² (PC Engine CD)
+  Hiérarchie      : Roms / NEC / pcenginecd
+  Constructeur    : NEC Home Electronics (1988)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .pce  .chd  .cue  .iso  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - syscard3.pce : Super CD-ROM² System Card v3.00 (Requis pour jeux CD)
+
+RetroMad Frontend Retrogaming
+============================================================

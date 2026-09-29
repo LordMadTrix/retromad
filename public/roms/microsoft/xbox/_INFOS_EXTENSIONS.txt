@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : MICROSOFT XBOX (Xbox)
+  Hiérarchie      : Roms / MICROSOFT / xbox
+  Constructeur    : Microsoft (2001)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .iso  .xiso
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - mcpx_1.0.bin : MCPX Boot ROM v1.0 (Indispensable pour xemu)
+  - Complex_4627.bin : Xbox BIOS ROM (Indispensable pour xemu)
+
+RetroMad Frontend Retrogaming
+============================================================

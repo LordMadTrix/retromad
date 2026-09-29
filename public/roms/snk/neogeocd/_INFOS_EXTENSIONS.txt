@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : SNK NEO GEO CD (Neo Geo CD)
+  Hiérarchie      : Roms / SNK / neogeocd
+  Constructeur    : SNK (1994)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .chd  .cue  .bin  .iso  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - neocd.bin : BIOS Neo Geo CD (top-loading ou front-loading)
+
+RetroMad Frontend Retrogaming
+============================================================

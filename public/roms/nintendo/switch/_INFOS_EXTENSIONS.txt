@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : NINTENDO SWITCH (Switch)
+  Hiérarchie      : Roms / NINTENDO / switch
+  Constructeur    : Nintendo (2017)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .nsp  .xci  .nca
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - prod.keys : Nintendo Switch Decryption Keys (Indispensable)
+
+RetroMad Frontend Retrogaming
+============================================================

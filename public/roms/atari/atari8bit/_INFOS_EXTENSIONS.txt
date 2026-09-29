@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : ATARI 8-BIT FAMILY (Atari 8-bit)
+  Hiérarchie      : Roms / ATARI / atari8bit
+  Constructeur    : Atari (1979)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .atr  .xfd  .dsk  .atr.gz  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - ATARIXL.ROM : OS XL (obligatoire pour XL/XE)
+  - ATARIOSA.ROM : OS 400/800 révision A
+
+RetroMad Frontend Retrogaming
+============================================================

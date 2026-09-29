@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : CAPCOM PLAY SYSTEM 3 (ARCADE) (CPS-3)
+  Hiérarchie      : Roms / CAPCOM / cps3
+  Constructeur    : Capcom (1996)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .zip  .7z  .chd
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - cps3_boot.bin : BIOS CPS-3 (requis, inclus dans les sets FBNeo)
+
+RetroMad Frontend Retrogaming
+============================================================

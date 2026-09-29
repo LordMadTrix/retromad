@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE 64 GAMES SYSTEM (C64GS)
+  Hiérarchie      : Roms / COMMODORE / c64gs
+  Constructeur    : Commodore (1990)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .crt  .prg  .d64  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

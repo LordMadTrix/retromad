@@ -1,0 +1,20 @@
+============================================================
+  DOSSIER DE ROMS : SEGA MEGA-CD / SEGA CD (Mega-CD)
+  Hiérarchie      : Roms / SEGA / segacd
+  Constructeur    : SEGA (1991)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .bin  .iso  .chd  .cue  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - bios_CD_E.bin : Mega-CD Europe BIOS (PAL)
+  - bios_CD_J.bin : Mega-CD Japon BIOS (NTSC-J)
+  - bios_CD_U.bin : Sega CD USA BIOS (NTSC-U)
+
+RetroMad Frontend Retrogaming
+============================================================

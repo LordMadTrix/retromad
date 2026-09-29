@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE AMIGA 600 (A600)
+  Hiérarchie      : Roms / COMMODORE / amiga600
+  Constructeur    : Commodore (1992)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .adf  .hdf  .lha  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

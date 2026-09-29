@@ -2,13 +2,13 @@ import { SYSTEMS } from '../../electron/data/systems';
 import { COMPANIES } from '../../electron/data/companies';
 import { BUILTIN_EMULATORS } from '../../electron/data/emulators';
 import { ALL_BIOS_DEFINITIONS } from '../../electron/data/biosData';
-import { AppSettings, BiosStatus, Company, EmulatorProfile, ExtensionInfo, ExtensionProgress, Game, System } from '../types';
+import { AppSettings, BiosStatus, Company, EmulatorProfile, ExtensionInfo, ExtensionProgress, Game, ScrapeCandidate, System } from '../types';
 import {
   getStoredGames,
   saveStoredGames,
   filterOutDeletedGames,
 } from './romStorage';
-import { scanPublicRomsManifest, SYSTEM_MAPPINGS } from './romScanner';
+import { scanPublicRomsManifest } from './romScanner';
 
 const STORAGE_KEY_SETTINGS = 'retromad_web_settings';
 
@@ -462,85 +462,70 @@ export function createWebApi() {
     },
 
     scrapeGame: async (game: Game): Promise<Game> => {
-      await new Promise((r) => setTimeout(r, 350));
-
-      // Scraping réel des jaquettes depuis le CDN libretro (sans clé API).
-      // Les noms de fichiers libretro suivent le format No-Intro :
-      // "Mega Man 2 (USA).png", "Zelda II - The Adventure of Link (Europe).png".
-      // On essaie plusieurs variantes (régions + chiffres romains, car No-Intro
-      // mélange "2" et "II" selon les séries) jusqu'à trouver (HEAD 200).
-      const mapping = SYSTEM_MAPPINGS.find((m) => m.id === game.systemId);
-      const media: Game['media'] = { ...game.media };
-      if (mapping?.libretroName) {
-        const baseUrl = `https://raw.githubusercontent.com/libretro-thumbnails/${mapping.libretroName}/master`;
-        const name = game.cleanTitle || game.title;
-        const toRoman = (n: number): string => {
-          const map: Array<[number, string]> = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
-          let out = '';
-          for (const [v, s] of map) { while (n >= v) { out += s; n -= v; } }
-          return out;
-        };
-        const romanized = name.replace(/\b(\d{1,2})\b/g, (m) => {
-          const n = parseInt(m, 10);
-          return n >= 1 && n <= 20 ? toRoman(n) : m;
-        });
-        // Abréviations avec point final : No-Intro écrit "Super Mario Bros. 3"
-        const dotted = name.replace(/\bBros\b/g, 'Bros.').replace(/\bBros\.(?=\s*\d)/g, 'Bros.');
-        const baseNames = [...new Set([name, romanized, dotted, romanized.replace(/\bBros\b/g, 'Bros.')])];
-        const regions = [' (USA, Europe)', ' (USA)', ' (Europe)', ' (Japan, USA)', ' (Japan, Europe)', ''];
-        const candidates: string[] = [];
-        for (const base of baseNames) {
-          for (const region of regions) {
-            candidates.push(`${baseUrl}/Named_Boxarts/${encodeURIComponent(base + region)}.png`);
-          }
-        }
-        for (const candidate of candidates) {
-          try {
-            const probe = await fetch(candidate, { method: 'HEAD' });
-            if (probe.ok) {
-              media.boxart2d = candidate;
-              media.snap = candidate.replace('/Named_Boxarts/', '/Named_Snaps/');
-              break;
-            }
-          } catch {
-            /* réseau indisponible : variante suivante */
-          }
-        }
-      }
-
+      const { scrapeGameWeb } = await import('./scraper');
+      const updated = await scrapeGameWeb(game, { forceRe: false });
+      // Sauvegarder dans le store local
       const current = loadGames();
-      const updatedGame: Game = {
-        ...game,
-        media,
-        metadata: {
-          ...game.metadata,
-          rating: game.metadata?.rating || 90,
-          players: game.metadata?.players || '1-2',
-          synopsis: game.metadata?.synopsis || `Classique incontournable du catalogue ${game.systemId.toUpperCase()}.`,
-        },
-      };
-      const updatedList = current.map((g) => (g.id === game.id ? updatedGame : g));
+      const updatedList = current.map((g) => (g.id === updated.id ? updated : g));
       saveGames(updatedList);
-      return updatedGame;
+      return updated;
     },
 
-    scrapeAll: async (): Promise<Game[]> => {
+    searchScrapeCandidates: async (game: Game, query?: string): Promise<ScrapeCandidate[]> => {
+      const cleanQ = (query || game.cleanTitle || game.title || '').toLowerCase().trim();
       const current = loadGames();
-      const total = current.length;
-
-      for (let i = 0; i < total; i++) {
-        await new Promise((r) => setTimeout(r, 200));
-        const item = current[i];
-        scrapeListeners.forEach((fn) =>
-          fn({
-            total,
-            current: i + 1,
-            currentGameTitle: item.cleanTitle,
-          })
-        );
+      const candidates: ScrapeCandidate[] = [];
+      for (const g of current) {
+        if (g.cleanTitle.toLowerCase().includes(cleanQ) || cleanQ.includes(g.cleanTitle.toLowerCase())) {
+          candidates.push({
+            title: g.title,
+            cleanTitle: g.cleanTitle,
+            systemId: g.systemId,
+            score: 85,
+            boxartUrl: g.media?.boxart2d,
+            source: 'local',
+            region: g.region,
+          });
+        }
       }
+      return candidates;
+    },
 
-      return current;
+    scrapeGameWithTitle: async (game: Game, chosenTitle: string): Promise<Game> => {
+      const cleanChosen = chosenTitle.replace(/\s*\([^)]*\)/g, '').trim();
+      const targetGame = { ...game, title: chosenTitle, cleanTitle: cleanChosen };
+      const { scrapeGameWeb } = await import('./scraper');
+      const updated = await scrapeGameWeb(targetGame, { forceRe: true });
+      const current = loadGames();
+      const updatedList = current.map((g) => (g.id === updated.id ? updated : g));
+      saveGames(updatedList);
+      return updated;
+    },
+
+
+    scrapeAll: async (): Promise<Game[]> => {
+      const { scrapeAllGamesWeb } = await import('./scraper');
+      const current = loadGames();
+      const controller = new AbortController();
+      const results = await scrapeAllGamesWeb(
+        current,
+        (stats) => {
+          scrapeListeners.forEach((fn) =>
+            fn({
+              total: stats.total,
+              current: stats.done,
+              currentGameTitle: stats.currentGame || '',
+              found: stats.found,
+              notFound: stats.notFound,
+              skipped: stats.skipped,
+              currentBoxartUrl: stats.currentBoxartUrl,
+            })
+          );
+        },
+        controller.signal
+      );
+      saveGames(results);
+      return results;
     },
 
     onScrapeProgress: (callback: (data: any) => void) => {
@@ -723,6 +708,9 @@ export function createWebApi() {
     minimizeWindow: () => {},
     maximizeWindow: () => {},
     closeWindow: () => {},
+
+    detectUsbDrives: async () => [],
+    importFromUsb: async () => ({ success: true, imported: 0, games: [] }),
   };
 }
 

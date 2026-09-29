@@ -12,3 +12,33 @@ release/
 
 # Index des ROMs généré automatiquement par Vite
 public/roms/_index.json
+
+# ROMs & images disques (fichiers volumineux ou sous copyright commercial)
+*.nes
+*.sfc
+*.smc
+*.bin
+*.cue
+*.iso
+*.chd
+*.z64
+*.n64
+*.v64
+*.cso
+*.pbp
+*.gb
+*.gbc
+*.gba
+*.nds
+*.3ds
+*.wbfs
+*.rvz
+*.gcm
+*.nsp
+*.xci
+*.zip
+*.7z
+*.rar
+!public/roms/**/_INFOS_EXTENSIONS.txt
+!public/roms/**/.gitkeep
+

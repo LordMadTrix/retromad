@@ -23,8 +23,9 @@ export class StorageService {
 
     this.mediaDir = path.join(this.dataDir, 'media');
     fs.mkdirSync(this.mediaDir, { recursive: true });
-    fs.mkdirSync(path.join(this.mediaDir, 'boxarts'), { recursive: true });
-    fs.mkdirSync(path.join(this.mediaDir, 'snaps'), { recursive: true });
+    ['boxarts', 'boxarts3d', 'snaps', 'titles', 'wheels', 'videos', 'manuals', 'fanarts'].forEach((sub) => {
+      fs.mkdirSync(path.join(this.mediaDir, sub), { recursive: true });
+    });
 
     this.settingsFile = path.join(this.dataDir, 'settings.json');
     this.gamesFile = path.join(this.dataDir, 'games.json');

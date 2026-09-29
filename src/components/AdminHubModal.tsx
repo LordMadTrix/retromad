@@ -34,6 +34,9 @@ import {
   Copy,
   Sparkles,
   FileJson,
+  LayoutDashboard,
+  Activity,
+  ChevronRight,
 } from 'lucide-react';
 import { GameEditModal } from './GameEditModal';
 
@@ -56,8 +59,13 @@ import { BatchGamesToolbar } from './admin/BatchGamesToolbar';
 import { CollectionHealthReport } from './admin/CollectionHealthReport';
 import { BackupsAdminView } from './admin/BackupsAdminView';
 import { KioskCustomizeView } from './admin/KioskCustomizeView';
+import { AdminDashboard } from './admin/AdminDashboard';
+import { AdminLogsView } from './admin/AdminLogsView';
+import { ConfirmDialog, useConfirmDialog } from './admin/ConfirmDialog';
+import { useAdminLogs } from '../hooks/useAdminLogs';
 
 export type AdminTab =
+  | 'dashboard'
   | 'games'
   | 'systems'
   | 'companies'
@@ -70,7 +78,8 @@ export type AdminTab =
   | 'kiosk'
   | 'appearance'
   | 'backups'
-  | 'json';
+  | 'json'
+  | 'logs';
 
 interface AdminHubModalProps {
   isOpen: boolean;
@@ -150,7 +159,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const [activeTab, setActiveTab] = useState<AdminTab>('games');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [formSettings, setFormSettings] = useState<AppSettings>({ ...settings });
   const [savedSettingsSuccess, setSavedSettingsSuccess] = useState(false);
 
@@ -183,12 +192,27 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   const [isDetectingEmulators, setIsDetectingEmulators] = useState(false);
   const [statusNotification, setStatusNotification] = useState<string | null>(null);
 
+  // Mode de présentation : Vue Simplifiée par Univers (par défaut) vs Vue Complète classique
+  const [isSimplifiedView, setIsSimplifiedView] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('retromad_admin_simplified_view');
+      return stored !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [adminSearch, setAdminSearch] = useState('');
+
+  // ── Logs & Confirmation ──
+  const { logs, logSuccess, logWarning, clearLogs } = useAdminLogs();
+  const { confirmState, confirm, closeConfirm } = useConfirmDialog();
+
   const { playMove, playSelect, playCoin, playFavorite, playUnlock } =
     useAudio(formSettings.soundEnabled, formSettings.soundVolume ?? 0.8);
 
   const notify = (msg: string) => {
     setStatusNotification(msg);
-    setTimeout(() => setStatusNotification(null), 3000);
+    setTimeout(() => setStatusNotification(null), 3500);
   };
 
   // ==========================================
@@ -241,14 +265,16 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     let newGames: Game[];
     if (exists) {
       newGames = games.map((g) => (g.id === updatedGame.id ? updatedGame : g));
+      logSuccess('Jeux', `Jeu modifié : ${updatedGame.cleanTitle}`);
     } else {
       newGames = [updatedGame, ...games];
+      logSuccess('Jeux', `Nouveau jeu créé : ${updatedGame.cleanTitle}`);
     }
     onSaveGames(newGames);
     notify(`Jeu "${updatedGame.cleanTitle}" enregistré avec succès !`);
   };
 
-  const handleDeleteGame = (gameId: string) => {
+  const _doDeleteGame = (gameId: string) => {
     const target = games.find((g) => g.id === gameId);
     markGameDeleted(gameId, target?.filename);
     const newGames = games.filter((g) => g.id !== gameId);
@@ -258,7 +284,19 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
       next.delete(gameId);
       return next;
     });
-    notify('Jeu supprimé définitivement de la bibliothèque (protégé contre la réapparition).');
+    logWarning('Jeux', `Jeu supprimé : ${target?.cleanTitle || target?.title || gameId}`);
+    notify('Jeu supprimé définitivement de la bibliothèque.');
+  };
+
+  const handleDeleteGame = (gameId: string) => {
+    const target = games.find((g) => g.id === gameId);
+    confirm({
+      title: 'Supprimer ce jeu ?',
+      message: `« ${target?.cleanTitle || target?.title || gameId} » sera retiré définitivement de la bibliothèque et protégé contre la réapparition au prochain scan.`,
+      confirmLabel: 'Supprimer',
+      variant: 'danger',
+      onConfirm: () => { _doDeleteGame(gameId); closeConfirm(); },
+    });
   };
 
   const handleDuplicateGame = (game: Game) => {
@@ -329,21 +367,32 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   };
 
   const handleBatchDelete = (ids: string[]) => {
-    const idSet = new Set(ids);
-    const targets = games
-      .filter((g) => idSet.has(g.id))
-      .map((g) => ({ id: g.id, filename: g.filename }));
-    markMultipleGamesDeleted(targets);
-    const updated = games.filter((g) => !idSet.has(g.id));
-    onSaveGames(updated);
-    setSelectedGameIds(new Set());
-    notify(`${ids.length} jeu(x) supprimé(s) définitivement (protégés contre la réapparition).`);
+    confirm({
+      title: `Supprimer ${ids.length} jeu(x) ?`,
+      message: `Cette action est irréversible. Les jeux sélectionnés seront retirés de la bibliothèque et protégés contre la réapparition.`,
+      confirmLabel: `Supprimer ${ids.length} jeu(x)`,
+      variant: 'danger',
+      onConfirm: () => {
+        const idSet = new Set(ids);
+        const targets = games
+          .filter((g) => idSet.has(g.id))
+          .map((g) => ({ id: g.id, filename: g.filename }));
+        markMultipleGamesDeleted(targets);
+        const updated = games.filter((g) => !idSet.has(g.id));
+        onSaveGames(updated);
+        setSelectedGameIds(new Set());
+        logWarning('Jeux', `${ids.length} jeu(x) supprimé(s) en lot`);
+        notify(`${ids.length} jeu(x) supprimé(s) définitivement.`);
+        closeConfirm();
+      },
+    });
   };
 
   const handleBatchToggleFavorite = (ids: string[], fav: boolean) => {
     const idSet = new Set(ids);
     const updated = games.map((g) => (idSet.has(g.id) ? { ...g, favorite: fav } : g));
     onSaveGames(updated);
+    logSuccess('Jeux', `${ids.length} jeu(x) ${fav ? 'ajoutés aux' : 'retirés des'} favoris`);
     notify(`${ids.length} jeu(x) mis à jour en favoris.`);
   };
 
@@ -351,12 +400,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     const idSet = new Set(ids);
     const updated = games.map((g) => (idSet.has(g.id) ? { ...g, systemId: targetSystemId } : g));
     onSaveGames(updated);
+    logSuccess('Jeux', `${ids.length} jeu(x) réassignés vers ${targetSystemId}`);
     notify(`${ids.length} jeu(x) réassigné(s) à la console.`);
   };
 
   const handleBatchScrape = async (selected: Game[]) => {
     if (!onScrapeGame) return;
     notify(`Lancement du scraping pour ${selected.length} jeu(x)...`);
+    logSuccess('Scraper', `Scraping lancé pour ${selected.length} jeu(x)`);
     for (const g of selected) {
       await onScrapeGame(g);
     }
@@ -410,17 +461,30 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     let newSystems: System[];
     if (exists) {
       newSystems = systems.map((s) => (s.id === updatedSystem.id ? updatedSystem : s));
+      logSuccess('Consoles', `Console modifiée : ${updatedSystem.name}`);
     } else {
       newSystems = [...systems, updatedSystem];
+      logSuccess('Consoles', `Nouvelle console créée : ${updatedSystem.name}`);
     }
     onSaveSystems(newSystems);
     notify(`Console "${updatedSystem.name}" enregistrée !`);
   };
 
   const handleDeleteSystem = (systemId: string) => {
-    const newSystems = systems.filter((s) => s.id !== systemId);
-    onSaveSystems(newSystems);
-    notify('Console retirée.');
+    const target = systems.find((s) => s.id === systemId);
+    confirm({
+      title: 'Supprimer cette console ?',
+      message: `« ${target?.name || systemId} » sera retirée de la liste. Les jeux associés resteront dans la bibliothèque.`,
+      confirmLabel: 'Supprimer',
+      variant: 'danger',
+      onConfirm: () => {
+        const newSystems = systems.filter((s) => s.id !== systemId);
+        onSaveSystems(newSystems);
+        logWarning('Consoles', `Console supprimée : ${target?.name || systemId}`);
+        notify('Console retirée.');
+        closeConfirm();
+      },
+    });
   };
 
   const handleDuplicateSystem = (sys: System) => {
@@ -485,17 +549,30 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     let newCompanies: Company[];
     if (exists) {
       newCompanies = companies.map((c) => (c.id === updatedCompany.id ? updatedCompany : c));
+      logSuccess('Firmes', `Firme modifiée : ${updatedCompany.name}`);
     } else {
       newCompanies = [...companies, updatedCompany];
+      logSuccess('Firmes', `Nouvelle firme créée : ${updatedCompany.name}`);
     }
     onSaveCompanies(newCompanies);
     notify(`Firme "${updatedCompany.name}" enregistrée !`);
   };
 
   const handleDeleteCompany = (companyId: string) => {
-    const newCompanies = companies.filter((c) => c.id !== companyId);
-    onSaveCompanies(newCompanies);
-    notify('Firme retirée.');
+    const target = companies.find((c) => c.id === companyId);
+    confirm({
+      title: 'Supprimer ce constructeur ?',
+      message: `« ${target?.name || companyId} » sera retiré de l'encyclopédie. Les consoles associées resteront en place.`,
+      confirmLabel: 'Supprimer',
+      variant: 'danger',
+      onConfirm: () => {
+        const newCompanies = companies.filter((c) => c.id !== companyId);
+        onSaveCompanies(newCompanies);
+        logWarning('Firmes', `Firme supprimée : ${target?.name || companyId}`);
+        notify('Firme retirée.');
+        closeConfirm();
+      },
+    });
   };
 
   const handleDuplicateCompany = (comp: Company) => {
@@ -556,17 +633,30 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     let newEmus: EmulatorProfile[];
     if (exists) {
       newEmus = emulators.map((e) => (e.id === updatedEmulator.id ? updatedEmulator : e));
+      logSuccess('Émulateurs', `Émulateur modifié : ${updatedEmulator.name}`);
     } else {
       newEmus = [...emulators, updatedEmulator];
+      logSuccess('Émulateurs', `Nouvel émulateur créé : ${updatedEmulator.name}`);
     }
     onSaveEmulators(newEmus);
     notify(`Profil émulateur "${updatedEmulator.name}" enregistré !`);
   };
 
   const handleDeleteEmulator = (emulatorId: string) => {
-    const newEmus = emulators.filter((e) => e.id !== emulatorId);
-    onSaveEmulators(newEmus);
-    notify('Émulateur supprimé.');
+    const target = emulators.find((e) => e.id === emulatorId);
+    confirm({
+      title: 'Supprimer ce profil émulateur ?',
+      message: `« ${target?.name || emulatorId} » sera retiré. Si des jeux l'utilisent, ils retomberont sur le profil par défaut.`,
+      confirmLabel: 'Supprimer',
+      variant: 'danger',
+      onConfirm: () => {
+        const newEmus = emulators.filter((e) => e.id !== emulatorId);
+        onSaveEmulators(newEmus);
+        logWarning('Émulateurs', `Émulateur supprimé : ${target?.name || emulatorId}`);
+        notify('Émulateur supprimé.');
+        closeConfirm();
+      },
+    });
   };
 
   const handleDuplicateEmulator = (emu: EmulatorProfile) => {
@@ -616,6 +706,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     onSaveSettings(formSettings);
     setSavedSettingsSuccess(true);
     setTimeout(() => setSavedSettingsSuccess(false), 1200);
+    logSuccess('Paramètres', 'Paramètres enregistrés');
     notify('Paramètres enregistrés avec succès.');
   };
 
@@ -623,6 +714,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     const dir = await onSelectDirectory();
     if (dir) {
       setFormSettings((prev) => ({ ...prev, romsDir: dir }));
+      logSuccess('Dossiers', `Dossier ROMs défini : ${dir}`);
     }
   };
 
@@ -630,229 +722,479 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     const dir = await onSelectDirectory();
     if (dir) {
       setFormSettings((prev) => ({ ...prev, biosDir: dir }));
+      logSuccess('Dossiers', `Dossier BIOS défini : ${dir}`);
     }
   };
+
+  // ── Types et configuration de navigation par Univers (Vue Simplifiée) ──
+  type MasterCategory = 'dashboard' | 'library' | 'emulation' | 'kiosk' | 'system';
+
+  const tabToCategoryMap: Record<AdminTab, MasterCategory> = {
+    dashboard: 'dashboard',
+    games: 'library',
+    systems: 'library',
+    companies: 'library',
+    scraper: 'library',
+    emulators: 'emulation',
+    extensions: 'emulation',
+    bios: 'emulation',
+    gamepad: 'emulation',
+    kiosk: 'kiosk',
+    appearance: 'kiosk',
+    storage: 'system',
+    backups: 'system',
+    logs: 'system',
+    json: 'system',
+  };
+
+  const activeCategory: MasterCategory = tabToCategoryMap[activeTab] || 'dashboard';
+
+  const masterPillars: {
+    id: MasterCategory;
+    title: string;
+    subtitle: string;
+    badge?: number;
+    icon: React.FC<{ className?: string }>;
+    accentColor: string;
+    borderActive: string;
+    bgActive: string;
+    subTabs: { id: AdminTab; label: string; icon: React.FC<{ className?: string }>; badge?: number }[];
+  }[] = [
+    {
+      id: 'dashboard',
+      title: 'Accueil',
+      subtitle: 'Vue globale & Santé',
+      icon: LayoutDashboard,
+      accentColor: 'text-cyan-400',
+      borderActive: 'border-cyan-500',
+      bgActive: 'bg-cyan-500/15 text-cyan-200 border-cyan-500/50 shadow-cyan-500/10',
+      subTabs: [],
+    },
+    {
+      id: 'library',
+      title: 'Ludothèque',
+      subtitle: 'Jeux, Consoles & Jaquettes',
+      badge: games.length,
+      icon: Gamepad2,
+      accentColor: 'text-emerald-400',
+      borderActive: 'border-emerald-500',
+      bgActive: 'bg-emerald-500/15 text-emerald-200 border-emerald-500/50 shadow-emerald-500/10',
+      subTabs: [
+        { id: 'games', label: 'Catalogue Jeux', icon: Gamepad2, badge: games.length },
+        { id: 'systems', label: 'Consoles', icon: Cpu, badge: systems.length },
+        { id: 'companies', label: 'Constructeurs', icon: Landmark, badge: companies.length },
+        { id: 'scraper', label: 'Scraping & Jaquettes', icon: Globe },
+      ],
+    },
+    {
+      id: 'emulation',
+      title: 'Émulateurs & Matériel',
+      subtitle: 'Cœurs, BIOS & Manettes',
+      icon: Terminal,
+      accentColor: 'text-amber-400',
+      borderActive: 'border-amber-500',
+      bgActive: 'bg-amber-500/15 text-amber-200 border-amber-500/50 shadow-amber-500/10',
+      subTabs: [
+        { id: 'emulators', label: 'Profils Émulateurs', icon: Terminal, badge: emulators.length },
+        { id: 'extensions', label: 'Cœurs Libretro', icon: DownloadCloud },
+        { id: 'bios', label: 'Santé des BIOS', icon: Cpu, badge: biosStatuses.filter((b) => !b.found && !b.optional).length || undefined },
+        { id: 'gamepad', label: 'Testeur Manettes', icon: Gamepad2 },
+      ],
+    },
+    {
+      id: 'kiosk',
+      title: 'Borne & Ambiance',
+      subtitle: 'Kiosk, Shaders CRT & Thème',
+      icon: Lock,
+      accentColor: 'text-pink-400',
+      borderActive: 'border-pink-500',
+      bgActive: 'bg-pink-500/15 text-pink-200 border-pink-500/50 shadow-pink-500/10',
+      subTabs: [
+        { id: 'kiosk', label: 'Mode Kiosk & Code PIN', icon: Lock },
+        { id: 'appearance', label: 'Apparence & Shaders CRT', icon: Palette },
+      ],
+    },
+    {
+      id: 'system',
+      title: 'Système & Données',
+      subtitle: 'Dossiers, Backups & Logs',
+      icon: HardDrive,
+      accentColor: 'text-indigo-400',
+      borderActive: 'border-indigo-500',
+      bgActive: 'bg-indigo-500/15 text-indigo-200 border-indigo-500/50 shadow-indigo-500/10',
+      subTabs: [
+        { id: 'storage', label: 'Dossiers Stockage', icon: Folder },
+        { id: 'backups', label: 'Sauvegardes', icon: RotateCcw },
+        { id: 'logs', label: 'Journal d\'actions', icon: Activity, badge: logs.filter((l) => l.level === 'error' || l.level === 'warning').length || undefined },
+        { id: 'json', label: 'Éditeur JSON Brut', icon: FileJson },
+      ],
+    },
+  ];
+
+  const searchIndex = [
+    { label: 'Scanner & Ajouter des ROMs', tab: 'storage' as AdminTab, keywords: 'scan roms rom dossier importer jeux' },
+    { label: 'Catalogue des Jeux & Favoris', tab: 'games' as AdminTab, keywords: 'jeux catalogue roms titres jaquettes favoris supprimer modifier' },
+    { label: 'Consoles & Systèmes (119 machines)', tab: 'systems' as AdminTab, keywords: 'consoles snes nes psx megadrive machines plateformes' },
+    { label: 'Constructeurs (Nintendo, Sega, Sony...)', tab: 'companies' as AdminTab, keywords: 'firmes constructeurs fabricants nintendo sega sony' },
+    { label: 'Scraping des Jaquettes & Vidéos', tab: 'scraper' as AdminTab, keywords: 'scrap scraper jaquettes boxart fanart screenscraper libretro images vidéos' },
+    { label: 'Profils d\'Émulateurs (RetroArch & Standalone)', tab: 'emulators' as AdminTab, keywords: 'émulateurs retroarch commande arguments lanceur standalone' },
+    { label: 'Cœurs Libretro & Extensions', tab: 'extensions' as AdminTab, keywords: 'cœurs cores libretro extensions snes9x genesis mupen' },
+    { label: 'Diagnostic Santé des BIOS', tab: 'bios' as AdminTab, keywords: 'bios firmwares scph5501 disksys fichiers requis santé' },
+    { label: 'Testeur & Calibration Manettes', tab: 'gamepad' as AdminTab, keywords: 'manettes gamepad stick boutons dpad calibration' },
+    { label: 'Mode Kiosk Borne Arcade & Code PIN', tab: 'kiosk' as AdminTab, keywords: 'kiosk borne arcade code pin verrouillage public restreint' },
+    { label: 'Apparence, Effets CRT, Sons & Thèmes', tab: 'appearance' as AdminTab, keywords: 'thèmes apparence crt scanlines shaders couleurs audio volume sons musique bgm' },
+    { label: 'Emplacement des Dossiers ROMs & BIOS', tab: 'storage' as AdminTab, keywords: 'dossiers répertoires stockage romsdir biosdir chemins' },
+    { label: 'Sauvegardes & Restauration Système', tab: 'backups' as AdminTab, keywords: 'sauvegardes backup export import réinitialisation usine' },
+    { label: 'Journal des Actions Administrateur', tab: 'logs' as AdminTab, keywords: 'logs journal historique audit modifications' },
+    { label: 'Éditeur JSON Brut (Avancé)', tab: 'json' as AdminTab, keywords: 'json brut raw configuration expert base de données' },
+  ];
+
+  const filteredSearchIndex = useMemo(() => {
+    if (!adminSearch.trim()) return [];
+    const q = adminSearch.toLowerCase().trim();
+    return searchIndex.filter(
+      (item) => item.label.toLowerCase().includes(q) || item.keywords.includes(q)
+    );
+  }, [adminSearch]);
+
+  const handleSelectPillar = (pillarId: MasterCategory) => {
+    playSelect();
+    if (pillarId === 'dashboard') setActiveTab('dashboard');
+    else if (pillarId === 'library') setActiveTab('games');
+    else if (pillarId === 'emulation') setActiveTab('emulators');
+    else if (pillarId === 'kiosk') setActiveTab('kiosk');
+    else if (pillarId === 'system') setActiveTab('storage');
+  };
+
+  // ── Navigation sidebar items (pour la Vue Complète classique) ──
+  type SidebarGroup = {
+    label: string;
+    items: { id: AdminTab; label: string; icon: React.FC<{ className?: string }>; badge?: string | number; color?: string }[];
+  };
+
+  const sidebarGroups: SidebarGroup[] = [
+    {
+      label: 'Vue d\'ensemble',
+      items: [
+        { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard, color: 'text-cyan-400' },
+        { id: 'logs', label: 'Journal d\'actions', icon: Activity, badge: logs.length > 0 ? logs.filter(l => l.level === 'error' || l.level === 'warning').length || undefined : undefined, color: 'text-amber-400' },
+      ],
+    },
+    {
+      label: 'Bibliothèque',
+      items: [
+        { id: 'games', label: 'Catalogue Jeux', icon: Gamepad2, badge: games.length, color: 'text-cyan-400' },
+        { id: 'systems', label: 'Consoles', icon: Cpu, badge: systems.length, color: 'text-amber-400' },
+        { id: 'companies', label: 'Constructeurs', icon: Landmark, badge: companies.length, color: 'text-violet-400' },
+        { id: 'emulators', label: 'Émulateurs', icon: Terminal, color: 'text-emerald-400' },
+      ],
+    },
+    {
+      label: 'Outils',
+      items: [
+        { id: 'bios', label: 'BIOS & Firmwares', icon: Cpu, color: 'text-blue-400' },
+        { id: 'extensions', label: 'Cœurs Libretro', icon: DownloadCloud, color: 'text-teal-400' },
+        { id: 'scraper', label: 'Scraper', icon: Globe, color: 'text-violet-400' },
+        { id: 'gamepad', label: 'Manettes', icon: Gamepad2, color: 'text-cyan-400' },
+      ],
+    },
+    {
+      label: 'Système',
+      items: [
+        { id: 'storage', label: 'Dossiers', icon: Folder, color: 'text-slate-400' },
+        { id: 'kiosk', label: 'Mode Kiosk', icon: Lock, color: 'text-rose-400' },
+        { id: 'appearance', label: 'Apparence', icon: Palette, color: 'text-pink-400' },
+        { id: 'backups', label: 'Sauvegardes', icon: RotateCcw, color: 'text-indigo-400' },
+        { id: 'json', label: 'JSON Brut', icon: FileJson, color: 'text-slate-400' },
+      ],
+    },
+  ];
+
+  const currentPillar = masterPillars.find((p) => p.id === activeCategory) || masterPillars[0];
 
   return (
     <>
       <div className="retromad-modal-overlay">
-        <div className="retromad-modal-card max-w-7xl h-[94vh]">
-          {/* EN-TÊTE PRINCIPAL */}
-          <div className="retromad-modal-header">
-            <div className="flex items-center space-x-3.5">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
-                <Settings className="w-4 h-4 text-cyan-400" />
+        <div className="retromad-modal-card max-w-[1440px] h-[96vh] flex flex-col overflow-hidden">
+          {/* EN-TÊTE PRINCIPAL ULTRA-ERGONOMIQUE */}
+          <div className="retromad-modal-header shrink-0 flex items-center justify-between gap-3 px-6 py-3.5 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+            <div className="flex items-center space-x-3 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500/25 to-blue-600/25 border border-cyan-500/40 flex items-center justify-center shadow-lg shadow-cyan-500/10 shrink-0">
+                <Settings className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                  <span>Centre d'Administration RetroMad</span>
-                  <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                    Contrôle & Gestion
+                <h2 className="text-base font-black text-white tracking-wide flex items-center gap-2">
+                  <span>Administration</span>
+                  <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    RetroMad
                   </span>
-                  {/* Indicateur de build : hash court du commit, injecté par Vite. */}
                   <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border hidden md:inline ${
                       APP_BUILD_HASH
                         ? 'bg-slate-800/80 text-slate-400 border-slate-700'
                         : 'bg-rose-500/20 text-rose-300 border-rose-500/50 animate-pulse'
                     }`}
-                    title={
-                      APP_BUILD_HASH
-                        ? `Bundle construit sur le commit ${APP_BUILD_HASH}\n${APP_BUILD_DATE ? 'Date : ' + new Date(APP_BUILD_DATE).toLocaleString('fr-FR') : ''}`
-                        : 'Bundle périmé : le hash de version est absent. Lancez npm run build puis relancez RetroMad.'
-                    }
                   >
-                    {APP_BUILD_HASH ? `build ${APP_BUILD_HASH}` : '⚠ build périmé'}
+                    {APP_BUILD_HASH ? `build ${APP_BUILD_HASH}` : 'build dev'}
                   </span>
                 </h2>
-                <span className="text-xs text-slate-400 block -mt-0.5">
-                  Gestion intégrale : Jeux, Consoles, Constructeurs, Émulateurs, BIOS, Scraper, Cœurs, Contrôleurs & Données
+                <span className="text-[11px] text-slate-400 hidden sm:block">
+                  {games.length} jeux · {systems.length} consoles · {emulators.length} émulateurs
                 </span>
               </div>
             </div>
 
-            {/* Notification flottante */}
-            {statusNotification && (
-              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold animate-in fade-in">
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{statusNotification}</span>
+            {/* BARRE DE RECHERCHE RAPIDE DANS L'ADMIN */}
+            <div className="relative flex-1 max-w-sm hidden lg:block">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={adminSearch}
+                  onChange={(e) => setAdminSearch(e.target.value)}
+                  placeholder="Recherche rapide (ex: volume, rom, kiosk, bios, thème...)"
+                  className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-500 rounded-xl pl-9 pr-8 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition"
+                />
+                {adminSearch && (
+                  <button
+                    onClick={() => setAdminSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
+
+              {/* RÉSULTATS FLOTTANTS DE RECHERCHE INSTANTANÉE */}
+              {filteredSearchIndex.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 p-2 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl z-50 space-y-1 max-h-64 overflow-y-auto backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-[10px] font-bold text-slate-400 px-2 py-0.5 uppercase tracking-wider">
+                    Accès direct ({filteredSearchIndex.length}) :
+                  </div>
+                  {filteredSearchIndex.map((res) => (
+                    <button
+                      key={res.tab}
+                      onClick={() => {
+                        setActiveTab(res.tab);
+                        setAdminSearch('');
+                        playSelect();
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-cyan-500/20 text-xs text-slate-200 hover:text-cyan-200 flex items-center justify-between transition group"
+                    >
+                      <span>{res.label}</span>
+                      <ChevronRight className="w-3 h-3 text-slate-500 group-hover:text-cyan-400 transition" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ACTIONS HEADER : BASCULE DE VUE & NOTIFICATIONS */}
+            <div className="flex items-center space-x-2 shrink-0">
+              {/* Notification flottante */}
+              {statusNotification && (
+                <div className="hidden xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{statusNotification}</span>
+                </div>
+              )}
+
+              {/* BOUTON BASCULE VUE SIMPLIFIÉE / VUE COMPLÈTE */}
+              <button
+                type="button"
+                onClick={() => {
+                  playMove();
+                  const next = !isSimplifiedView;
+                  setIsSimplifiedView(next);
+                  try {
+                    localStorage.setItem('retromad_admin_simplified_view', String(next));
+                  } catch {}
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
+                  isSimplifiedView
+                    ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/25'
+                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                }`}
+                title="Bascule entre l'organisation par Univers (simplifiée) et la liste complète à 15 onglets"
+              >
+                <span>{isSimplifiedView ? '✨ Vue Simplifiée' : '📋 Vue Complète'}</span>
+              </button>
+
+              <button
+                onClick={onClose}
+                className="retromad-modal-close-btn ml-1"
+                title="Fermer le Centre Admin (Échap)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* VUE SIMPLIFIÉE : BARRE DES 4 GRANDS UNIVERS + ACTIONS RAPIDES */}
+          {isSimplifiedView && (
+            <div className="shrink-0 bg-slate-950 border-b border-slate-800/80">
+              {/* LES 5 PILIERS MAJEURS */}
+              <div className="px-6 pt-3 pb-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                {masterPillars.map((pillar) => {
+                  const Icon = pillar.icon;
+                  const isPillarActive = activeCategory === pillar.id;
+                  return (
+                    <button
+                      key={pillar.id}
+                      onClick={() => handleSelectPillar(pillar.id)}
+                      className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 ${
+                        isPillarActive
+                          ? `${pillar.bgActive} border-current shadow-lg`
+                          : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 shrink-0 ${isPillarActive ? pillar.accentColor : 'text-slate-500'}`} />
+                      <span>{pillar.title}</span>
+                      {pillar.badge !== undefined && (
+                        <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full min-w-[18px] text-center ${
+                          isPillarActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
+                        }`}>
+                          {pillar.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* SOUS-ONGLETS HORIZONTAUX DU PILIER ACTIF */}
+              {currentPillar.subTabs.length > 0 && (
+                <div className="px-6 py-2 bg-slate-900/40 border-t border-slate-800/60 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    {currentPillar.subTabs.map((sub) => {
+                      const SubIcon = sub.icon;
+                      const isSubActive = activeTab === sub.id;
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            playMove();
+                            setActiveTab(sub.id);
+                          }}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
+                            isSubActive
+                              ? 'bg-slate-800 text-white border-cyan-500/60 shadow-md'
+                              : 'bg-slate-950/40 text-slate-400 hover:text-slate-200 border-transparent hover:border-slate-800'
+                          }`}
+                        >
+                          <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                          <span>{sub.label}</span>
+                          {sub.badge !== undefined && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                              {sub.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* MINI BOUTONS D'ACTION RAPIDE SUR LA LIGNE SOUS-ONGLETS */}
+                  <div className="flex items-center gap-1.5 text-xs">
+                    {onScanRoms && (
+                      <button
+                        onClick={onScanRoms}
+                        disabled={isScanningRoms}
+                        className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-bold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 text-[11px]"
+                        title="Vérifier et importer immédiatement les nouvelles ROMs"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isScanningRoms ? 'animate-spin' : ''}`} />
+                        <span>{isScanningRoms ? 'Scan…' : 'Scan ROMs'}</span>
+                      </button>
+                    )}
+                    {onStartScrapeBatch && (
+                      <button
+                        onClick={onStartScrapeBatch}
+                        disabled={isScrapingBatch}
+                        className="px-2.5 py-1 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/30 text-violet-300 font-bold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 text-[11px]"
+                        title="Récupérer les jaquettes et vidéos manquantes"
+                      >
+                        <Globe className={`w-3 h-3 ${isScrapingBatch ? 'animate-spin' : ''}`} />
+                        <span>{isScrapingBatch ? 'Scraping…' : 'Scraper'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CORPS : SIDEBAR (SI VUE COMPLÈTE) + CONTENU */}
+          <div className="flex flex-1 min-h-0">
+            {/* ── SIDEBAR VERTICALE CLASSIQUE (affichée uniquement en vue complète) ── */}
+            {!isSimplifiedView && (
+              <aside className="w-52 shrink-0 bg-slate-950/80 border-r border-slate-800 flex flex-col overflow-y-auto py-3">
+                {sidebarGroups.map((group) => (
+                  <div key={group.label} className="mb-4">
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 mb-1.5 block">
+                      {group.label}
+                    </span>
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveTab(item.id)}
+                          className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold transition-all group ${
+                            isActive
+                              ? 'bg-cyan-500/10 text-white border-r-2 border-cyan-400'
+                              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? (item.color || 'text-cyan-400') : 'text-slate-500 group-hover:text-slate-300'}`} />
+                          <span className="flex-1 text-left truncate">{item.label}</span>
+                          {item.badge !== undefined && item.badge !== 0 && (
+                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center ${
+                              isActive ? 'bg-cyan-500/30 text-cyan-200' : 'bg-slate-800 text-slate-400'
+                            }`}>
+                              {item.badge}
+                            </span>
+                          )}
+                          {isActive && <ChevronRight className="w-3 h-3 text-cyan-400 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+
+                {/* Infos version en bas de sidebar */}
+                <div className="mt-auto px-4 pb-3 pt-2 border-t border-slate-800">
+                  <span className="text-[9px] text-slate-600 block">RetroMad Admin</span>
+                  <span className="text-[9px] text-slate-700 font-mono">{games.length} jeux · {systems.length} sys</span>
+                </div>
+              </aside>
             )}
 
-            <button
-              onClick={onClose}
-              className="retromad-modal-close-btn"
-              title="Fermer le Centre Admin (Échap)"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+            {/* ── CONTENU PRINCIPAL ── */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* ======================================================== */}
+              {/* TABLEAU DE BORD */}
+              {/* ======================================================== */}
+              {activeTab === 'dashboard' && (
+                <AdminDashboard
+                  games={games}
+                  systems={systems}
+                  companies={companies}
+                  emulators={emulators}
+                  biosStatuses={biosStatuses}
+                  logs={logs}
+                  onNavigate={(tab) => setActiveTab(tab as AdminTab)}
+                />
+              )}
 
-          {/* BARRE DE NAVIGATION D'ONGLETS ADMIN COMPLÈTE */}
-          <div className="flex items-center space-x-1.5 px-6 py-2.5 border-b border-slate-800 bg-slate-950/70 shrink-0 overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => setActiveTab('games')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'games'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Gamepad2 className="w-3.5 h-3.5" />
-              <span>Catalogue Jeux ({games.length})</span>
-            </button>
+              {/* ======================================================== */}
+              {/* JOURNAL DES ACTIONS */}
+              {/* ======================================================== */}
+              {activeTab === 'logs' && (
+                <AdminLogsView logs={logs} onClear={clearLogs} />
+              )}
 
-            <button
-              onClick={() => setActiveTab('systems')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'systems'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Consoles ({systems.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('companies')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'companies'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Landmark className="w-3.5 h-3.5" />
-              <span>Firmes ({companies.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('emulators')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'emulators'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Terminal className="w-3.5 h-3.5" />
-              <span>Émulateurs</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('bios')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'bios'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5 text-blue-400" />
-              <span>BIOS</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('extensions')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'extensions'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <DownloadCloud className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Cœurs & Extensions</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('scraper')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'scraper'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5 text-violet-400" />
-              <span>Scraper</span>
-            </button>
-
-
-
-            <button
-              onClick={() => setActiveTab('gamepad')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'gamepad'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Gamepad2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Manettes</span>
-            </button>
-
-            <div className="w-[1px] h-5 bg-slate-800 mx-1 shrink-0" />
-
-            <button
-              onClick={() => setActiveTab('storage')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'storage'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Folder className="w-3.5 h-3.5" />
-              <span>Dossiers</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('kiosk')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'kiosk'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>Kiosk</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('appearance')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'appearance'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <Palette className="w-3.5 h-3.5" />
-              <span>Apparence</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('backups')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'backups'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Sauvegardes</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('json')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'json'
-                ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent'
-              }`}
-            >
-              <FileJson className="w-3.5 h-3.5" />
-              <span>JSON Brut</span>
-            </button>
-          </div>
-
-          {/* CONTENU PRINCIPAL DE L'ONGLET ACTIF */}
-          <div className="flex-1 overflow-y-auto p-6">
             {/* ======================================================== */}
             {/* ONGLET: JEUX (CATALOGUE, BATCH ACTIONS & ÉDITION) */}
             {/* ======================================================== */}
@@ -2098,9 +2440,22 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 onSaveSettings={onSaveSettings}
               />
             )}
+            </div>
+          {/* ── Fin du corps sidebar + contenu ── */}
           </div>
         </div>
       </div>
+
+      {/* DIALOGUE DE CONFIRMATION GLOBAL */}
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        variant={confirmState.variant}
+        onConfirm={confirmState.onConfirm}
+        onCancel={closeConfirm}
+      />
 
       {/* MODALES D'ÉDITION CONTEXTUELLES */}
       <GameEditModal

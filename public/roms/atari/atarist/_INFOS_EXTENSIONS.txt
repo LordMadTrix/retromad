@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : ATARI ST (Atari ST)
+  Hiérarchie      : Roms / ATARI / atarist
+  Constructeur    : Atari (1985)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .st  .stx  .dim  .msa  .zip  .7z
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - tos.img : Atari ST TOS ROM (Requis — TOS 1.02 recommandé)
+
+RetroMad Frontend Retrogaming
+============================================================

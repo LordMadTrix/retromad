@@ -9,14 +9,16 @@ export function resolveMediaUrl(path?: string): string | undefined {
     path.startsWith('https://') ||
     path.startsWith('data:') ||
     path.startsWith('blob:') ||
+    path.startsWith('retromad-media://') ||
     path.startsWith('/')
   ) {
     return path;
   }
   // En environnement Electron natif
-  if (typeof window !== 'undefined' && window.isElectron) {
-    return `retromad-media://${path}`;
+  if (typeof window !== 'undefined' && (window as any).isElectron) {
+    return `retromad-media://${path.replace(/^\//, '')}`;
   }
   // En environnement Web standard
   return path;
 }
+

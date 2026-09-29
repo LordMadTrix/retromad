@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : COMMODORE PLUS/4 (Plus/4)
+  Hiérarchie      : Roms / COMMODORE / plus4
+  Constructeur    : Commodore (1984)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .d64  .t64  .prg  .tap  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

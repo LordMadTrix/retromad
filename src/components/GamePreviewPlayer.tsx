@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Game } from '../types';
 import { EJS_CORE_BY_SYSTEM } from '../constants/emulatorjs';
+import { resolveMediaUrl } from '../utils/media';
 
 interface GamePreviewPlayerProps {
   game: Game;
@@ -9,15 +10,16 @@ interface GamePreviewPlayerProps {
 }
 
 /**
- * Mini-lecteur ÉmulatorJS « aperçu » : démo silencieuse lancée dans un petit
- * cadre au survol d'une jaquette. Chaque instance charge le CDN dans une
- * iframe isolée (pas de conflit de globales EJS_* avec un éventuel lecteur
- * principal déjà ouvert).
+ * Mini-lecteur aperçu : joue la vidéo MP4 de gameplay si elle est scrapée/disponible,
+ * ou démarre la démo EmulatorJS silencieuse en repli.
  */
 export const GamePreviewPlayer: React.FC<GamePreviewPlayerProps> = ({ game, className = '' }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const videoUrl = resolveMediaUrl(game.media?.video);
 
   useEffect(() => {
+    if (videoUrl) return; // Si la vidéo existe, pas besoin d'iframe EmulatorJS
+
     let romUrl = game.path;
     if (!romUrl.startsWith('/') && !romUrl.startsWith('http') && !romUrl.startsWith('blob:')) {
       romUrl = `/roms/${game.systemId}/${game.filename}`;
@@ -55,7 +57,21 @@ export const GamePreviewPlayer: React.FC<GamePreviewPlayerProps> = ({ game, clas
     if (iframe) {
       iframe.srcdoc = html;
     }
-  }, [game]);
+  }, [game, videoUrl]);
+
+  if (videoUrl) {
+    return (
+      <video
+        src={videoUrl}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={`${className} object-cover w-full h-full`}
+      />
+    );
+  }
 
   return <iframe ref={iframeRef} className={className} title={`Aperçu ${game.cleanTitle}`} sandbox="allow-scripts allow-same-origin" />;
 };
+

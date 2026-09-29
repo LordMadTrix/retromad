@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : MACINTOSH (SYSTEM 1-7) (Macintosh)
+  Hiérarchie      : Roms / APPLE / macintosh
+  Constructeur    : Apple Computer (1984)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .dsk  .img  .hfv  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - macplus.rom : ROM Macintosh Plus 128K (obligatoire pour Mini vMac)
+
+RetroMad Frontend Retrogaming
+============================================================

@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : 3DO INTERACTIVE MULTIPLAYER (3DO)
+  Hiérarchie      : Roms / PANASONIC / 3do
+  Constructeur    : Panasonic / The 3DO Company (1993)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .iso  .bin  .chd  .cue
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - panafz1.bin : Panasonic FZ-1 3DO BIOS (Requis)
+
+RetroMad Frontend Retrogaming
+============================================================

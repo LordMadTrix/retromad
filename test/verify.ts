@@ -97,8 +97,22 @@ async function runTests() {
 
   fs.rmdirSync(tempDir);
 
+  // Test Scraping Flou & Choix de Titres Similaires
+  console.log('\n--- Test Scraping Flou & Choix de Titres Similaires ---');
+  const sim1 = scraper.calculateSimilarity('Super Mario World', 'Super Mario World (USA)');
+  assert(sim1 >= 85, `Forte ressemblance Super Mario World (${sim1}%)`);
+
+  const sim2 = scraper.calculateSimilarity('Mario World', 'Super Mario World (USA, Europe)');
+  assert(sim2 >= 70, `Ressemblance sous-chaîne Mario World (${sim2}%)`);
+
+  const sim3 = scraper.calculateSimilarity('Zelda', 'The Legend of Zelda (Europe)');
+  assert(sim3 >= 60, `Détection mot-clé Zelda (${sim3}%)`);
+
+  assert(fs.existsSync(path.join(__dirname, '../src/components/ScrapeCandidateModal.tsx')), 'Composant ScrapeCandidateModal.tsx présent');
+
   // Test 5: Mode Kiosk & Sécurité
   console.log('\n--- Test Mode Kiosk & Sécurité ---');
+
   const defaultPin = '1234';
   const testPinSuccess = (input: string) => input === defaultPin;
   assert(testPinSuccess('1234') === true, 'Validation code PIN correct (1234)');

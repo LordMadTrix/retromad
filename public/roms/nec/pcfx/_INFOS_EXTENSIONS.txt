@@ -1,0 +1,18 @@
+============================================================
+  DOSSIER DE ROMS : NEC PC-FX (PC-FX)
+  Hiérarchie      : Roms / NEC / pcfx
+  Constructeur    : NEC Home Electronics (1994)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .cue  .bin  .iso  .toc  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - pcfx.rom : BIOS PC-FX (obligatoire pour Beetle PC-FX)
+
+RetroMad Frontend Retrogaming
+============================================================

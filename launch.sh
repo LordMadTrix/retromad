@@ -81,13 +81,12 @@ fi
 
 echo -e "${GREEN}[*] Lancement de RetroMad...${NC}"
 
-# Contournement NVIDIA/sandbox : le processus GPU d'Electron plante
-# (SIGSEGV) avec le sandbox GPU sur certains drivers (nvidia-drm).
-# Le rendu logiciel désactivé-GPU est le chemin fiable sur ces machines.
-ELECTRON_FORCE_PROD=1 npx electron . --disable-gpu --disable-gpu-sandbox "$@"
+# Lancement avec accélération matérielle GPU (ultra-fluide 60 FPS).
+# --disable-gpu-sandbox évite les blocages de permissions sans couper l'accélération matérielle.
+ELECTRON_FORCE_PROD=1 npx electron . --disable-gpu-sandbox --enable-gpu-rasterization --enable-zero-copy "$@"
 RC=$?
-if [ "$RC" -ne 0 ] && [ -n "${DISPLAY:-}" ]; then
-    echo -e "${YELLOW}[!] Plantage détecté, nouvelle tentative en mode sans sandbox...${NC}"
+if [ "$RC" -ne 0 ] && [ "$RC" -ne 130 ] && [ "$RC" -ne 143 ] && [ -n "${DISPLAY:-}" ]; then
+    echo -e "${YELLOW}[!] GPU non supporté ou plantage détecté, repli en mode sécurisé...${NC}"
     ELECTRON_FORCE_PROD=1 LIBGL_ALWAYS_SOFTWARE=1 npx electron . --disable-gpu --disable-gpu-sandbox --no-sandbox "$@"
     RC=$?
 fi

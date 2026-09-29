@@ -1,0 +1,17 @@
+============================================================
+  DOSSIER DE ROMS : MS-DOS 4.01 (DOS 4.01)
+  Hiérarchie      : Roms / MICROSOFT / dos4
+  Constructeur    : Microsoft (1989)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .exe  .com  .bat  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS : Aucun fichier BIOS supplémentaire requis pour cette console.
+
+RetroMad Frontend Retrogaming
+============================================================

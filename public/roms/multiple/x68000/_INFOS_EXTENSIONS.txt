@@ -1,0 +1,19 @@
+============================================================
+  DOSSIER DE ROMS : SHARP X68000 (X68000)
+  Hiérarchie      : Roms / MULTIPLE / x68000
+  Constructeur    : Sharp (1987)
+============================================================
+
+FORMATS DE FICHIERS ET EXTENSIONS ACCEPTÉES :
+  .dim  .img  .d88  .hdf  .zip
+
+INSTRUCTIONS :
+  Déposez simplement vos fichiers de jeux (.zip, .7z, ou ROM brute)
+  dans ce dossier. RetroMad les identifiera automatiquement lors du scan.
+
+BIOS REQUIS OU CONSEILLÉS :
+  - iplrom.dat : IPLROM X68000 (obligatoire pour PX68K)
+  - cgrom.dat : CGROM polices X68000 (obligatoire)
+
+RetroMad Frontend Retrogaming
+============================================================
