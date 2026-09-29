@@ -62,14 +62,6 @@
   .retromad-btn-secondary {
     @apply px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-2;
   }
-
-  .retromad-btn-danger {
-    @apply px-4 py-2 rounded-xl bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-2;
-  }
-
-  .retromad-input {
-    @apply bg-slate-900/80 border border-slate-700/60 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40 transition;
-  }
 }
 
 @keyframes retromadFadeIn {
@@ -274,17 +266,7 @@ button {
   z-index: 51;
 }
 
-/* Animations de focus manette */
-.gamepad-focus-ring {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.gamepad-focus-ring:focus-visible,
-.gamepad-focus-active {
-  box-shadow: 0 0 0 3px #00f2fe, 0 0 25px rgba(0, 242, 254, 0.6);
-  transform: scale(1.04);
-  z-index: 10;
-}
+/* Animations de focus manette supprimées (classes mortes — focus natif utilisé) */
 
 /* ═════════════════════════════════════════════════════════════════
    RÈGLES D'EXPORT PDF ET D'IMPRESSION PRO DU GUIDE RETROMAD
@@ -326,16 +308,6 @@ button {
 
   .no-print {
     display: none !important;
-  }
-
-  .print-break-before-page {
-    page-break-before: always !important;
-    break-before: page !important;
-  }
-
-  .print-avoid-break {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 }
 
