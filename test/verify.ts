@@ -375,21 +375,33 @@ async function runTests() {
     delete g.window;
   }
 
-  // Test 16 : lecteur YouTube insensible aux blocages (152/153)
+  // Test 16 : lecteur YouTube auto-réparant (embed d'abord, repli sur erreur)
   console.log('\n--- Test lecteur YouTube insensible aux blocages ---');
   const ytPlayable = fs.readFileSync(
     path.join(__dirname, '../src/components/YoutubePlayable.tsx'),
     'utf-8'
   );
   assert(
-    ytPlayable.includes("img.youtube.com/vi/${videoId}/maxresdefault.jpg") &&
-      ytPlayable.includes('openYouTubeWatch'),
-    'Lecteur YouTube : vignette cliquable avec repli hqdefault'
+    ytPlayable.includes('loadYouTubeIframeApi') &&
+      ytPlayable.includes('onError') &&
+      ytPlayable.includes('setFailed(true)'),
+    "Lecteur YouTube : lecteur intégré tenté en premier, repli automatique sur erreur"
   );
   assert(
     ytPlayable.includes("window.isElectron") &&
       ytPlayable.includes('youtube-nocookie.com/embed/'),
     'Lecteur YouTube : iframe conservée en web, stratégie desktop distincte'
+  );
+  assert(
+    ytPlayable.includes('maxresdefault.jpg') &&
+      ytPlayable.includes('hqdefault.jpg') &&
+      ytPlayable.includes('openYouTubeWatch'),
+    'Lecteur YouTube : repli vignette cliquable avec repli hqdefault + réessai'
+  );
+  assert(
+    ytPlayable.includes('Réessayer le lecteur intégré') &&
+      ytPlayable.includes('setAttempt'),
+    "Lecteur YouTube : bouton « Réessayer le lecteur intégré »"
   );
   const mainTs = fs.readFileSync(path.join(__dirname, '../electron/main.ts'), 'utf-8');
   const preloadTs = fs.readFileSync(path.join(__dirname, '../electron/preload.ts'), 'utf-8');
