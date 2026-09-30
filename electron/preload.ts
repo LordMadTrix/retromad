@@ -23,10 +23,18 @@ export const API = {
   openExternal: (url: string): Promise<boolean> => ipcRenderer.invoke('open-external', url),
   // Vidéos MP4 locales par firme : sélection, import hors ligne, lecture, suppression
   selectVideoFile: (): Promise<string | null> => ipcRenderer.invoke('select-video-file'),
+  selectMediaFiles: (): Promise<string[]> => ipcRenderer.invoke('select-media-files'),
   importCompanyVideo: (companyId: string, sourcePath: string): Promise<{ ok: boolean; url?: string; path?: string; error?: string }> =>
     ipcRenderer.invoke('import-company-video', companyId, sourcePath),
   getCompanyVideo: (companyId: string): Promise<string | null> => ipcRenderer.invoke('get-company-video', companyId),
   removeCompanyVideo: (companyId: string): Promise<boolean> => ipcRenderer.invoke('remove-company-video', companyId),
+  // Médiathèque d'archives par firme : photos d'époque + vidéos multiples
+  importCompanyMedia: (companyId: string, sourcePaths: string[]): Promise<{ ok: boolean; added: number; skipped?: number; error?: string }> =>
+    ipcRenderer.invoke('import-company-media', companyId, sourcePaths),
+  listCompanyMedia: (companyId: string): Promise<{ photos: { url: string; name: string }[]; videos: { url: string; name: string }[] }> =>
+    ipcRenderer.invoke('list-company-media', companyId),
+  removeCompanyMedia: (companyId: string, fileName: string): Promise<boolean> =>
+    ipcRenderer.invoke('remove-company-media', companyId, fileName),
 
   // Données de base
   getSystems: (): Promise<System[]> => ipcRenderer.invoke('get-systems'),

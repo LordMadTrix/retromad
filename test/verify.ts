@@ -491,6 +491,51 @@ async function runTests() {
     'Vidéos locales : priorité + gestion intégrée dans la fiche musée'
   );
 
+  // Test 19 : médiathèque d'archives par firme (photos d'époque + vidéos multiples)
+  console.log('\n--- Test médiathèque d\'archives ---');
+  assert(
+    mainTs.includes("ipcMain.handle('import-company-media'") &&
+      mainTs.includes("ipcMain.handle('list-company-media'") &&
+      mainTs.includes("ipcMain.handle('remove-company-media'") &&
+      mainTs.includes('company-gallery') &&
+      mainTs.includes('GALLERY_IMAGE_EXTENSIONS'),
+    'Médiathèque : IPC import/liste/retrait, stockage hors ligne company-gallery'
+  );
+  assert(
+    mainTs.includes("properties: ['openFile', 'multiSelections']") &&
+      mainTs.split("ipcMain.handle('select-media-files'").length === 2,
+    'Médiathèque : sélecteur multi-fichiers, déclaré une seule fois'
+  );
+  const galleryUtil = fs.readFileSync(
+    path.join(__dirname, '../src/utils/companyMediaLibrary.ts'),
+    'utf-8'
+  );
+  assert(
+    galleryUtil.includes('useCompanyMediaLibrary') &&
+      galleryUtil.includes('listCompanyMedia') &&
+      galleryUtil.includes('refresh'),
+    'Médiathèque : hook de liste avec rafraîchissement après import/retrait'
+  );
+  const gallery = fs.readFileSync(
+    path.join(__dirname, '../src/components/CompanyMediaGallery.tsx'),
+    'utf-8'
+  );
+  assert(
+    gallery.includes('lightboxIndex') &&
+      gallery.includes("'ArrowLeft'") &&
+      gallery.includes("'ArrowRight'") &&
+      gallery.includes('Escape'),
+    'Médiathèque : lightbox plein écran avec navigation clavier'
+  );
+  assert(
+    gallery.includes('<video') && gallery.includes('canManage'),
+    'Médiathèque : vidéos multiples natives, gestion réservée hors Kiosque'
+  );
+  assert(
+    museum.includes('<CompanyMediaGallery company={company} canManage={!isKioskMode} />'),
+    'Médiathèque : galerie branchée dans la fiche musée (onglet Archives vidéo)'
+  );
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);

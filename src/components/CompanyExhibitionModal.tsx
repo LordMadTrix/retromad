@@ -6,6 +6,7 @@ import { COMPANY_MUSEUM_DATA } from '../data/companyMuseumData';
 import { YoutubePlayable, openYouTubeWatch } from './YoutubePlayable';
 import { useCompanyLocalVideo } from '../utils/companyLocalVideo';
 import { CompanyLocalVideoSection } from './CompanyBackgroundVideo';
+import { CompanyMediaGallery } from './CompanyMediaGallery';
 import {
   X,
   Landmark,
@@ -623,8 +624,11 @@ export const CompanyExhibitionModal: React.FC<CompanyExhibitionModalProps> = ({
                 </div>
               )}
 
-              {/* Attacher / gérer la vidéo locale de la firme (desktop) */}
+              {/* Attacher / gérer la vidéo locale « de fond » (une seule, lue en Kiosque) */}
               <CompanyLocalVideoSection company={company} />
+
+              {/* Médiathèque d'archives : photos d'époque + vidéos multiples hors ligne */}
+              <CompanyMediaGallery company={company} canManage={!isKioskMode} />
             </div>
           )}
         </div>

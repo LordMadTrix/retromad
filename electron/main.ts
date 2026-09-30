@@ -421,6 +421,27 @@ ipcMain.handle('select-video-file', async () => {
   }
 });
 
+// Sélection multiple : photos d'époque et/ou vidéos pour la médiathèque.
+ipcMain.handle('select-media-files', async () => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow!, {
+      title: 'Choisir des photos et/ou vidéos pour la médiathèque',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        {
+          name: 'Photos & vidéos',
+          extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif', 'mp4', 'webm', 'ogv', 'mov', 'm4v'],
+        },
+      ],
+    });
+    if (result.canceled || result.filePaths.length === 0) return [];
+    return result.filePaths;
+  } catch (e) {
+    console.error('[RetroMad] select-media-files impossible :', e);
+    return [];
+  }
+});
+
 // Copie la vidéo choisie dans media/company-videos/<companyId>.<ext> (hors ligne,
 // survive aux déplacements du fichier d'origine) et renvoie l'URL retromad-media://.
 ipcMain.handle('import-company-video', async (_event, companyId: string, sourcePath: string) => {
@@ -491,6 +512,111 @@ ipcMain.handle('remove-company-video', async (_event, companyId: string) => {
     return removed;
   } catch (e) {
     console.error('[RetroMad] remove-company-video impossible :', e);
+    return false;
+  }
+});
+
+// ─── Médiathèque d'archives par firme : photos d'époque + vidéos multiples ───
+const GALLERY_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
+
+function companyGalleryDir(companyId: string): string {
+  const dir = path.join(storage.mediaDir, 'company-gallery', companyId);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function isSafeGalleryFileName(name: string): boolean {
+  return !!name && /^[a-zA-Z0-9._-]+$/.test(name) && !name.includes('..');
+}
+
+function galleryMediaType(fileNameOrExt: string): 'photo' | 'video' | null {
+  const ext = fileNameOrExt.startsWith('.')
+    ? fileNameOrExt.toLowerCase()
+    : path.extname(fileNameOrExt).toLowerCase();
+  if (GALLERY_IMAGE_EXTENSIONS.has(ext)) return 'photo';
+  if (COMPANY_VIDEO_EXTENSIONS.has(ext)) return 'video';
+  return null;
+}
+
+// Import multiple : copie chaque fichier hors ligne (photos et/ou vidéos)
+// dans media/company-gallery/<companyId>/ sous un nom unique — l'ordre
+// alphabétique reflète l'ordre d'ajout.
+ipcMain.handle('import-company-media', async (_event, companyId: string, sourcePaths: string[]) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId) {
+      return { ok: false, added: 0, error: 'Identifiant de firme invalide.' };
+    }
+    if (!Array.isArray(sourcePaths) || sourcePaths.length === 0) {
+      return { ok: false, added: 0, error: 'Aucun fichier sélectionné.' };
+    }
+    const dir = companyGalleryDir(safeCompanyId);
+    let added = 0;
+    let skipped = 0;
+    for (const src of sourcePaths) {
+      try {
+        const ext = path.extname(src).toLowerCase();
+        if (!galleryMediaType(ext)) {
+          skipped++;
+          continue;
+        }
+        if (!fs.existsSync(src)) {
+          skipped++;
+          continue;
+        }
+        const prefix = GALLERY_IMAGE_EXTENSIONS.has(ext) ? 'p' : 'v';
+        const destName = `${prefix}_${Date.now()}_${added}${ext}`;
+        await fs.promises.copyFile(src, path.join(dir, destName));
+        added++;
+      } catch {
+        skipped++;
+      }
+    }
+    if (added > 0) {
+      console.log(`[RetroMad] Médiathèque ${safeCompanyId} : ${added} fichier(s) importé(s).`);
+    }
+    return { ok: added > 0, added, skipped, error: added === 0 ? 'Aucun fichier valide (formats photo ou vidéo attendus).' : undefined };
+  } catch (e) {
+    console.error('[RetroMad] import-company-media impossible :', e);
+    return { ok: false, added: 0, error: 'Import impossible (voir logs).' };
+  }
+});
+
+// Liste la médiathèque d'une firme : photos et vidéos, URLs retromad-media://.
+ipcMain.handle('list-company-media', async (_event, companyId: string) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId) return { photos: [], videos: [] };
+    const dir = companyGalleryDir(safeCompanyId);
+    const photos: { url: string; name: string }[] = [];
+    const videos: { url: string; name: string }[] = [];
+    for (const file of fs.readdirSync(dir).sort()) {
+      const type = galleryMediaType(file);
+      if (type === 'photo') {
+        photos.push({ url: `retromad-media://media/company-gallery/${safeCompanyId}/${file}`, name: file });
+      } else if (type === 'video') {
+        videos.push({ url: `retromad-media://media/company-gallery/${safeCompanyId}/${file}`, name: file });
+      }
+    }
+    return { photos, videos };
+  } catch (e) {
+    console.error('[RetroMad] list-company-media impossible :', e);
+    return { photos: [], videos: [] };
+  }
+});
+
+// Retire un élément précis de la médiathèque (le fichier d'origine n'est pas touché).
+ipcMain.handle('remove-company-media', async (_event, companyId: string, fileName: string) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId || !isSafeGalleryFileName(fileName)) return false;
+    const target = path.join(companyGalleryDir(safeCompanyId), fileName);
+    if (!target.startsWith(companyGalleryDir(safeCompanyId))) return false;
+    if (!fs.existsSync(target)) return false;
+    fs.unlinkSync(target);
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] remove-company-media impossible :', e);
     return false;
   }
 });
