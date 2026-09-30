@@ -455,6 +455,42 @@ async function runTests() {
     'Lanceur : garde session unique avec réactivation + porte de secours --force'
   );
 
+  // Test 18 : vidéos MP4 locales par firme (hors ligne, lecture native)
+  console.log('\n--- Test vidéos locales par firme ---');
+  const localVideoUtil = fs.readFileSync(
+    path.join(__dirname, '../src/utils/companyLocalVideo.ts'),
+    'utf-8'
+  );
+  assert(
+    localVideoUtil.includes('useCompanyLocalVideo') &&
+      localVideoUtil.includes('getCompanyVideo') &&
+      localVideoUtil.includes('companyLocalVideoApi'),
+    'Vidéos locales : hook de résolution retromad-media:// exposé au renderer'
+  );
+  assert(
+    mainTs.includes("ipcMain.handle('import-company-video'") &&
+      mainTs.includes('company-videos') &&
+      mainTs.includes('COMPANY_VIDEO_EXTENSIONS') &&
+      mainTs.includes('/^[a-zA-Z0-9_-]{1,64}$/'),
+    'Vidéos locales : import copié hors ligne (media/company-videos, firme assainie)'
+  );
+  assert(
+    preloadTs.includes('importCompanyVideo') &&
+      preloadTs.includes('selectVideoFile') &&
+      preloadTs.includes('removeCompanyVideo'),
+    'Vidéos locales : API complète exposée au renderer (sélection, import, retrait)'
+  );
+  assert(
+    bgVideo.includes('CompanyLocalVideoSection') &&
+      bgVideo.includes('localVideoUrl || rawVideoUrl'),
+    'Vidéos locales : priorité sur YouTube dans les fonds de firmes'
+  );
+  assert(
+    museum.includes('useCompanyLocalVideo') &&
+      museum.includes('<CompanyLocalVideoSection'),
+    'Vidéos locales : priorité + gestion intégrée dans la fiche musée'
+  );
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);

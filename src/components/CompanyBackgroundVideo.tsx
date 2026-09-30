@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Company } from '../types';
 import { YoutubePlayable, openYouTubeWatch, isDesktopApp as isDesktop } from './YoutubePlayable';
+import { useCompanyLocalVideo, companyLocalVideoApi } from '../utils/companyLocalVideo';
 import {
   Volume2,
   VolumeX,
@@ -13,6 +14,8 @@ import {
   Maximize2,
   RotateCcw,
   Film,
+  FolderOpen,
+  Trash2,
   Sun,
   Tv,
 } from 'lucide-react';
@@ -278,6 +281,98 @@ export function saveCompanyVideoConfig(
   }
 }
 
+// ── Section « Vidéo locale » réutilisable dans les deux modales d'édition ──
+interface CompanyLocalVideoSectionProps {
+  company: Company;
+}
+
+export const CompanyLocalVideoSection: React.FC<CompanyLocalVideoSectionProps> = ({ company }) => {
+  const { url, loading, refresh } = useCompanyLocalVideo(company.id);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [importedUrl, setImportedUrl] = useState<string | null>(null);
+
+  const effectiveUrl = url ?? importedUrl;
+
+  if (!companyLocalVideoApi) return null; // navigateur web : fonctionnalité desktop
+
+  const handlePick = async () => {
+    if (!companyLocalVideoApi || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const picked = await companyLocalVideoApi.selectVideoFile();
+      if (!picked) return; // annulé par l'utilisateur
+      const res = await companyLocalVideoApi.importCompanyVideo(company.id, picked);
+      if (res.ok && res.url) {
+        setImportedUrl(res.url);
+        refresh();
+      } else {
+        setError(res.error || 'Import impossible.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!companyLocalVideoApi || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const ok = await companyLocalVideoApi.removeCompanyVideo(company.id);
+      if (ok) {
+        setImportedUrl(null);
+        refresh();
+      } else {
+        setError('Suppression impossible.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-black uppercase tracking-wider text-emerald-300 flex items-center space-x-1.5">
+          <Film className="w-3.5 h-3.5" />
+          <span>Vidéo locale — MP4 hors ligne</span>
+        </span>
+        {effectiveUrl && <span className="text-[10px] font-bold text-emerald-400">✓ Active</span>}
+      </div>
+      <p className="text-[11px] text-slate-400 leading-snug">
+        La vidéo est copiée dans les données de RetroMad puis lue nativement dans l'app —
+        sans YouTube, sans connexion. Elle est prioritaire sur tout lien YouTube.
+      </p>
+      <div className="flex items-center space-x-2">
+        <button
+          type="button"
+          onClick={handlePick}
+          disabled={busy}
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs transition shadow cursor-pointer"
+        >
+          <FolderOpen className="w-3.5 h-3.5" />
+          <span>{busy ? 'Import en cours…' : effectiveUrl ? 'Remplacer la vidéo' : 'Choisir un fichier…'}</span>
+        </button>
+        {effectiveUrl && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={busy}
+            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-red-900/60 disabled:opacity-50 text-slate-300 hover:text-red-300 font-bold text-xs transition border border-slate-700 cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Retirer</span>
+          </button>
+        )}
+      </div>
+      {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
+      {!effectiveUrl && loading && <p className="text-[10px] text-slate-500">Vérification de la vidéo locale…</p>}
+    </div>
+  );
+};
+
 export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
   company,
   mode = 'banner',
@@ -293,6 +388,8 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
   const [customInput, setCustomInput] = useState('');
   const [inputError, setInputError] = useState<string | null>(null);
   const [videoConfig, setVideoConfig] = useState(() => getCompanyVideoConfig(company.id));
+  // Vidéo locale MP4 (prioritaire sur le lien direct et YouTube)
+  const { url: localVideoUrl } = useCompanyLocalVideo(company.id);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -446,9 +543,10 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
 
         {/* Chargement différé : la vidéo n'est montée QUE sur la carte focalisée (active)
             pour éviter de lancer 30 lecteurs vidéo simultanés qui ralentissent toute la page. */}
-        {active && rawVideoUrl ? (
+        {active && (localVideoUrl || rawVideoUrl) ? (
           <video
-            src={rawVideoUrl}
+            key={localVideoUrl || rawVideoUrl}
+            src={localVideoUrl || rawVideoUrl}
             autoPlay
             loop
             muted
@@ -494,9 +592,10 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
       <canvas ref={canvasRef} width={1000} height={400} className="absolute inset-0 w-full h-full object-cover opacity-35" />
 
       {/* Vidéo directe ou YouTube */}
-      {rawVideoUrl ? (
+      {(localVideoUrl || rawVideoUrl) ? (
         <video
-          src={rawVideoUrl}
+          key={localVideoUrl || rawVideoUrl}
+          src={localVideoUrl || rawVideoUrl}
           autoPlay
           loop
           muted={isMuted}
@@ -651,6 +750,9 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
             </div>
 
             {/* Formulaire de saisie du lien YouTube */}
+            {/* Vidéo locale MP4 (prioritaire sur YouTube) */}
+            <CompanyLocalVideoSection company={company} />
+
             <div className="space-y-3">
               <label className="text-xs font-bold text-slate-300 block">
                 Collez l'URL de votre vidéo YouTube ou son ID :
@@ -796,7 +898,17 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
 
             {/* Lecteur Vidéo Plein Format */}
             <div className="relative w-full aspect-video bg-black">
-              {isDesktop ? (
+              {localVideoUrl ? (
+                <video
+                  key={localVideoUrl}
+                  src={localVideoUrl}
+                  autoPlay
+                  loop
+                  controls
+                  playsInline
+                  className="w-full h-full border-0"
+                />
+              ) : isDesktop ? (
                 /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
                 <button
                   type="button"
@@ -853,6 +965,8 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
   className = '',
 }) => {
   const [videoConfig, setVideoConfig] = useState(() => getCompanyVideoConfig(company.id));
+  // Vidéo locale MP4 (prioritaire sur YouTube)
+  const { url: localVideoUrl } = useCompanyLocalVideo(company.id);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isCinemaMode, setIsCinemaMode] = useState(false);
@@ -926,7 +1040,18 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
       {/* Cadre Cathodique 16:9 avec Vidéo YouTube */}
       <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden my-1.5 border border-slate-800 shadow-inner group">
         {isPlaying ? (
-          isDesktop ? (
+          localVideoUrl ? (
+            <video
+              key={localVideoUrl}
+              src={localVideoUrl}
+              autoPlay
+              loop
+              muted={isMuted}
+              controls
+              playsInline
+              className="w-full h-full object-contain bg-black"
+            />
+          ) : isDesktop ? (
             /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
             <button
               type="button"
@@ -1027,6 +1152,9 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Vidéo locale MP4 (prioritaire sur YouTube) */}
+            <CompanyLocalVideoSection company={company} />
 
             <div className="space-y-3">
               <label className="text-xs font-bold text-slate-300 block">
@@ -1146,7 +1274,17 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
               </button>
             </div>
             <div className="relative w-full aspect-video bg-black">
-              {isDesktop ? (
+              {localVideoUrl ? (
+                <video
+                  key={localVideoUrl}
+                  src={localVideoUrl}
+                  autoPlay
+                  loop
+                  controls
+                  playsInline
+                  className="w-full h-full border-0"
+                />
+              ) : isDesktop ? (
                 /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
                 <button
                   type="button"

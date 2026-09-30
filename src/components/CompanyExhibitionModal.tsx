@@ -4,6 +4,8 @@ import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
 import { COMPANY_MUSEUM_DATA } from '../data/companyMuseumData';
 import { YoutubePlayable, openYouTubeWatch } from './YoutubePlayable';
+import { useCompanyLocalVideo } from '../utils/companyLocalVideo';
+import { CompanyLocalVideoSection } from './CompanyBackgroundVideo';
 import {
   X,
   Landmark,
@@ -49,6 +51,8 @@ export const CompanyExhibitionModal: React.FC<CompanyExhibitionModalProps> = ({
   isKioskMode = false,
 }) => {
   const [activeTab, setActiveTab] = useState<CompanyMuseumTab>('epic');
+  // Vidéo locale MP4 (prioritaire sur YouTube dans l'onglet Archives vidéo)
+  const { url: localVideoUrl } = useCompanyLocalVideo(company?.id ?? '');
 
   // Gestion des raccourcis clavier
   useEffect(() => {
@@ -594,15 +598,33 @@ export const CompanyExhibitionModal: React.FC<CompanyExhibitionModalProps> = ({
                 </button>
               </div>
 
-              {/* Écran 16:9 « toujours jouable » : iframe en navigateur web,
-                  vignette ouvrant le navigateur système en desktop (le player
+              {/* Vidéo locale MP4 prioritaire — lecture native hors ligne.
+                  À défaut, écran 16:9 « toujours jouable » : iframe en navigateur
+                  web, vignette ouvrant le navigateur système en desktop (le player
                   embed est bloqué par YouTube dans Electron → erreurs 152/153). */}
-              <div className="relative rounded-2xl overflow-hidden aspect-video bg-black border-2 border-slate-700 shadow-2xl">
-                <YoutubePlayable
-                  videoId={youtubeVideoId}
-                  title={`Archive Vidéo ${company.name}`}
-                />
-              </div>
+              {localVideoUrl ? (
+                <div className="relative rounded-2xl overflow-hidden aspect-video bg-black border-2 border-emerald-500/40 shadow-2xl">
+                  <video
+                    key={localVideoUrl}
+                    src={localVideoUrl}
+                    controls
+                    autoPlay
+                    loop
+                    playsInline
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : (
+                <div className="relative rounded-2xl overflow-hidden aspect-video bg-black border-2 border-slate-700 shadow-2xl">
+                  <YoutubePlayable
+                    videoId={youtubeVideoId}
+                    title={`Archive Vidéo ${company.name}`}
+                  />
+                </div>
+              )}
+
+              {/* Attacher / gérer la vidéo locale de la firme (desktop) */}
+              <CompanyLocalVideoSection company={company} />
             </div>
           )}
         </div>

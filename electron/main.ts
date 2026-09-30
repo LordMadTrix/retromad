@@ -390,6 +390,111 @@ ipcMain.handle('open-external', async (_event, url: string) => {
   }
 });
 
+// ─── Vidéos MP4 locales par firme (stockées hors ligne, lues nativement) ───
+const COMPANY_VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.ogv', '.mov', '.m4v']);
+
+function companyVideoDir(): string {
+  const dir = path.join(storage.mediaDir, 'company-videos');
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function sanitizeCompanyVideoFileId(id: string): string | null {
+  if (!id || typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,64}$/.test(id)) return null;
+  return id;
+}
+
+ipcMain.handle('select-video-file', async () => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow!, {
+      title: 'Choisir une vidéo locale pour la firme',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Vidéos (MP4, WebM, OGV, MOV)', extensions: ['mp4', 'webm', 'ogv', 'mov', 'm4v'] },
+      ],
+    });
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
+  } catch (e) {
+    console.error('[RetroMad] select-video-file impossible :', e);
+    return null;
+  }
+});
+
+// Copie la vidéo choisie dans media/company-videos/<companyId>.<ext> (hors ligne,
+// survive aux déplacements du fichier d'origine) et renvoie l'URL retromad-media://.
+ipcMain.handle('import-company-video', async (_event, companyId: string, sourcePath: string) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId) {
+      console.warn('[RetroMad] import-company-video : identifiant firme invalide :', companyId);
+      return { ok: false, error: 'Identifiant de firme invalide.' };
+    }
+    if (!sourcePath || typeof sourcePath !== 'string') {
+      return { ok: false, error: 'Chemin de vidéo manquant.' };
+    }
+    const ext = path.extname(sourcePath).toLowerCase();
+    if (!COMPANY_VIDEO_EXTENSIONS.has(ext)) {
+      return { ok: false, error: `Format non supporté (${ext || 'inconnu'}). Utilisez MP4, WebM, OGV, MOV ou M4V.` };
+    }
+    if (!fs.existsSync(sourcePath)) {
+      return { ok: false, error: 'Fichier introuvable.' };
+    }
+    const dir = companyVideoDir();
+    // Supprimer les anciennes versions (autre extension) pour éviter les doublons.
+    for (const old of fs.readdirSync(dir)) {
+      if (old.startsWith(`${safeCompanyId}.`)) {
+        try { fs.unlinkSync(path.join(dir, old)); } catch { /* ignore */ }
+      }
+    }
+    const dest = path.join(dir, `${safeCompanyId}${ext}`);
+    await fs.promises.copyFile(sourcePath, dest);
+    const url = `retromad-media://media/company-videos/${safeCompanyId}${ext}`;
+    console.log(`[RetroMad] Vidéo locale importée pour la firme ${safeCompanyId} : ${dest}`);
+    return { ok: true, url, path: dest };
+  } catch (e) {
+    console.error('[RetroMad] import-company-video impossible :', e);
+    return { ok: false, error: 'Import impossible (voir logs).' };
+  }
+});
+
+// Renvoie l'URL retromad-media:// de la vidéo locale d'une firme, si elle existe.
+ipcMain.handle('get-company-video', async (_event, companyId: string) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId) return null;
+    const dir = companyVideoDir();
+    for (const file of fs.readdirSync(dir)) {
+      if (file.startsWith(`${safeCompanyId}.`) && COMPANY_VIDEO_EXTENSIONS.has(path.extname(file).toLowerCase())) {
+        return `retromad-media://media/company-videos/${file}`;
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('[RetroMad] get-company-video impossible :', e);
+    return null;
+  }
+});
+
+// Supprime la vidéo locale d'une firme (le fichier d'origine n'est pas touché).
+ipcMain.handle('remove-company-video', async (_event, companyId: string) => {
+  try {
+    const safeCompanyId = sanitizeCompanyVideoFileId(companyId);
+    if (!safeCompanyId) return false;
+    const dir = companyVideoDir();
+    let removed = false;
+    for (const file of fs.readdirSync(dir)) {
+      if (file.startsWith(`${safeCompanyId}.`)) {
+        try { fs.unlinkSync(path.join(dir, file)); removed = true; } catch { /* ignore */ }
+      }
+    }
+    return removed;
+  } catch (e) {
+    console.error('[RetroMad] remove-company-video impossible :', e);
+    return false;
+  }
+});
+
 ipcMain.handle('get-systems', async () => {
   return storage.getSystems();
 });

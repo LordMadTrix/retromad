@@ -21,6 +21,12 @@ export const API = {
   openBiosFolder: (systemId: string): Promise<boolean> => ipcRenderer.invoke('open-bios-folder', systemId),
   // Ouvre une URL http(s) dans le navigateur système (lecteur YouTube sans blocage)
   openExternal: (url: string): Promise<boolean> => ipcRenderer.invoke('open-external', url),
+  // Vidéos MP4 locales par firme : sélection, import hors ligne, lecture, suppression
+  selectVideoFile: (): Promise<string | null> => ipcRenderer.invoke('select-video-file'),
+  importCompanyVideo: (companyId: string, sourcePath: string): Promise<{ ok: boolean; url?: string; path?: string; error?: string }> =>
+    ipcRenderer.invoke('import-company-video', companyId, sourcePath),
+  getCompanyVideo: (companyId: string): Promise<string | null> => ipcRenderer.invoke('get-company-video', companyId),
+  removeCompanyVideo: (companyId: string): Promise<boolean> => ipcRenderer.invoke('remove-company-video', companyId),
 
   // Données de base
   getSystems: (): Promise<System[]> => ipcRenderer.invoke('get-systems'),
