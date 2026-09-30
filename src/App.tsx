@@ -80,7 +80,6 @@ const loadConsoleExhibitionModal = () => import('./components/ConsoleExhibitionM
 const loadCompanyExhibitionModal = () => import('./components/CompanyExhibitionModal').then((m) => ({ default: m.CompanyExhibitionModal }));
 const loadGlobalSearchModal = () => import('./components/GlobalSearchModal').then((m) => ({ default: m.GlobalSearchModal }));
 const loadRomScannerModal = () => import('./components/RomScannerModal').then((m) => ({ default: m.RomScannerModal }));
-const loadQuickStartOnboardingModal = () => import('./components/QuickStartOnboardingModal').then((m) => ({ default: m.QuickStartOnboardingModal }));
 const loadWebEmulatorModal = () => import('./components/WebEmulatorModal').then((m) => ({ default: m.WebEmulatorModal }));
 const loadRetroAchievementsModal = () => import('./components/retro/RetroAchievementsModal').then((m) => ({ default: m.RetroAchievementsModal }));
 const loadRetroCheatsModal = () => import('./components/retro/RetroCheatsModal').then((m) => ({ default: m.RetroCheatsModal }));
@@ -126,7 +125,6 @@ const ConsoleExhibitionModal = React.lazy(loadConsoleExhibitionModal);
 const CompanyExhibitionModal = React.lazy(loadCompanyExhibitionModal);
 const GlobalSearchModal = React.lazy(loadGlobalSearchModal);
 const RomScannerModal = React.lazy(loadRomScannerModal);
-const QuickStartOnboardingModal = React.lazy(loadQuickStartOnboardingModal);
 const WebEmulatorModal = React.lazy(loadWebEmulatorModal);
 const RetroAchievementsModal = React.lazy(loadRetroAchievementsModal);
 const RetroCheatsModal = React.lazy(loadRetroCheatsModal);
@@ -184,7 +182,6 @@ const PRELOAD_PRIMARY_OVERLAYS = [
   loadKioskPinModal,
   loadGlobalSearchModal,
   loadWebEmulatorModal,
-  loadQuickStartOnboardingModal,
   loadArcadeHotkeysGuideModal,
   loadKioskAttractMode,
   loadGamepadHint,
@@ -513,14 +510,6 @@ export const App: React.FC = () => {
   const [isCartridgeShelfModalOpen, setIsCartridgeShelfModalOpen] = useState(false);
   const [isSaveStateSyncModalOpen, setIsSaveStateSyncModalOpen] = useState(false);
   const [isHotkeysGuideOpen, setIsHotkeysGuideOpen] = useState(false);
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
-    try {
-      const completed = localStorage.getItem('retromad_onboarding_completed');
-      return !completed;
-    } catch {
-      return false;
-    }
-  });
 
   // Données centralisées sous /public
   const [centralizedRoms] = useState(INITIAL_CENTRALIZED_ROMS);
@@ -1823,10 +1812,6 @@ export const App: React.FC = () => {
               playSelect();
               setIsSaveStateSyncModalOpen(true);
             }}
-            onOpenQuickStart={() => {
-              playSelect();
-              setIsOnboardingOpen(true);
-            }}
           />
 
           {/* Vues principales (Suspense : certains onglets sont chargés à la demande) */}
@@ -2715,33 +2700,6 @@ export const App: React.FC = () => {
         onClose={() => setIsHotkeysGuideOpen(false)}
       />
 
-      {/* ASSISTANT DE DÉMARRAGE RAPIDE & PREMIER LANCEMENT (régie déverrouillée) */}
-      {isAdminUnlocked && (
-        <QuickStartOnboardingModal
-          isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        settings={settings}
-        onSaveSettings={(partial) => {
-          setSettings((prev) => ({ ...prev, ...partial }));
-        }}
-        onSelectTab={(tab) => {
-          if (tab === 'companies' || tab === 'museum') {
-            setCurrentTab(tab === 'museum' ? 'companies' : tab);
-          } else {
-            setCurrentTab('games');
-          }
-        }}
-        onEnterKiosk={handleEnterKiosk}
-        sampleGamesCount={visibleGames.length}
-          onPlaySound={(type) => {
-            if (type === 'select') playSelect();
-            if (type === 'coin') playCoin();
-            if (type === 'move') playMove();
-            if (type === 'launch') playUnlock();
-            if (type === 'unlock') playUnlock();
-          }}
-        />
-      )}
       </Suspense>
     </div>
   );

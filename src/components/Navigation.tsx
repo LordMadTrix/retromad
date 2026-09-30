@@ -24,7 +24,6 @@ interface NavigationProps {
   isAdminUnlocked?: boolean;
   onEnterKiosk: () => void;
   onUnlockKiosk: () => void;
-  onOpenQuickStart?: () => void;
   selectedGenre?: string;
   onSelectGenre?: (genre: string) => void;
   availableGenres?: { genre: string; count: number }[];
