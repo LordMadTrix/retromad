@@ -45,6 +45,30 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
+// ════════════════════════════════════════════════════════════════════════
+// Verrou d'instance unique — on ne peut ouvrir une nouvelle session que si
+// la précédente est fermée. Un second lancement ne démarre pas une nouvelle
+// session : il réveille la fenêtre existante (focus + restauration), puis
+// quitte immédiatement. Protège aussi la base de données (settings.json,
+// games.json…) contre deux processus qui s'écraseraient mutuellement.
+// ════════════════════════════════════════════════════════════════════════
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!gotSingleInstanceLock) {
+  // Une session RetroMad est déjà ouverte : on quitte silencieusement.
+  // Le premier processus reçoit 'second-instance' et ramène sa fenêtre au premier plan.
+  console.log('[RetroMad] Une session est déjà ouverte — réactivation de la fenêtre existante.');
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      if (!mainWindow.isVisible()) mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {

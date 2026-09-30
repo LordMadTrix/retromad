@@ -422,6 +422,27 @@ async function runTests() {
     'Fiche musée : écran vidéo toujours jouable (vignette → navigateur en desktop)'
   );
 
+  // Test 17 : session unique — pas de nouvelle session tant que la précédente est ouverte
+  console.log('\n--- Test session unique ---');
+  assert(
+    mainTs.includes('app.requestSingleInstanceLock()') &&
+      mainTs.includes("console.log('[RetroMad] Une session est déjà ouverte"),
+    "Verrou d'instance unique : second lancement refusé (app.quit)"
+  );
+  assert(
+    mainTs.includes("app.on('second-instance'") &&
+      mainTs.includes('mainWindow.restore()') &&
+      mainTs.includes('mainWindow.focus()'),
+    "Événement second-instance : la fenêtre existante est restaurée et mise au premier plan"
+  );
+  const launchSh = fs.readFileSync(path.join(__dirname, '../launch.sh'), 'utf-8');
+  assert(
+    launchSh.includes("pgrep -f '[e]lectron \\.'") &&
+      launchSh.includes('--force') &&
+      launchSh.includes('aucune nouvelle session'),
+    'Lanceur : garde session unique avec réactivation + porte de secours --force'
+  );
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);

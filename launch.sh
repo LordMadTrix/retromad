@@ -43,6 +43,29 @@ if [ ! -f "$HOME/.local/share/applications/retromad.desktop" ] \
     bash "$DIR/install-desktop-launcher.sh" >/dev/null 2>&1 || true
 fi
 
+# Porte de secours : --force contourne le garde de session unique (débogage).
+if [ "$1" == "--force" ]; then
+    FORCE=1
+    shift
+else
+    FORCE=0
+fi
+
+# ─── Session unique ──────────────────────────────────────────────
+# On ne peut ouvrir une nouvelle session que si la précédente est fermée.
+if [ "$FORCE" -eq 0 ] && pgrep -f '[e]lectron \.' >/dev/null 2>&1; then
+    N=$(pgrep -fc '[e]lectron \.' 2>/dev/null || echo "?")
+    echo -e "${YELLOW}[*] Une session RetroMad est déjà ouverte ($N processus) —${NC}"
+    echo -e "${YELLOW}    réactivation de la fenêtre existante, aucune nouvelle session.${NC}"
+    echo -e "${CYAN}    (Utilisez ./launch.sh --force pour forcer un nouveau lancement)${NC}"
+    # Ce second processus déclenche l'événement 'second-instance' du premier
+    # (focus + restauration de la fenêtre) puis se ferme immédiatement —
+    # le verrou d'instance d'Electron empêche toute double session.
+    ELECTRON_FORCE_PROD=1 npx electron . >/dev/null 2>&1 &
+    sleep 2
+    exit 0
+fi
+
 # Mode développement : serveur Vite (HMR) + fenêtre Electron
 if [ "$1" == "--dev" ]; then
     echo -e "${GREEN}[*] Démarrage de RetroMad en mode Développement (Vite + Electron)...${NC}"
