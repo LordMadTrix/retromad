@@ -348,6 +348,24 @@ ipcMain.handle('open-bios-folder', async (_event, systemId: string) => {
   }
 });
 
+// Ouvre un lien externe (ex. page YouTube watch) dans le navigateur système —
+// insensible aux restrictions que YouTube applique au player embarqué d'Electron.
+ipcMain.handle('open-external', async (_event, url: string) => {
+  try {
+    if (typeof url !== 'string') return false;
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      console.warn('[RetroMad] open-external: protocole refusé :', parsed.protocol);
+      return false;
+    }
+    await shell.openExternal(parsed.toString());
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] open-external impossible :', e);
+    return false;
+  }
+});
+
 ipcMain.handle('get-systems', async () => {
   return storage.getSystems();
 });

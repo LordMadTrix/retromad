@@ -3,6 +3,7 @@ import { Company, System } from '../types';
 import { CompanyLogo } from './CompanyLogo';
 import { ConsoleLogo } from './ConsoleLogo';
 import { COMPANY_MUSEUM_DATA } from '../data/companyMuseumData';
+import { YoutubePlayable, openYouTubeWatch } from './YoutubePlayable';
 import {
   X,
   Landmark,
@@ -19,8 +20,6 @@ import {
   Users,
   Compass,
   Play,
-  Volume2,
-  VolumeX,
   CheckCircle2,
   Trophy,
   Pencil,
@@ -50,7 +49,6 @@ export const CompanyExhibitionModal: React.FC<CompanyExhibitionModalProps> = ({
   isKioskMode = false,
 }) => {
   const [activeTab, setActiveTab] = useState<CompanyMuseumTab>('epic');
-  const [videoMuted, setVideoMuted] = useState(true);
 
   // Gestion des raccourcis clavier
   useEffect(() => {
@@ -586,44 +584,24 @@ export const CompanyExhibitionModal: React.FC<CompanyExhibitionModalProps> = ({
                   </p>
                 </div>
 
-                <a
-                  href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => openYouTubeWatch(youtubeVideoId)}
                   className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-red-950/50 hover:bg-red-900 border border-red-500/40 text-red-300 hover:text-white text-xs font-bold transition shadow"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Ouvrir sur YouTube</span>
-                </a>
+                </button>
               </div>
 
-              {/* Écran Rétro Cinéma 16:9 YouTube */}
+              {/* Écran 16:9 « toujours jouable » : iframe en navigateur web,
+                  vignette ouvrant le navigateur système en desktop (le player
+                  embed est bloqué par YouTube dans Electron → erreurs 152/153). */}
               <div className="relative rounded-2xl overflow-hidden aspect-video bg-black border-2 border-slate-700 shadow-2xl">
-                <iframe
+                <YoutubePlayable
+                  videoId={youtubeVideoId}
                   title={`Archive Vidéo ${company.name}`}
-                  src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}?autoplay=1&mute=${videoMuted ? 1 : 0}&loop=1&playlist=${youtubeVideoId}&rel=0&modestbranding=1`}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
                 />
-
-                {/* Contrôleur Son Flottant */}
-                <button
-                  onClick={() => setVideoMuted(!videoMuted)}
-                  className="absolute bottom-4 right-4 z-20 p-2.5 rounded-full bg-black/80 hover:bg-black text-white backdrop-blur-md border border-white/20 transition shadow-lg flex items-center space-x-2 text-xs font-bold"
-                >
-                  {videoMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4 text-amber-400" />
-                      <span>Activer le Son</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span>Son Activé</span>
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           )}

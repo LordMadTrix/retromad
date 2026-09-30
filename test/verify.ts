@@ -375,6 +375,53 @@ async function runTests() {
     delete g.window;
   }
 
+  // Test 16 : lecteur YouTube insensible aux blocages (152/153)
+  console.log('\n--- Test lecteur YouTube insensible aux blocages ---');
+  const ytPlayable = fs.readFileSync(
+    path.join(__dirname, '../src/components/YoutubePlayable.tsx'),
+    'utf-8'
+  );
+  assert(
+    ytPlayable.includes("img.youtube.com/vi/${videoId}/maxresdefault.jpg") &&
+      ytPlayable.includes('openYouTubeWatch'),
+    'Lecteur YouTube : vignette cliquable avec repli hqdefault'
+  );
+  assert(
+    ytPlayable.includes("window.isElectron") &&
+      ytPlayable.includes('youtube-nocookie.com/embed/'),
+    'Lecteur YouTube : iframe conservée en web, stratégie desktop distincte'
+  );
+  const mainTs = fs.readFileSync(path.join(__dirname, '../electron/main.ts'), 'utf-8');
+  const preloadTs = fs.readFileSync(path.join(__dirname, '../electron/preload.ts'), 'utf-8');
+  assert(
+    mainTs.includes("ipcMain.handle('open-external'") &&
+      mainTs.includes("parsed.protocol !== 'https:' && parsed.protocol !== 'http:'"),
+    'IPC open-external : présent avec garde-fou protocole http(s)'
+  );
+  assert(
+    preloadTs.includes("openExternal: (url: string): Promise<boolean> => ipcRenderer.invoke('open-external', url)"),
+    'Preload : openExternal exposé au renderer'
+  );
+  const bgVideo = fs.readFileSync(
+    path.join(__dirname, '../src/components/CompanyBackgroundVideo.tsx'),
+    'utf-8'
+  );
+  const museum = fs.readFileSync(
+    path.join(__dirname, '../src/components/CompanyExhibitionModal.tsx'),
+    'utf-8'
+  );
+  assert(
+    bgVideo.includes('<YoutubePlayable') &&
+      bgVideo.includes('openYouTubeWatch(') &&
+      !bgVideo.includes('youtube-nocookie.com/embed/'),
+    'Vidéos de fond firmes : plus aucune iframe YouTube sans alternative desktop'
+  );
+  assert(
+    museum.includes('<YoutubePlayable') &&
+      !museum.includes('youtube-nocookie.com/embed/'),
+    'Fiche musée : écran vidéo toujours jouable (vignette → navigateur en desktop)'
+  );
+
   console.log(`\n================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);

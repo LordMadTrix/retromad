@@ -19,6 +19,8 @@ export const API = {
   selectDirectory: (): Promise<string | null> => ipcRenderer.invoke('select-directory'),
   // Rapport santé : ouvre (ou crée) le dossier BIOS d'un système dans l'explorateur
   openBiosFolder: (systemId: string): Promise<boolean> => ipcRenderer.invoke('open-bios-folder', systemId),
+  // Ouvre une URL http(s) dans le navigateur système (lecteur YouTube sans blocage)
+  openExternal: (url: string): Promise<boolean> => ipcRenderer.invoke('open-external', url),
 
   // Données de base
   getSystems: (): Promise<System[]> => ipcRenderer.invoke('get-systems'),

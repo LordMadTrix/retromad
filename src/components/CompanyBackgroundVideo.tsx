@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Company } from '../types';
+import { YoutubePlayable, openYouTubeWatch, isDesktopApp as isDesktop } from './YoutubePlayable';
 import {
   Volume2,
   VolumeX,
@@ -455,12 +456,12 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
             className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-55 transition-opacity duration-500 scale-105"
           />
         ) : active && currentYoutubeId ? (
-          /* Vidéo YouTube d'archive en boucle (uniquement sur la carte focalisée) */
-          <iframe
-            src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${currentYoutubeId}&playsinline=1&rel=0`}
-            title={`Vidéo de fond ${company.name}`}
-            className="absolute inset-0 w-[160%] h-[160%] -top-[30%] -left-[30%] object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none border-0"
-            allow="autoplay; encrypted-media"
+          /* Archive YouTube : en desktop, vignette ouvrant le navigateur système
+             (lecteur embed bloqué par YouTube dans Electron) ; en web, iframe. */
+          <YoutubePlayable
+            videoId={currentYoutubeId}
+            title={`Archive vidéo ${company.name}`}
+            compact
           />
         ) : currentYoutubeId ? (
           /* Miniature statique instantanée : aucun coût vidéo, rendu immédiat */
@@ -505,14 +506,17 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
           }`}
         />
       ) : currentYoutubeId && isPlaying ? (
-        <iframe
-          src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&loop=1&playlist=${currentYoutubeId}&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1`}
-          title={`Archive vidéo YouTube de la firme ${company.name}`}
-          className={`absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] object-cover transition-opacity duration-700 pointer-events-none border-0 ${
-            bgOpacityLevel === 'cinema' ? 'opacity-95' : bgOpacityLevel === 'vivid' ? 'opacity-75' : 'opacity-40'
-          }`}
-          allow="autoplay; encrypted-media"
-        />
+        /* Archive YouTube : vignette cliquable en desktop (ouverture navigateur
+           système), iframe conservée en web. Le canvas + dégradés restent actifs. */
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 w-full h-full">
+            <YoutubePlayable
+              videoId={currentYoutubeId}
+              title={`Archive vidéo YouTube de la firme ${company.name}`}
+              compact
+            />
+          </div>
+        </div>
       ) : null}
 
       {/* Dégradés cinématiques transparents laissant voir nettement la vidéo */}
@@ -694,11 +698,10 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
                     <span>Aperçu de la vidéo détectée ({liveDetectedId}) :</span>
                   </span>
                   <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-700 bg-black shadow-xl">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${liveDetectedId}?autoplay=1&mute=1&controls=1&rel=0`}
+                    <YoutubePlayable
+                      videoId={liveDetectedId}
                       title="Aperçu YouTube en direct"
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      compact
                     />
                   </div>
                 </div>
@@ -793,13 +796,29 @@ export const CompanyBackgroundVideo: React.FC<CompanyBackgroundVideoProps> = ({
 
             {/* Lecteur Vidéo Plein Format */}
             <div className="relative w-full aspect-video bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&controls=1&rel=0`}
-                title={`Vidéo ${company.name}`}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {isDesktop ? (
+                /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
+                <button
+                  type="button"
+                  onClick={() => openYouTubeWatch(currentYoutubeId)}
+                  className="w-full h-full flex flex-col items-center justify-center space-y-2 cursor-pointer group transition hover:bg-slate-900/40"
+                  title="Lire la vidéo dans le navigateur"
+                >
+                  <span className="flex items-center justify-center w-16 h-11 rounded-2xl bg-red-600 shadow-2xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
+                    <Play className="w-7 h-7 text-white fill-white translate-x-[1px]" />
+                  </span>
+                  <span className="text-xs font-bold text-slate-200">Ouvrir dans le navigateur</span>
+                  <span className="text-[10px] text-slate-400">Lecteur intégré bloqué par YouTube</span>
+                </button>
+              ) : (
+                <iframe
+                  src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&controls=1&rel=0`}
+                  title={`Vidéo ${company.name}`}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
             </div>
 
             {/* Footer Cinema */}
@@ -907,13 +926,28 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
       {/* Cadre Cathodique 16:9 avec Vidéo YouTube */}
       <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden my-1.5 border border-slate-800 shadow-inner group">
         {isPlaying ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&loop=1&playlist=${currentYoutubeId}&playsinline=1&rel=0`}
-            title={`Vidéo TV de ${company.name}`}
-            className="w-full h-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          isDesktop ? (
+            /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
+            <button
+              type="button"
+              onClick={() => openYouTubeWatch(currentYoutubeId)}
+              className="w-full h-full flex flex-col items-center justify-center space-y-1.5 cursor-pointer group transition hover:bg-slate-900/40"
+              title="Lire dans le navigateur"
+            >
+              <span className="flex items-center justify-center w-12 h-9 rounded-xl bg-red-600 shadow-xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
+                <Play className="w-5 h-5 text-white fill-white translate-x-[1px]" />
+              </span>
+              <span className="text-[10px] font-bold text-slate-200">Ouvrir dans le navigateur</span>
+            </button>
+          ) : (
+            <iframe
+              src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&loop=1&playlist=${currentYoutubeId}&playsinline=1&rel=0`}
+              title={`Vidéo TV de ${company.name}`}
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          )
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-400">
             <Pause className="w-6 h-6 mb-1 text-slate-500" />
@@ -1112,13 +1146,29 @@ export const CompanyTvWidget: React.FC<CompanyTvWidgetProps> = ({
               </button>
             </div>
             <div className="relative w-full aspect-video bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&controls=1&rel=0`}
-                title={`Vidéo ${company.name}`}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {isDesktop ? (
+                /* Desktop : ouverture navigateur système (player embed bloqué par YouTube) */
+                <button
+                  type="button"
+                  onClick={() => openYouTubeWatch(currentYoutubeId)}
+                  className="w-full h-full flex flex-col items-center justify-center space-y-2 cursor-pointer group transition hover:bg-slate-900/40"
+                  title="Lire la vidéo dans le navigateur"
+                >
+                  <span className="flex items-center justify-center w-16 h-11 rounded-2xl bg-red-600 shadow-2xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
+                    <Play className="w-7 h-7 text-white fill-white translate-x-[1px]" />
+                  </span>
+                  <span className="text-xs font-bold text-slate-200">Ouvrir dans le navigateur</span>
+                  <span className="text-[10px] text-slate-400">Lecteur intégré bloqué par YouTube</span>
+                </button>
+              ) : (
+                <iframe
+                  src={`https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&controls=1&rel=0`}
+                  title={`Vidéo ${company.name}`}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
             </div>
             <div className="px-6 py-3 bg-slate-900/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
               <span>Appuyez sur Échap pour fermer</span>
