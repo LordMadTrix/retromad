@@ -69,6 +69,8 @@ const loadCompanyEditModal = () => import('./components/CompanyEditModal').then(
 const loadScraperModal = () => import('./components/ScraperModal').then((m) => ({ default: m.ScraperModal }));
 const loadScrapeCandidateModal = () => import('./components/ScrapeCandidateModal').then((m) => ({ default: m.ScrapeCandidateModal }));
 const loadCompanyView = () => import('./components/CompanyView').then((m) => ({ default: m.CompanyView }));
+const loadBugTracker = () => import('./components/BugTracker').then((m) => ({ default: m.BugTracker }));
+const loadCapturesView = () => import('./components/CapturesView').then((m) => ({ default: m.CapturesView }));
 const loadBiosManager = () => import('./components/BiosManager').then((m) => ({ default: m.BiosManager }));
 const loadComputingView = () => import('./components/extended/ComputingView').then((m) => ({ default: m.ComputingView }));
 const loadKioskAttractMode = () => import('./components/KioskAttractMode').then((m) => ({ default: m.KioskAttractMode }));
@@ -158,6 +160,8 @@ const ArcadeHotkeysGuideModal = React.lazy(loadArcadeHotkeysGuideModal);
 // Vues secondaires chargées à la demande (thunks définis plus haut, partagés
 // avec le préchargeur d'arrière-plan).
 const CompanyView = React.lazy(loadCompanyView);
+const BugTracker = React.lazy(loadBugTracker);
+const CapturesView = React.lazy(loadCapturesView);
 const BiosManager = React.lazy(loadBiosManager);
 const ComputingView = React.lazy(loadComputingView);
 const KioskAttractMode = React.lazy(loadKioskAttractMode);
@@ -173,7 +177,7 @@ const RetroJukeboxFloatingPlayer = React.lazy(loadJukeboxFloatingPlayer);
  *    recherche, émulateur, attract mode, hints) ;
  * 3. le reste des modules rétro.
  */
-const PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager];
+const PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager, loadBugTracker, loadCapturesView];
 const PRELOAD_PRIMARY_OVERLAYS = [
   loadConsoleExhibitionModal,
   loadCompanyExhibitionModal,
@@ -1903,6 +1907,14 @@ export const App: React.FC = () => {
               isChecking={isCheckingBios}
               onOpenSettings={() => setIsSettingsOpen(true)}
             />
+          )}
+
+          {currentTab === 'bugs' && (
+            <BugTracker />
+          )}
+
+          {currentTab === 'captures' && (
+            <CapturesView />
           )}
           </Suspense>
         </>

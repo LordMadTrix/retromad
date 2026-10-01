@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, protocol, net, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, protocol, net, shell, desktopCapturer, session } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { storage } from './services/storage';
@@ -9,7 +9,7 @@ import { launcher, BUILTIN_EMULATORS } from './services/launcher';
 import { SYSTEMS } from './data/systems';
 import { COMPANIES } from './data/companies';
 import { extensionInstaller } from './services/extensionInstaller';
-import { Game } from './types';
+import { Game, Recording, ScreenSource, SaveRecordingResult, SaveRecordingAsResult } from './types';
 import {
   startPhoneGamepadServer,
   stopPhoneGamepadServer,
@@ -299,6 +299,34 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+
+  // ─── Capture d’écran (Vue Kiosque / gameplay) pour l’enregistrement AV ───
+  // Autorise la demande du renderer (getDisplayMedia) en sélectionnant l’écran
+  // principal — en mode Kiosque plein écran, il correspond à la vue gameplay.
+  // Sur Windows on ajoute l’audio du système (loopback) ; sur les autres OS,
+  // desktopCapturer ne supporte pas l’audio système → vidéo uniquement. Aucun
+  // secret/OAuth stocké : la capture est locale, le partage s’ouvre dans le navigateur.
+  session.defaultSession.setDisplayMediaRequestHandler((_request, callback) => {
+    desktopCapturer
+      .getSources({ types: ['screen', 'window'], thumbnailSize: { width: 0, height: 0 } })
+      .then((sources) => {
+        if (sources.length === 0) {
+          callback({ video: { id: '', name: '' } });
+          return;
+        }
+        // Si une source préférée a été définie via set-screen-source,
+        // on la sélectionne ; sinon on retombe sur l'écran principal.
+        const selected = preferredCaptureSourceId
+          ? sources.find((s) => s.id === preferredCaptureSourceId) || sources[0]
+          : sources[0];
+        const streams: Electron.Streams = { video: selected };
+        if (process.platform === 'win32') {
+          streams.audio = 'loopback';
+        }
+        callback(streams);
+      })
+      .catch(() => callback({ video: { id: '', name: '' } }));
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -1092,6 +1120,65 @@ ipcMain.handle('import-from-usb', async (_, usbPath: string) => {
   }
 });
 
+/**
+ * ─── Suivi des issues GitHub ───
+ * Récupère les issues publiques du dépôt GitHub (sans token, via l'API publique
+ * qui autorise 60 requêtes/heure — largement suffisant pour un client desktop).
+ * L'URL est construite côté main process pour ne pas exposer le nom du dépôt
+ * dans le bundle web et centraliser la logique de parsing HTTP → types.
+ */
+ipcMain.handle('fetch-github-issues', async (_event, repo: string, state: 'open' | 'closed' | 'all' = 'all') => {
+  try {
+    if (!repo || typeof repo !== 'string') {
+      return { ok: false, error: 'Repo invalide' };
+    }
+    const request = net.request({
+      method: 'GET',
+      url: `https://api.github.com/repos/${repo}/issues?state=${state}&per_page=50`,
+    });
+
+    request.setHeader('Accept', 'application/vnd.github+json');
+    request.setHeader('User-Agent', 'RetroMad-Desktop');
+
+    const response = await new Promise<{ status: number; body: string }>((resolve, reject) => {
+      let body = '';
+      request.on('response', (res: Electron.IncomingMessage) => {
+        res.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+        res.on('end', () => resolve({ status: res.statusCode, body }));
+      });
+      request.on('error', (err: Error) => reject(err));
+      request.end();
+    });
+
+    if (response.status !== 200) {
+      return { ok: false, error: `GitHub API erreur ${response.status}`, status: response.status };
+    }
+
+    const raw = JSON.parse(response.body);
+    const issues = raw.map((item: any) => ({
+      id: item.id,
+      number: item.number,
+      title: item.title,
+      state: item.state,
+      htmlUrl: item.html_url,
+      body: item.body,
+      user: {
+        login: item.user?.login,
+        avatarUrl: item.user?.avatar_url,
+      },
+      labels: (item.labels || []).map((l: any) => ({ name: l.name, color: l.color })),
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+      isPullRequest: !!item.pull_request,
+    }));
+
+    return { ok: true, issues };
+  } catch (e: any) {
+    console.error('[RetroMad] fetch-github-issues:', e);
+    return { ok: false, error: e.message };
+  }
+});
+
 ipcMain.on('window-minimize', () => {
   mainWindow?.minimize();
 });
@@ -1106,5 +1193,249 @@ ipcMain.on('window-maximize', () => {
 
 ipcMain.on('window-close', () => {
   mainWindow?.close();
+});
+
+// ─── Enregistrement audio/vidéo (Vue Kiosque / gameplay) ────────────────
+// desktopCapturer est orchestré depuis le renderer via
+// navigator.mediaDevices.getDisplayMedia (autorisé ci-dessus). Le renderer
+// produit un Blob qu'il envoie ici pour être persisté sur le disque.
+
+/** Dossier des enregistrements AV (media/recordings/). */
+let preferredCaptureSourceId: string | null = null;
+
+/** Dossier des enregistrements AV (media/recordings/). */
+function recordingsDir(): string {
+  const dir = path.join(storage.mediaDir, 'recordings');
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return dir;
+}
+
+/** Liste des sources (écrans + fenêtres) exposées au renderer pour la sélection. */
+ipcMain.handle('get-screen-sources', async (): Promise<ScreenSource[]> => {
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ['screen', 'window'],
+      thumbnailSize: { width: 0, height: 0 },
+    });
+    return sources.map((s) => ({
+      id: s.id,
+      name: s.name,
+      displayId: s.display_id,
+      // « screen » pour un écran complet, « window » pour une fenêtre.
+      type: s.id.startsWith('screen:') ? 'screen' : 'window' as const,
+    }));
+  } catch (e) {
+    console.error('[RetroMad] get-screen-sources:', e);
+    return [];
+  }
+});
+
+/** Définit la source d'écran/fenêtre à capturer (au lieu de l'écran par défaut). */
+ipcMain.handle('set-screen-source', async (_event, sourceId: string | null): Promise<boolean> => {
+  try {
+    if (sourceId === null || (typeof sourceId === 'string' && sourceId.trim() !== '')) {
+      preferredCaptureSourceId = sourceId;
+      console.log(`[RetroMad] Source de capture définie : ${sourceId || 'écran principal (défaut)'}`);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('[RetroMad] set-screen-source:', e);
+    return false;
+  }
+});
+
+/** Durée estimée d’un enregistrement (pour la persistance en side-car). */
+const RECORDING_META_RE = /^\w[\w .-]{0,126}\.(webm|mp4|ogg|mp3|wav|m4a)$/i;
+
+/** Persiste un Blob (ArrayBuffer) enregistré par le renderer sur le disque. */
+ipcMain.handle('save-recording', async (
+  _event,
+  filename: string,
+  data: ArrayBuffer,
+  durationMs?: number
+): Promise<SaveRecordingResult> => {
+  try {
+    if (!filename || typeof filename !== 'string' || !RECORDING_META_RE.test(filename)) {
+      return { ok: false, error: 'Nom de fichier invalide.' };
+    }
+    const dir = recordingsDir();
+    const safeName = path.basename(filename);
+    let dest = path.join(dir, safeName);
+    // On ne chevauche pas un enregistrement existant : on suffixe d'un horodatage.
+    if (fs.existsSync(dest)) {
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const parsed = path.parse(safeName);
+      dest = path.join(dir, `${parsed.name}_${ts}${parsed.ext}`);
+    }
+    const buffer = Buffer.from(data);
+    await fs.promises.writeFile(dest, buffer);
+    console.log(`[RetroMad] Enregistrement sauvegardé : ${dest} (${buffer.length} octets)`);
+    const stat = await fs.promises.stat(dest);
+    return {
+      ok: true,
+      path: dest,
+      name: path.basename(dest),
+      size: stat.size,
+      error: undefined,
+    };
+  } catch (e: any) {
+    console.error('[RetroMad] save-recording:', e);
+    return { ok: false, error: e.message };
+  }
+});
+
+/** Liste les enregistrements (du plus recent au plus ancien). */
+ipcMain.handle('list-recordings', async (): Promise<Recording[]> => {
+  try {
+    const dir = recordingsDir();
+    const files = await fs.promises.readdir(dir);
+    const out: Recording[] = [];
+    for (const f of files) {
+      const full = path.join(dir, f);
+      let stat: fs.Stats;
+      try {
+        stat = await fs.promises.stat(full);
+      } catch {
+        continue;
+      }
+      if (!stat.isFile()) continue;
+      // On ignore les miniatures (.thumb.jpg) — ce sont des side-cars, pas des
+      // enregistrements utilisables directement par le lecteur.
+      if (f.endsWith('.thumb.jpg')) continue;
+      const ext = path.extname(f).toLowerCase();
+      let mime = 'application/octet-stream';
+      let type: 'video' | 'audio' | 'screen' = 'video';
+      if (ext === '.webm') { mime = 'video/webm'; type = 'video'; }
+      else if (ext === '.mp4') { mime = 'video/mp4'; type = 'video'; }
+      else if (ext === '.m4a') { mime = 'audio/mp4'; type = 'audio'; }
+      else if (ext === '.ogg') { mime = 'audio/ogg'; type = 'audio'; }
+      else if (ext === '.mp3') { mime = 'audio/mpeg'; type = 'audio'; }
+      else if (ext === '.wav') { mime = 'audio/wav'; type = 'audio'; }
+      else continue; // extension non reconnue
+      // URL de la miniature si un side-car .thumb.jpg existe
+      const thumbPath = path.join(dir, `${path.parse(f).name}.thumb.jpg`);
+      const thumbnailUrl = fs.existsSync(thumbPath)
+        ? `retromad-media://media/recordings/${encodeURIComponent(path.basename(thumbPath))}`
+        : undefined;
+      out.push({
+        id: f,
+        name: f,
+        path: full,
+        url: `retromad-media://media/recordings/${encodeURIComponent(f)}`,
+        size: stat.size,
+        mime,
+        createdAt: new Date(stat.birthtime).toISOString(),
+        type,
+        thumbnailUrl,
+      });
+    }
+    out.sort((a, b) => (b.createdAt < a.createdAt ? -1 : b.createdAt > a.createdAt ? 1 : 0));
+    return out;
+  } catch (e) {
+    console.error('[RetroMad] list-recordings:', e);
+    return [];
+  }
+});
+
+/** Supprime un enregistrement par nom de fichier. */
+ipcMain.handle('delete-recording', async (_event, filename: string): Promise<boolean> => {
+  try {
+    if (!filename || typeof filename !== 'string' || filename.includes('/') || filename.includes('\\') || filename.includes('..')) {
+      return false;
+    }
+    const dir = recordingsDir();
+    const target = path.join(dir, path.basename(filename));
+    if (!target.startsWith(dir + path.sep)) return false;
+    if (!fs.existsSync(target)) return false;
+    fs.unlinkSync(target);
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] delete-recording:', e);
+    return false;
+  }
+});
+
+/** Ouvre le dossier des enregistrements dans l'explorateur du systeme. */
+ipcMain.handle('open-recordings-folder', async (): Promise<boolean> => {
+  try {
+    await shell.openPath(recordingsDir());
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] open-recordings-folder:', e);
+    return false;
+  }
+});
+
+/** Enregistre un thumbnail (data URL) à côté d’un enregistrement pour la vignette. */
+ipcMain.handle('save-thumbnail', async (_event, filename: string, dataUrl: string): Promise<boolean> => {
+  try {
+    if (!filename || typeof filename !== 'string' || !RECORDING_META_RE.test(filename)) {
+      return false;
+    }
+    const dir = recordingsDir();
+    const parsed = path.parse(path.basename(filename));
+    const thumbName = `${parsed.name}.thumb.jpg`;
+    const dest = path.join(dir, thumbName);
+
+    // Extraction du buffer base64 depuis « data:image/jpeg;base64,/9j/… »
+    const base64 = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64, 'base64');
+    if (buffer.length === 0) return false;
+
+    await fs.promises.writeFile(dest, buffer);
+    return true;
+  } catch (e) {
+    console.error('[RetroMad] save-thumbnail:', e);
+    return false;
+  }
+});
+
+/** Exporte un enregistrement vers un emplacement choisi par l'utilisateur (« Sauvegarder sous… »). */
+ipcMain.handle('save-recording-as', async (_event, filename: string): Promise<SaveRecordingAsResult> => {
+  try {
+    if (!filename || typeof filename !== 'string' || !RECORDING_META_RE.test(filename)) {
+      return { ok: false, error: 'Nom de fichier invalide.' };
+    }
+    if (!mainWindow) return { ok: false, error: 'Fenêtre principale indisponible.' };
+
+    const sourcePath = path.join(recordingsDir(), path.basename(filename));
+    if (!fs.existsSync(sourcePath)) {
+      return { ok: false, error: 'Fichier source introuvable.' };
+    }
+
+    const ext = path.extname(sourcePath).toLowerCase();
+    const defaultName = path.basename(sourcePath);
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Sauvegarder l\'enregistrement sous…',
+      defaultPath: defaultName,
+      filters: [
+        { name: 'Fichiers vidéo', extensions: ['webm', 'mp4'] },
+        { name: 'Tous les fichiers', extensions: ['*'] },
+      ],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { ok: false, error: 'Annulé par l’utilisateur.' };
+    }
+
+    const dest = result.filePath;
+    // Sécuriser : s’assurer que le destination reste un fichier, pas un dossier
+    const destResolved = path.resolve(dest);
+    await fs.promises.copyFile(sourcePath, destResolved);
+    const stat = await fs.promises.stat(destResolved);
+
+    return {
+      ok: true,
+      path: destResolved,
+      name: path.basename(destResolved),
+      size: stat.size,
+    };
+  } catch (e: any) {
+    console.error('[RetroMad] save-recording-as:', e);
+    return { ok: false, error: e.message };
+  }
 });
 

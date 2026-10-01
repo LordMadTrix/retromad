@@ -1,10 +1,10 @@
 import React from 'react';
 import {
   Gamepad2, Settings, Volume2, VolumeX, Lock, Unlock, ShieldCheck,
-  Tv, Search, Flame
+  Tv, Search, Flame, Bug, Video
 } from 'lucide-react';
 
-export type NavTab = 'games' | 'companies' | 'computing' | 'bios' | 'settings';
+export type NavTab = 'games' | 'companies' | 'computing' | 'bios' | 'bugs' | 'captures' | 'settings';
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -115,6 +115,34 @@ export const Navigation: React.FC<NavigationProps> = ({
             <span>Quitter Kiosk</span>
           </button>
         )}
+
+        <button
+          type="button"
+          onClick={() => onTabChange('bugs')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm shrink-0 cursor-pointer ${
+            currentTab === 'bugs'
+              ? 'bg-rose-500/20 border-rose-400 text-rose-200 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+              : 'bg-slate-800/80 border-slate-700/60 text-slate-300 hover:text-rose-300 hover:border-slate-500 hover:bg-slate-800'
+          }`}
+          title="Suivi des bugs GitHub"
+        >
+          <Bug className="w-3.5 h-3.5 text-rose-400" />
+          <span>Suivi des bugs</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onTabChange('captures')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm shrink-0 cursor-pointer ${
+            currentTab === 'captures'
+              ? 'bg-fuchsia-500/20 border-fuchsia-400 text-fuchsia-200 shadow-[0_0_12px_rgba(217,70,239,0.3)]'
+              : 'bg-slate-800/80 border-slate-700/60 text-slate-300 hover:text-fuchsia-300 hover:border-slate-500 hover:bg-slate-800'
+          }`}
+          title="Captures audio/vidéo"
+        >
+          <Video className="w-3.5 h-3.5 text-fuchsia-400" />
+          <span>Captures</span>
+        </button>
 
         <button
           type="button"

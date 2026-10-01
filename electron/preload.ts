@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company, ScrapeCandidate } from './types';
+import { AppSettings, Game, EmulatorProfile, ExtensionInfo, ExtensionProgress, System, Company, ScrapeCandidate, GitHubIssue, ScreenSource, Recording, SaveRecordingResult, SaveRecordingAsResult } from './types';
 
 
 export interface ScrapeProgressData {
@@ -132,6 +132,31 @@ export const API = {
   },
   importFromUsb: (usbPath: string): Promise<{ success: boolean; imported: number; total?: number; games?: Game[]; message?: string }> =>
     ipcRenderer.invoke('import-from-usb', usbPath),
+
+  // Suivi des issues GitHub (Bug Tracker)
+  fetchGithubIssues: (repo: string, state?: 'open' | 'closed' | 'all'): Promise<{ ok: boolean; issues?: GitHubIssue[]; error?: string; status?: number }> =>
+    ipcRenderer.invoke('fetch-github-issues', repo, state),
+
+  // ─── Enregistrement audio/vidéo (Vue Kiosque / gameplay) ───
+  // La capture (desktopCapturer -> getDisplayMedia) est orchestrée par le main
+  // process (setDisplayMediaRequestHandler) ; le renderer consomme le flux via
+  // navigator.mediaDevices.getDisplayMedia + MediaRecorder, puis persiste le Blob
+  // ici sans jamais exposer de créance OAuth.
+  getScreenSources: (): Promise<ScreenSource[]> => ipcRenderer.invoke('get-screen-sources'),
+  /** Définit la source d'écran/fenêtre à capturer (au lieu de l'écran par défaut). */
+  setScreenSource: (sourceId: string | null): Promise<boolean> => ipcRenderer.invoke('set-screen-source', sourceId),
+  /** Enregistre un thumbnail (data URL) à côté d'un enregistrement. */
+  saveThumbnail: (filename: string, dataUrl: string): Promise<boolean> => ipcRenderer.invoke('save-thumbnail', filename, dataUrl),
+  saveRecording: (
+    filename: string,
+    data: ArrayBuffer,
+    durationMs?: number
+  ): Promise<SaveRecordingResult> => ipcRenderer.invoke('save-recording', filename, data, durationMs),
+  /** Exporte un enregistrement vers un emplacement choisi par l'utilisateur. */
+  saveRecordingAs: (filename: string): Promise<SaveRecordingAsResult> => ipcRenderer.invoke('save-recording-as', filename),
+  listRecordings: (): Promise<Recording[]> => ipcRenderer.invoke('list-recordings'),
+  deleteRecording: (filename: string): Promise<boolean> => ipcRenderer.invoke('delete-recording', filename),
+  openRecordingsFolder: (): Promise<boolean> => ipcRenderer.invoke('open-recordings-folder'),
 };
 
 contextBridge.exposeInMainWorld('api', API);

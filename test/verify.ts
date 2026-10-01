@@ -304,8 +304,8 @@ async function runTests() {
     'Préchargeur : échecs isolés et annulation propre de la file'
   );
 
-  const navIdx = appContent.indexOf('PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager]');
-  assert(navIdx > -1, 'Onglets Firmes / Informatique / BIOS dans la file de préchargement');
+  const navIdx = appContent.indexOf('PRELOAD_NAV_TABS = [loadCompanyView, loadComputingView, loadBiosManager, loadBugTracker, loadCapturesView]');
+  assert(navIdx > -1, 'Onglets Firmes / Informatique / BIOS / Captures dans la file de préchargement');
 
   const primaryIdx = appContent.indexOf('PRELOAD_PRIMARY_OVERLAYS = [');
   const secondaryIdx = appContent.indexOf('PRELOAD_SECONDARY_MODULES = [');
@@ -536,7 +536,378 @@ async function runTests() {
     'Médiathèque : galerie branchée dans la fiche musée (onglet Archives vidéo)'
   );
 
-  console.log(`\n================================`);
+  // Test : Suivi des bugs GitHub (Bug Tracker IPC + composant)
+  console.log('\n--- Test Bug Tracker GitHub ---');
+  assert(
+    mainTs.includes("ipcMain.handle('fetch-github-issues'"),
+    "IPC fetch-github-issues : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes("api.github.com/repos") &&
+      mainTs.includes('Accept') &&
+      mainTs.includes('RetroMad-Desktop'),
+    'IPC fetch-github-issues : URL GitHub, headers Accept + User-Agent correctement configurés'
+  );
+  assert(
+    preloadTs.includes('fetchGithubIssues') &&
+      preloadTs.includes('fetch-github-issues'),
+    'Preload : fetchGithubIssues exposé au renderer'
+  );
+  const bugTracker = fs.readFileSync(
+    path.join(__dirname, '../src/components/BugTracker.tsx'),
+    'utf-8'
+  );
+  assert(
+    bugTracker.includes('fetchGithubIssues') &&
+      bugTracker.includes('handleOpenIssue') &&
+      bugTracker.includes('handleReportBug'),
+    'BugTracker : appel API + ouverture issue + signalement de bug présents'
+  );
+  assert(
+    bugTracker.includes('LordMadTrix/retromad') &&
+      bugTracker.includes('issues/new'),
+    'BugTracker : URL du repo GitHub + lien de création de issue pré-rempli'
+  );
+  const navTs = fs.readFileSync(
+    path.join(__dirname, '../src/components/Navigation.tsx'),
+    'utf-8'
+  );
+  assert(
+    navTs.includes("'bugs'") && navTs.includes('Bug') && navTs.includes('onTabChange(\'bugs\')'),
+    'Navigation : onglet bugs ajouté au type NavTab + bouton Suivi des bugs'
+  );
+  const appTs = fs.readFileSync(
+    path.join(__dirname, '../src/App.tsx'),
+    'utf-8'
+  );
+  assert(
+    appTs.includes('loadBugTracker') &&
+      appTs.includes('BugTracker = React.lazy') &&
+      appTs.includes("currentTab === 'bugs'"),
+    'App.tsx : BugTracker lazy-loaded + rendu sous Suspense pour l\'onglet bugs'
+  );
+
+  // Test : Enregistrement audio/vidéo + partage multi-réseaux (Captures AV)
+  console.log('\n--- Test Enregistrement AV & Partage Multi-Réseaux ---');
+
+  // —─ IPC handlers dans main.ts —─
+  assert(
+    mainTs.includes("ipcMain.handle('get-screen-sources'"),
+    "IPC get-screen-sources : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes("ipcMain.handle('save-recording'"),
+    "IPC save-recording : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes("ipcMain.handle('list-recordings'"),
+    "IPC list-recordings : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes("ipcMain.handle('delete-recording'"),
+    "IPC delete-recording : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes("ipcMain.handle('open-recordings-folder'"),
+    "IPC open-recordings-folder : handler présent dans main.ts"
+  );
+
+  // —─ setDisplayMediaRequestHandler : capture d'écran + audio loopback —─
+  assert(
+    mainTs.includes('setDisplayMediaRequestHandler') &&
+      mainTs.includes('desktopCapturer') &&
+      mainTs.includes("'loopback'"),
+    "IPC setDisplayMediaRequestHandler : capture d'écran + audio loopback sur Windows"
+  );
+
+  // —─ Garde-fou anti-traversée de chemin dans delete-recording —─
+  assert(
+    mainTs.includes("filename.includes('/')") &&
+      mainTs.includes("filename.includes('\\\\')") &&
+      mainTs.includes('filename.includes(\'..\')'),
+    'IPC delete-recording : garde-fou anti-traversée de chemin'
+  );
+
+  // —─ Dossier des enregistrements + URL retromad-media:// —─
+  assert(
+    mainTs.includes('recordingsDir') &&
+      mainTs.includes('retromad-media://media/recordings/'),
+    'IPC list-recordings : dossier media/recordings/ + URL retromad-media:// persistante'
+  );
+
+  // —─ Preload exposure des handlers AV —─
+  assert(
+    preloadTs.includes('getScreenSources') &&
+      preloadTs.includes('get-screen-sources'),
+    'Preload : getScreenSources + get-screen-sources exposés au renderer'
+  );
+  assert(
+    preloadTs.includes('saveRecording') &&
+      preloadTs.includes('save-recording'),
+    'Preload : saveRecording + save-recording exposés au renderer'
+  );
+  assert(
+    preloadTs.includes('listRecordings') &&
+      preloadTs.includes('list-recordings'),
+    'Preload : listRecordings + list-recordings exposés au renderer'
+  );
+  assert(
+    preloadTs.includes('deleteRecording') &&
+      preloadTs.includes('delete-recording'),
+    'Preload : deleteRecording + delete-recording exposés au renderer'
+  );
+  assert(
+    preloadTs.includes('openRecordingsFolder') &&
+      preloadTs.includes('open-recordings-folder'),
+    'Preload : openRecordingsFolder + open-recordings-folder exposés au renderer'
+  );
+
+  // —─ Types TypeScript —─
+  const typesTs = fs.readFileSync(
+    path.join(__dirname, '../electron/types.ts'),
+    'utf-8'
+  );
+  assert(
+    typesTs.includes('ShareNetwork') &&
+      typesTs.includes('RecordingType') &&
+      typesTs.includes('ScreenSource') &&
+      typesTs.includes('SaveRecordingResult'),
+    'Types : ShareNetwork, RecordingType, ScreenSource, SaveRecordingResult déclarés'
+  );
+  assert(
+    typesTs.includes("'video' | 'audio' | 'screen'") &&
+      typesTs.includes('url: string;') &&
+      typesTs.includes('createdAt: string;'),
+    "Types : Recording.type union + url/createdAt champs présents"
+  );
+
+  // —─ Hook useScreenRecorder —─
+  const recorderHook = fs.readFileSync(
+    path.join(__dirname, '../src/hooks/useScreenRecorder.ts'),
+    'utf-8'
+  );
+  assert(
+    recorderHook.includes("'idle' | 'preparing' | 'recording' | 'preview'") &&
+      recorderHook.includes('getDisplayMedia'),
+    "Hook useScreenRecorder : phases lifecycle + getDisplayMedia"
+  );
+  assert(
+    recorderHook.includes('MediaRecorder') &&
+      recorderHook.includes('vp9') &&
+      recorderHook.includes('ondataavailable'),
+    'Hook useScreenRecorder : MediaRecorder + codec vp9 + ondataavailable'
+  );
+  assert(
+    recorderHook.includes('saveRecording') &&
+      recorderHook.includes('startAtRef'),
+    'Hook useScreenRecorder : persistence via saveRecording + chrono startAtRef'
+  );
+
+  // —─ Share helpers —─
+  const shareHelpers = fs.readFileSync(
+    path.join(__dirname, '../src/utils/shareHelpers.ts'),
+    'utf-8'
+  );
+  assert(
+    shareHelpers.includes('shareNetworkUrl') &&
+      shareHelpers.includes('studio.youtube.com') &&
+      shareHelpers.includes('twitter.com/intent/tweet') &&
+      shareHelpers.includes('tiktok.com/creator-center') &&
+      shareHelpers.includes('discord.com/channels/@me'),
+    "Share helpers : URLs multi-réseaux (YouTube/Twitter/TikTok/Discord) dans shareNetworkUrl"
+  );
+  assert(
+    shareHelpers.includes('openShare') &&
+      shareHelpers.includes('SHARE_NETWORK_LABELS') &&
+      shareHelpers.includes('SHARE_NETWORK_COLORS'),
+    'Share helpers : openShare + libellés/couleurs par réseau'
+  );
+  assert(
+    shareHelpers.includes('formatFileSize') &&
+      shareHelpers.includes('formatDuration') &&
+      shareHelpers.includes('formatDate'),
+    'Share helpers : formatFileSize + formatDuration + formatDate'
+  );
+
+  // —─ CapturesView —─
+  const capturesView = fs.readFileSync(
+    path.join(__dirname, '../src/components/CapturesView.tsx'),
+    'utf-8'
+  );
+  assert(
+    capturesView.includes('useScreenRecorder') &&
+      capturesView.includes('window.api?.listRecordings') &&
+      capturesView.includes('window.api?.deleteRecording') &&
+      capturesView.includes('window.api?.openRecordingsFolder'),
+    'CapturesView : hook + API list/delete/openFolder présents'
+  );
+  assert(
+    capturesView.includes('openShare') &&
+      capturesView.includes('SHARE_NETWORK_COLORS') &&
+      capturesView.includes('SHARE_NETWORK_LABELS'),
+    'CapturesView : boutons de partage multi-réseaux'
+  );
+  assert(
+    capturesView.includes('<Video') &&
+      capturesView.includes('phase ===') &&
+      capturesView.includes('recorder.cancel'),
+    "CapturesView : bouton d'enregistrement + état + cancel"
+  );
+
+  // —─ Navigation —─
+  assert(
+    navTs.includes("'captures'") &&
+      navTs.includes("onTabChange('captures')") &&
+      navTs.includes('Video') &&
+      navTs.includes('fuchsia'),
+    "Navigation : onglet captures ajouté (NavTab + bouton Video + accent fuchsia)"
+  );
+
+  // —─ App.tsx lazy + render —─
+  assert(
+    appTs.includes('loadCapturesView') &&
+      appTs.includes('CapturesView = React.lazy') &&
+      appTs.includes("currentTab === 'captures'"),
+    "App.tsx : CapturesView lazy-loaded + rendu sous Suspense"
+  );
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Proposition 1 : Capture d'une fenêtre/source spécifique
+  //   getScreenSources + set-screen-source IPC → source préférée transmise
+  //   au setDisplayMediaRequestHandler via preferredCaptureSourceId.
+  // ─────────────────────────────────────────────────────────────────────
+
+  // —─ types.ts : ScreenSource avec type discriminé ——
+  assert(
+    typesTs.includes("'screen' | 'window'") &&
+      typesTs.includes('export interface ScreenSource') &&
+      typesTs.includes('displayId: string;'),
+    "Types : ScreenSource type 'screen' | 'window' + displayId déclaré"
+  );
+
+  // —─ main.ts : set-screen-source + preferredCaptureSourceId ——
+  assert(
+    mainTs.includes("ipcMain.handle('set-screen-source'"),
+    "IPC set-screen-source : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes('preferredCaptureSourceId') &&
+      mainTs.includes('setDisplayMediaRequestHandler'),
+    "IPC setDisplayMediaRequestHandler : preferredCaptureSourceId utilisé pour la source préférée"
+  );
+
+  // —─ preload.ts : setScreenSource exposé ——
+  assert(
+    preloadTs.includes('setScreenSource') &&
+      preloadTs.includes('set-screen-source'),
+    'Preload : setScreenSource + set-screen-source exposés au renderer'
+  );
+
+  // —─ Hook useScreenRecorder : selectSource + selectedSourceId ——
+  assert(
+    recorderHook.includes('selectSource') &&
+      recorderHook.includes('selectedSourceId'),
+    "Hook useScreenRecorder : selectSource + selectedSourceId pour la source préférée"
+  );
+
+  // —─ CapturesView : sélecteur de source (dropdown) ——
+  assert(
+    capturesView.includes('handleSelectSource') &&
+      capturesView.includes('selectedSourceId') &&
+      capturesView.includes("src.type === 'window'"),
+    "CapturesView : dropdown sélecteur de source (écran/fenêtre) branché sur selectSource"
+  );
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Proposition 2 : Export « Sauvegarder sous… » via dialog.showSaveDialog
+  //   save-recording-as IPC → dialogue natif → copie fichier source.
+  // ─────────────────────────────────────────────────────────────────────
+
+  // —─ types.ts : SaveRecordingAsResult ——
+  assert(
+    typesTs.includes('export interface SaveRecordingAsResult') &&
+      typesTs.includes('SaveRecordingAsResult'),
+    "Types : SaveRecordingAsResult interface déclaré"
+  );
+
+  // —─ main.ts : save-recording-as + dialog.showSaveDialog + copyFile ——
+  assert(
+    mainTs.includes("ipcMain.handle('save-recording-as'") &&
+      mainTs.includes('dialog.showSaveDialog') &&
+      mainTs.includes('fs.promises.copyFile'),
+    "IPC save-recording-as : handler présent, dialog.showSaveDialog + fs.promises.copyFile"
+  );
+
+  // —─ preload.ts : saveRecordingAs exposé ——
+  assert(
+    preloadTs.includes('saveRecordingAs') &&
+      preloadTs.includes('save-recording-as') &&
+      preloadTs.includes('SaveRecordingAsResult'),
+    'Preload : saveRecordingAs + save-recording-as exposés (SaveRecordingAsResult)'
+  );
+
+  // —─ CapturesView : bouton Save As (Download icône) ——
+  assert(
+    capturesView.includes('handleSaveAs') &&
+      capturesView.includes('saveRecordingAs') &&
+      capturesView.includes('saveAsStatus'),
+    "CapturesView : bouton « Sauvegarder sous… » (Download) + état saveAsStatus"
+  );
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Proposition 3 : Miniatures vidéo dans la liste (canvas → .thumb.jpg)
+  //   generateThumbnail (canvas.toDataURL) → save-thumbnail IPC → .thumb.jpg
+  //   list-recordings retourne thumbnailUrl si side-car présent.
+  // ─────────────────────────────────────────────────────────────────────
+
+  // —─ types.ts : thumbnailUrl sur Recording ——
+  assert(
+    typesTs.includes('thumbnailUrl?: string') &&
+      typesTs.includes('Recording'),
+    "Types : thumbnailUrl?: string sur l'interface Recording"
+  );
+
+  // —─ main.ts : save-thumbnail + .thumb.jpg ignoré dans list-recordings ——
+  assert(
+    mainTs.includes("ipcMain.handle('save-thumbnail'") &&
+      mainTs.includes('save-thumbnail'),
+    "IPC save-thumbnail : handler présent dans main.ts"
+  );
+  assert(
+    mainTs.includes('.thumb.jpg') &&
+      mainTs.includes('thumbnailUrl'),
+    "IPC list-recordings : .thumb.jpg ignoré + thumbnailUrl retourné"
+  );
+
+  // —─ preload.ts : saveThumbnail exposé ——
+  assert(
+    preloadTs.includes('saveThumbnail') &&
+      preloadTs.includes('save-thumbnail'),
+    'Preload : saveThumbnail + save-thumbnail exposés au renderer'
+  );
+
+  // —─ Hook useScreenRecorder : generateThumbnail (canvas + JPEG) ——
+  assert(
+    recorderHook.includes('generateThumbnail') &&
+      recorderHook.includes("createElement('canvas')") &&
+      recorderHook.includes("toDataURL('image/jpeg") &&
+      recorderHook.includes('saveThumbnail'),
+    "Hook useScreenRecorder : generateThumbnail (canvas → toDataURL JPEG) + saveThumbnail"
+  );
+  assert(
+    recorderHook.includes('durationMs'),
+    "Hook useScreenRecorder : durationMs transmis à saveRecording"
+  );
+
+  // —─ CapturesView : rendu de la miniature <img> ——
+  assert(
+    capturesView.includes('rec.thumbnailUrl') &&
+      capturesView.includes('object-cover'),
+    "CapturesView : miniature <img src={rec.thumbnailUrl}> avec fallback icône"
+  );
+
+  console.log(`
+================================`);
   console.log(`Total: ${passed} passés, ${failed} échoués`);
   console.log(`================================\n`);
 

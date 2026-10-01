@@ -264,3 +264,71 @@ export interface ScrapeCandidate {
   };
 }
 
+export interface GitHubIssue {
+  id: number;
+  number: number;
+  title: string;
+  state: 'open' | 'closed';
+  htmlUrl: string;
+  body?: string | null;
+  user: {
+    login: string;
+    avatarUrl?: string;
+  };
+  labels: { name: string; color: string }[];
+  createdAt: string;       // ISO 8601
+  updatedAt: string;       // ISO 8601
+  isPullRequest?: boolean;
+}
+
+// ─── Capteurs / Enregistrements audio-vidéo ──────────────────────────────
+
+export type ShareNetwork = 'youtube' | 'twitter' | 'tiktok' | 'discord';
+
+export type RecordingType = 'video' | 'audio' | 'screen';
+
+/**
+ * Métadonnées d'un enregistrement (AV) persistant dans media/recordings/.
+ * Le rendu du fichier se fait via le protocole retromad-media://.
+ */
+export interface Recording {
+  id: string;            // nom de fichier (unique)
+  name: string;          // nom de fichier tel quel sur le disque
+  path: string;          // chemin absolu sur le disque
+  url: string;            // retromad-media://media/recordings/<name>
+  size: number;          // taille en octets
+  mime: string;          // type MIME du fichier (video/webm, …)
+  durationMs?: number;    // durée estimée en millisecondes
+  createdAt: string;      // ISO 8601 – date/heure d’enregistrement
+  type: RecordingType;    // nature du flux capturé
+  /** URL de la miniature générée localement (retromad-media://...) si disponible. */
+  thumbnailUrl?: string;
+}
+
+/** Source d’écran exposée au renderer (issue de desktopCapturer). */
+export interface ScreenSource {
+  id: string;          // chromeMediaSourceId correspondant
+  name: string;        // libellé usuel (« Écran 1 », …)
+  displayId: string;   // identifiant d’affichage (Screen API)
+  /** Nature de la source : « screen » (écran complet) ou « window » (fenêtre). */
+  type: 'screen' | 'window';
+}
+
+/** Réponse de l’enregistrement d’un blob sur le disque (processus principal). */
+export interface SaveRecordingResult {
+  ok: boolean;
+  path?: string;
+  name?: string;
+  size?: number;
+  error?: string;
+}
+
+/** Réponse de l’exportation vers un emplacement choisi par l’utilisateur. */
+export interface SaveRecordingAsResult {
+  ok: boolean;
+  path?: string;
+  name?: string;
+  size?: number;
+  error?: string;
+}
+
