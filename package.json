@@ -18,12 +18,7 @@
     "emulator",
     "roms",
     "screenscraper",
-    "libretro",
-    "jdr",
-    "mj",
-    "ttrpg",
-    "game-master",
-    "jeu-de-role"
+    "libretro"
   ],
   "author": "RetroMad Team",
   "license": "MIT",
